@@ -1,4 +1,3 @@
---   MN95 + ChatGPT Anti Lag V2 + FPS
 local Players = game:GetService("Players")
 local player = Players.LocalPlayer
 local StarterGui = game:GetService("StarterGui")
@@ -21,7 +20,6 @@ local Workspace    = game:GetService("Workspace")
 
 local player = Players.LocalPlayer
 
--- ======= 1. Hiển thị FPS nhỏ góc phải trên ======= --
 local fpsGui = Instance.new("ScreenGui")
 fpsGui.Name = "TSB_FPS_GUI"
 fpsGui.ResetOnSpawn = false
@@ -47,7 +45,6 @@ do
         if tick() - lastTime >= 1 then
             fpsLabel.Text = "FPS: " .. frameCt
 
-            -- Đổi màu chữ theo FPS
             if frameCt >= 50 then
                 fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- xanh lá
             elseif frameCt >= 30 then
@@ -62,7 +59,6 @@ do
     end)
 end
 
--- ======= 2. Fix lag + FullBright ======= --
 pcall(function()
 	settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
 end)
@@ -76,7 +72,6 @@ Lighting.OutdoorAmbient = Color3.fromRGB(170, 170, 170)
 Lighting.Technology     = Enum.Technology.Compatibility
 Lighting.ShadowSoftness = 0
 
--- Xoá hiệu ứng ánh sáng dư thừa
 for _, effect in pairs(Lighting:GetChildren()) do
 	if effect:IsA("BloomEffect") or effect:IsA("ColorCorrectionEffect")
 	or effect:IsA("SunRaysEffect") or effect:IsA("BlurEffect")
@@ -85,7 +80,6 @@ for _, effect in pairs(Lighting:GetChildren()) do
 	end
 end
 
--- Giảm chi tiết vật thể
 for _, part in pairs(Workspace:GetDescendants()) do
 	if part:IsA("BasePart") then
 		part.Material    = Enum.Material.SmoothPlastic
@@ -100,8 +94,6 @@ for _, part in pairs(Workspace:GetDescendants()) do
 		part:Destroy()
 	end
 end
-
--- Xoá hiệu ứng nặng
 for _, obj in pairs(Workspace:GetDescendants()) do
 	if obj:IsA("ParticleEmitter") or obj:IsA("Trail")
 	or obj:IsA("Smoke") or obj:IsA("Fire")
