@@ -72,7 +72,7 @@ Lighting.FogStart       = 0
 Lighting.FogEnd         = 1e6
 Lighting.Brightness     = 1.5
 Lighting.ClockTime      = 14
-Lighting.OutdoorAmbient = Color3.fromRGB(200, 200, 200)
+Lighting.OutdoorAmbient = Color3.fromRGB(170, 170, 170)
 Lighting.Technology     = Enum.Technology.Compatibility
 Lighting.ShadowSoftness = 0
 
