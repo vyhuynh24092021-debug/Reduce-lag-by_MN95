@@ -46,11 +46,11 @@ do
             fpsLabel.Text = "FPS: " .. frameCt
 
             if frameCt >= 50 then
-                fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 0) -- xanh lá
+                fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
             elseif frameCt >= 30 then
-                fpsLabel.TextColor3 = Color3.fromRGB(255, 255, 0) -- vàng
+                fpsLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
             else
-                fpsLabel.TextColor3 = Color3.fromRGB(255, 0, 0) -- đỏ
+                fpsLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
             end
 
             frameCt  = 0
@@ -79,23 +79,28 @@ for _, effect in pairs(Lighting:GetChildren()) do
 		effect:Destroy()
 	end
 end
-
-for _, part in pairs(Workspace:GetDescendants()) do
-	if part:IsA("BasePart") then
-		part.Material    = Enum.Material.SmoothPlastic
-		part.Reflectance = 0
-		part.CastShadow  = false 
-    	if part:IsA("MeshPart") then
-			part.TextureID = ""
-		end
-	end
-
-	if part:IsA("Decal") or part:IsA("Texture") then
-		part:Destroy()
-	end
-end
 for _, obj in pairs(Workspace:GetDescendants()) do
-	if obj:IsA("ParticleEmitter") or obj:IsA("Trail")
+    local skip = false
+    local ancestor = obj
+    while ancestor do
+        if ancestor:IsA("Model") and Players:GetPlayerFromCharacter(ancestor) then
+            skip = true
+            break
+        end
+        ancestor = ancestor.Parent
+    end
+    if skip then continue end
+
+	if obj:IsA("BasePart") then
+		obj.Material    = Enum.Material.SmoothPlastic
+		obj.Reflectance = 0
+		obj.CastShadow  = false 
+    	if obj:IsA("MeshPart") then
+			obj.TextureID = ""
+		end
+	elseif obj:IsA("Decal") or obj:IsA("Texture") then
+		obj:Destroy()
+	elseif obj:IsA("ParticleEmitter") or obj:IsA("Trail")
 	or obj:IsA("Smoke") or obj:IsA("Fire")
 	or obj:IsA("Beam") or obj:IsA("Sparkles")
 	or obj:IsA("SelectionBox") or obj:IsA("Highlight")
@@ -104,4 +109,4 @@ for _, obj in pairs(Workspace:GetDescendants()) do
 	end
 end
 
-print("REDUCE LAG BY MN95: FPS hiển thị, xóa bóng, fullbright, dọn hiệu ứng dư thừa.")
+print("REDUCE LAG BY MN95: FPS hiển thị, xóa bóng, fullbright, dọn hiệu ứng dư thừa (giữ nguyên Player).")
