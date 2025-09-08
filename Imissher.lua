@@ -6,7 +6,7 @@ local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
 
 StarterGui:SetCore("SendNotification", {
-    Title = "Anti Lag V2 BẢO BÉO GAY HUB",
+    Title = "ĐẠI VÀ BẢO GAY",
     Text = "Reduce lag by MN95 đã được bật (VỹMN95)",
     Duration = 10
 })
