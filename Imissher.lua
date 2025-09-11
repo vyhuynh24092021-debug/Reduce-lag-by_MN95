@@ -22,29 +22,40 @@ local playerGui = player:WaitForChild("PlayerGui")
 if playerGui:FindFirstChild("MN95_FPS_GUI") then
     playerGui.MN95_FPS_GUI:Destroy()
 end
-local player = game.Players.LocalPlayer
-local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+
+local gui = Instance.new("ScreenGui", playerGui)
 gui.Name = "MN95_GUI"
 
 local textLabel = Instance.new("TextLabel", gui)
-textLabel.Size = UDim2.new(0, 400, 0, 30)
-textLabel.Position = UDim2.new(0, 10, 0, 50)
+textLabel.Size = UDim2.new(0, 220, 0, 20)
+textLabel.Position = UDim2.new(0, 5, 0, 5)
 textLabel.BackgroundTransparency = 1
-textLabel.TextScaled = true
+textLabel.TextScaled = false
 textLabel.Font = Enum.Font.SourceSansBold
+textLabel.TextSize = 14
 textLabel.Text = "MN95 ANTI LAG | FPS: 0 | PING: 0"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
-textLabel.TextXAlignment = Enum.TextXAlignment.Left -- canh chữ về bên trái
+textLabel.TextXAlignment = Enum.TextXAlignment.Left
+
 local function rainbowColor(hue)
 	return Color3.fromHSV(hue, 1, 1)
 end
+
 spawn(function()
 	local hue = 0
-	while true do
-		hue = (hue + 0.01) % 1
+	local last = tick()
+	while task.wait(0.3) do
+		hue = (hue + 0.02) % 1
 		textLabel.TextColor3 = rainbowColor(hue)
-		local fps = math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
-		local ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
+
+		local now = tick()
+		local fps = math.floor(1 / math.max(now - last, 0.001))
+		last = now
+
+		local success, ping = pcall(function()
+			return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
+		end)
+		if not success then ping = 0 end
 
 		textLabel.Text = "MN95 ANTI LAG | FPS: " .. fps .. " | PING: " .. math.floor(ping) .. "ms"
 	end
