@@ -19,14 +19,15 @@ pcall(function()
 end)
 
 local playerGui = player:WaitForChild("PlayerGui")
-if playerGui:FindFirstChild("MN95_FPS_GUI") then
-    playerGui.MN95_FPS_GUI:Destroy()
+if playerGui:FindFirstChild("MN95_GUI") then
+    playerGui.MN95_GUI:Destroy()
 end
 
-local gui = Instance.new("ScreenGui", playerGui)
+local gui = Instance.new("ScreenGui")
 gui.Name = "MN95_GUI"
+gui.Parent = playerGui
 
-local textLabel = Instance.new("TextLabel", gui)
+local textLabel = Instance.new("TextLabel")
 textLabel.Size = UDim2.new(0, 220, 0, 20)
 textLabel.Position = UDim2.new(0, 5, 0, 5)
 textLabel.BackgroundTransparency = 1
@@ -36,6 +37,7 @@ textLabel.TextSize = 14
 textLabel.Text = "MN95 ANTI LAG | FPS: 0 | PING: 0"
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.TextXAlignment = Enum.TextXAlignment.Left
+textLabel.Parent = gui
 
 local function rainbowColor(hue)
 	return Color3.fromHSV(hue, 1, 1)
@@ -43,32 +45,33 @@ end
 
 spawn(function()
 	local fps = 0
-local frames = 0
-local lastTime = tick()
+	local frames = 0
+	local lastTime = tick()
 
-RunService.RenderStepped:Connect(function()
-	frames += 1
-	local now = tick()
-	if now - lastTime >= 1 then
-		fps = frames
-		frames = 0
-		lastTime = now
-	end
-end)
+	RunService.RenderStepped:Connect(function()
+		frames += 1
+		local now = tick()
+		if now - lastTime >= 1 then
+			fps = frames
+			frames = 0
+			lastTime = now
+		end
+	end)
 
-spawn(function()
-	local hue = 0
-	while task.wait(0.3) do
-		hue = (hue + 0.02) % 1
-		textLabel.TextColor3 = rainbowColor(hue)
+	spawn(function()
+		local hue = 0
+		while task.wait(0.3) do
+			hue = (hue + 0.02) % 1
+			textLabel.TextColor3 = rainbowColor(hue)
 
-		local success, ping = pcall(function()
-			return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
-		end)
-		if not success then ping = 0 end
+			local success, ping = pcall(function()
+				return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
+			end)
+			if not success then ping = 0 end
 
-		textLabel.Text = "MN95 ANTI LAG | FPS: " .. fps .. " | PING: " .. math.floor(ping) .. "ms"
-	end
+			textLabel.Text = "MN95 ANTI LAG | FPS: " .. fps .. " | PING: " .. math.floor(ping) .. "ms"
+		end
+	end)
 end)
 
 pcall(function()
