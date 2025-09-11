@@ -22,43 +22,33 @@ local playerGui = player:WaitForChild("PlayerGui")
 if playerGui:FindFirstChild("MN95_FPS_GUI") then
     playerGui.MN95_FPS_GUI:Destroy()
 end
+local player = game.Players.LocalPlayer
+local gui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui"))
+gui.Name = "MN95_GUI"
 
-local fpsGui = Instance.new("ScreenGui")
-fpsGui.Name = "MN95_FPS_GUI"
-fpsGui.ResetOnSpawn = false
-fpsGui.IgnoreGuiInset = true
-fpsGui.Parent = playerGui
-
-local fpsLabel = Instance.new("TextLabel")
-fpsLabel.Size = UDim2.new(0, 80, 0, 20)
-fpsLabel.Position = UDim2.new(1, -90, 0, 10)
-fpsLabel.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-fpsLabel.BackgroundTransparency = 0.4
-fpsLabel.TextColor3 = Color3.fromRGB(0, 0, 255)
-fpsLabel.TextScaled = true
-fpsLabel.Font = Enum.Font.Code
-fpsLabel.Text = "FPS: --"
-fpsLabel.Parent = fpsGui
-
-do
-    local lastTime = tick()
-    local frameCt = 0
-    RunService.RenderStepped:Connect(function()
-        frameCt += 1
-        if tick() - lastTime >= 1 then
-            fpsLabel.Text = "FPS: " .. frameCt
-            if frameCt >= 50 then
-                fpsLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
-            elseif frameCt >= 30 then
-                fpsLabel.TextColor3 = Color3.fromRGB(255, 255, 0)
-            else
-                fpsLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
-            end
-            frameCt = 0
-            lastTime = tick()
-        end
-    end)
+local textLabel = Instance.new("TextLabel", gui)
+textLabel.Size = UDim2.new(0, 400, 0, 30)
+textLabel.Position = UDim2.new(0, 10, 0, 50)
+textLabel.BackgroundTransparency = 1
+textLabel.TextScaled = true
+textLabel.Font = Enum.Font.SourceSansBold
+textLabel.Text = "MN95 ANTI LAG | FPS: 0 | PING: 0"
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.TextXAlignment = Enum.TextXAlignment.Left -- canh chữ về bên trái
+local function rainbowColor(hue)
+	return Color3.fromHSV(hue, 1, 1)
 end
+spawn(function()
+	local hue = 0
+	while true do
+		hue = (hue + 0.01) % 1
+		textLabel.TextColor3 = rainbowColor(hue)
+		local fps = math.floor(1 / game:GetService("RunService").RenderStepped:Wait())
+		local ping = game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
+
+		textLabel.Text = "MN95 ANTI LAG | FPS: " .. fps .. " | PING: " .. math.floor(ping) .. "ms"
+	end
+end)
 
 pcall(function()
 	settings().Rendering.QualityLevel = Enum.QualityLevel.Level01
