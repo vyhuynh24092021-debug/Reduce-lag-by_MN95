@@ -42,15 +42,25 @@ local function rainbowColor(hue)
 end
 
 spawn(function()
+	local fps = 0
+local frames = 0
+local lastTime = tick()
+
+RunService.RenderStepped:Connect(function()
+	frames += 1
+	local now = tick()
+	if now - lastTime >= 1 then
+		fps = frames
+		frames = 0
+		lastTime = now
+	end
+end)
+
+spawn(function()
 	local hue = 0
-	local last = tick()
 	while task.wait(0.3) do
 		hue = (hue + 0.02) % 1
 		textLabel.TextColor3 = rainbowColor(hue)
-
-		local now = tick()
-		local fps = math.floor(1 / math.max(now - last, 0.001))
-		last = now
 
 		local success, ping = pcall(function()
 			return game:GetService("Stats").Network.ServerStatsItem["Data Ping"]:GetValue()
