@@ -4,6 +4,7 @@ local StarterGui = game:GetService("StarterGui")
 local RunService = game:GetService("RunService")
 local Lighting = game:GetService("Lighting")
 local Workspace = game:GetService("Workspace")
+local CoreGui = game:GetService("CoreGui")
 
 StarterGui:SetCore("SendNotification", {
     Title = "ANTI LAG BUT LAG",
@@ -12,20 +13,18 @@ StarterGui:SetCore("SendNotification", {
 })
 Remove_Grass = true
 Remove_Trees = true
-Remove_Walls = true
 
 pcall(function()
     loadstring(game:HttpGet("https://raw.githubusercontent.com/louismich4el/ItsLouisPlayz-Scripts/refs/heads/main/Anti%20Lag%20V2.lua"))()
 end)
 
-local playerGui = player:WaitForChild("PlayerGui")
-if playerGui:FindFirstChild("MN95_GUI") then
-    playerGui.MN95_GUI:Destroy()
+if CoreGui:FindFirstChild("MN95_GUI") then
+    CoreGui.MN95_GUI:Destroy()
 end
 
 local gui = Instance.new("ScreenGui")
 gui.Name = "MN95_GUI"
-gui.Parent = playerGui
+gui.Parent = CoreGui
 
 local textLabel = Instance.new("TextLabel")
 textLabel.Size = UDim2.new(0, 220, 0, 20)
