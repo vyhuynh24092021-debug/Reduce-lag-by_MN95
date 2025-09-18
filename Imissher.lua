@@ -7,16 +7,10 @@ local Workspace = game:GetService("Workspace")
 local CoreGui = game:GetService("CoreGui")
 
 StarterGui:SetCore("SendNotification", {
-    Title = "ANTI LAG BUT LAG",
-    Text = "Reduce lag by MN95 đã được bật (VỹMN95)",
+    Title = "ANTI LAG",
+    Text = "Reduce lag by MN95 đã bật",
     Duration = 10
 })
-Remove_Grass = true
-Remove_Trees = true
-
-pcall(function()
-    loadstring(game:HttpGet("https://raw.githubusercontent.com/louismich4el/ItsLouisPlayz-Scripts/refs/heads/main/Anti%20Lag%20V2.lua"))()
-end)
 
 if CoreGui:FindFirstChild("MN95_GUI") then
     CoreGui.MN95_GUI:Destroy()
@@ -105,17 +99,19 @@ for _, obj in ipairs(Workspace:GetDescendants()) do
         ancestor = ancestor.Parent
     end
     if not skip then
-        if obj:IsA("BasePart") then
+        if obj:IsA("Decal") or obj:IsA("Texture") then
+            pcall(function() obj:Destroy() end)
+        elseif obj:IsA("MeshPart") then
+            pcall(function()
+                obj.TextureID = ""
+                obj.Material = Enum.Material.SmoothPlastic
+            end)
+        elseif obj:IsA("BasePart") then
             pcall(function()
                 obj.Material = Enum.Material.SmoothPlastic
                 obj.Reflectance = 0
                 obj.CastShadow = false
-                if obj:IsA("MeshPart") then
-                    obj.TextureID = ""
-                end
             end)
-        elseif obj:IsA("Decal") or obj:IsA("Texture") then
-            pcall(function() obj:Destroy() end)
         end
     end
 end
@@ -129,13 +125,7 @@ local EFFECT_CLASSES = {
     Sparkles = true,
     Highlight = true,
     SelectionBox = true,
-    SurfaceGui = true,
-    BillboardGui = true,
-    PointLight = true,
-    SpotLight = true,
-    SurfaceLight = true,
     Explosion = true,
-    ProximityPrompt = true,
 }
 
 local function tryRemove(obj)
