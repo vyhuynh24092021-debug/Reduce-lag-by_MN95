@@ -1,5 +1,5 @@
 -- =========================
--- ⚙️ SETTINGS (GIỮ NGUYÊN)
+-- ⚙️ SETTINGS
 -- =========================
 Remove_Grass = true
 Remove_Trees = true
