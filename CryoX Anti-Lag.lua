@@ -7,23 +7,35 @@ Remove_Walls = true
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/louismich4el/ItsLouisPlayz-Scripts/refs/heads/main/Anti%20Lag%20V2.lua"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/marianscriptKing/SUPER-MAX.lau/main/SUPER%20MAX%20PERFORMANCE"))()
-task.wait(3) -- đợi UI load
+-- 🔥 CryoX Rename UI (NO LAG - 1 block duy nhất)
 
-task.spawn(function()
-    while true do
-        task.wait(0.5)
-        for _, v in pairs(game:GetDescendants()) do
-            if v:IsA("TextLabel") then
-                if v.Text:find("Cleaner") then
-                    v.Text = "CryoX Cleaner"
-                end
-                if v.Text:find("Marian") then
-                    v.Text = "by MN95"
-                end
+task.delay(1, function()
+
+    local function rename(v)
+        if v:IsA("TextLabel") then
+            
+            if v.Text:find("Cleaner") then
+                v.Text = "CryoX Cleaner"
+            end
+            
+            if v.Text:find("Marian") then
+                v.Text = "by MN95"
+            end
+
+            if v.Text:find("MAX PERFORMANCE") then
+                v.Text = "CRYOX BOOST"
             end
         end
     end
+    for _, v in pairs(game.Players.LocalPlayer.PlayerGui:GetDescendants()) do
+        rename(v)
+    end
+    game.Players.LocalPlayer.PlayerGui.DescendantAdded:Connect(function(v)
+        rename(v)
+    end)
+
 end)
+
 -- =========================
 -- 🧹 XÓA TEXTURE (TRỪ PLAYER)
 -- =========================
