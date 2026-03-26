@@ -11,9 +11,19 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/marianscriptKing/SUPE
 -- =========================
 -- 🧹 XÓA TEXTURE (TRỪ PLAYER)
 -- =========================
+-- 🔥 FLAT COLOR MODE (all white/gray except player)
+
 local Players = game:GetService("Players")
 local Workspace = game:GetService("Workspace")
 
+-- 🎨 màu cho từng loại
+local COLORS = {
+    Default = Color3.fromRGB(200,200,200), -- xám
+    Ground = Color3.fromRGB(255,255,255),  -- trắng
+    Dark = Color3.fromRGB(150,150,150)     -- xám đậm
+}
+
+-- check có phải player không
 local function isPlayerCharacter(obj)
     for _, plr in pairs(Players:GetPlayers()) do
         if plr.Character and obj:IsDescendantOf(plr.Character) then
@@ -23,32 +33,56 @@ local function isPlayerCharacter(obj)
     return false
 end
 
-local function removeTextures()
-    for _, v in pairs(Workspace:GetDescendants()) do
-        if not isPlayerCharacter(v) then
-            if v:IsA("Decal") or v:IsA("Texture") then
-                v:Destroy()
-            end
-            if v:IsA("MeshPart") then
-                v.TextureID = ""
-            end
+-- xử lý object
+local function flatColor(obj)
+    if isPlayerCharacter(obj) then return end
+
+    -- XÓA texture thật
+    if obj:IsA("Decal") or obj:IsA("Texture") then
+        obj:Destroy()
+    end
+
+    if obj:IsA("SurfaceAppearance") then
+        obj:Destroy()
+    end
+
+    if obj:IsA("MeshPart") then
+        obj.TextureID = ""
+    end
+
+    if obj:IsA("SpecialMesh") then
+        obj.TextureId = ""
+    end
+
+    -- ĐỔI màu + material
+    if obj:IsA("BasePart") then
+        obj.Material = Enum.Material.Plastic
+        obj.Reflectance = 0
+
+        -- phân loại đơn giản
+        if obj.Name:lower():find("ground") or obj.Position.Y < 5 then
+            obj.Color = COLORS.Ground
+        elseif obj.Size.Magnitude > 50 then
+            obj.Color = COLORS.Dark
+        else
+            obj.Color = COLORS.Default
         end
     end
 end
 
-pcall(removeTextures)
-
--- Xóa texture mới spawn
-Workspace.DescendantAdded:Connect(function(v)
-    if not isPlayerCharacter(v) then
-        if v:IsA("Decal") or v:IsA("Texture") then
-            v:Destroy()
-        end
-        if v:IsA("MeshPart") then
-            v.TextureID = ""
-        end
+-- 🔥 delay để đợi map load
+task.delay(3, function()
+    for _, v in pairs(Workspace:GetDescendants()) do
+        flatColor(v)
     end
 end)
+
+-- 🔥 xử lý object spawn mới
+Workspace.DescendantAdded:Connect(function(v)
+    flatColor(v)
+end)
+
+print("Flat Color Mode On")
 
 -- =========================
 -- 📊 FPS + PING (GÓC TRÁI DƯỚI LOGO)
