@@ -9,7 +9,7 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/louismich4el/ItsLouis
 loadstring(game:HttpGet("https://raw.githubusercontent.com/marianscriptKing/SUPER-MAX.lau/main/SUPER%20MAX%20PERFORMANCE"))()
 -- 🔥 CryoX Rename UI (NO LAG - 1 block duy nhất)
 
-task.delay(1, function()
+task.delay(0.2, function()
 
     local function rename(v)
         if v:IsA("TextLabel") then
