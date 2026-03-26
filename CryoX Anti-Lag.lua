@@ -37,80 +37,44 @@ task.delay(1, function()
 end)
 
 -- =========================
--- 🧹 XÓA TEXTURE (TRỪ PLAYER)
--- =========================
--- 🔥 FLAT COLOR MODE (all white/gray except player)
-
+-- Script xóa Texture môi trường, GIỮ LẠI phụ kiện/tóc/quần áo nhân vật
 local Players = game:GetService("Players")
-local Workspace = game:GetService("Workspace")
+local lplr = Players.LocalPlayer
 
--- 🎨 màu cho từng loại
-local COLORS = {
-    Default = Color3.fromRGB(200,200,200), -- xám
-    Ground = Color3.fromRGB(255,255,255),  -- trắng
-    Dark = Color3.fromRGB(150,150,150)     -- xám đậm
-}
-
--- check có phải player không
-local function isPlayerCharacter(obj)
-    for _, plr in pairs(Players:GetPlayers()) do
-        if plr.Character and obj:IsDescendantOf(plr.Character) then
-            return true
-        end
+local function cleanTextures(obj)
+    -- Kiểm tra nếu vật thể nằm trong nhân vật của người chơi thì bỏ qua
+    if lplr.Character and obj:IsDescendantOf(lplr.Character) then 
+        return 
     end
-    return false
-end
 
--- xử lý object
-local function flatColor(obj)
-    if isPlayerCharacter(obj) then return end
-
-    -- XÓA texture thật
-    if obj:IsA("Decal") or obj:IsA("Texture") then
+    -- Xóa Texture và Decal trên môi trường
+    if obj:IsA("Texture") or obj:IsA("Decal") then
         obj:Destroy()
-    end
-
-    if obj:IsA("SurfaceAppearance") then
-        obj:Destroy()
-    end
-
-    if obj:IsA("MeshPart") then
-        obj.TextureID = ""
-    end
-
-    if obj:IsA("SpecialMesh") then
-        obj.TextureId = ""
-    end
-
-    -- ĐỔI màu + material
-    if obj:IsA("BasePart") then
-        obj.Material = Enum.Material.Plastic
+    -- Đưa các khối về dạng nhựa trơn để giảm lag GPU
+    elseif obj:IsA("BasePart") or obj:IsA("UnionOperation") or obj:IsA("MeshPart") then
+        obj.Material = Enum.Material.SmoothPlastic
         obj.Reflectance = 0
-
-        -- phân loại đơn giản
-        if obj.Name:lower():find("ground") or obj.Position.Y < 5 then
-            obj.Color = COLORS.Ground
-        elseif obj.Size.Magnitude > 50 then
-            obj.Color = COLORS.Dark
-        else
-            obj.Color = COLORS.Default
+        -- Nếu là MeshPart môi trường thì xóa TextureID
+        if obj:IsA("MeshPart") then
+            obj.TextureID = ""
         end
     end
 end
 
--- 🔥 delay để đợi map load
-task.delay(3, function()
-    for _, v in pairs(Workspace:GetDescendants()) do
-        flatColor(v)
-    end
-end)
+-- Quét toàn bộ map hiện tại
+for _, v in pairs(game.Workspace:GetDescendants()) do
+    cleanTextures(v)
+end
 
--- 🔥 xử lý object spawn mới
-Workspace.DescendantAdded:Connect(function(v)
-    flatColor(v)
-end)
+-- Tự động quét các vật thể mới xuất hiện (trừ nhân vật)
+game.Workspace.DescendantAdded:Connect(cleanTextures)
 
-print("Flat Color Mode On")
+-- Tối ưu thêm ánh sáng
+game:GetService("Lighting").GlobalShadows = false
+print("Đã xóa texture môi trường - Giữ lại nhân vật!")
+
+        
+        
 
 -- =========================
 -- 📊 FPS + PING (GÓC TRÁI DƯỚI LOGO)
