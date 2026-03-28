@@ -199,28 +199,7 @@ SkyBtn.MouseButton1Click:Connect(function()
     ContentFrame.Visible = true
     clearContent()
     
-    createScriptBtn("Trăng Máu (Blood Moon)", [[
-        for _,v in pairs(game.Lighting:GetChildren()) do 
-            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
-                v:Destroy() 
-            end 
-        end
-        local s = Instance.new("Sky", game.Lighting)
-        s.SkyboxBk, s.SkyboxDn, s.SkyboxFt, s.SkyboxLf, s.SkyboxRt, s.SkyboxUp = "rbxassetid://151327142","rbxassetid://151327159","rbxassetid://151327149","rbxassetid://151327140","rbxassetid://151327153","rbxassetid://151327164"
-        game.Lighting.ClockTime = 0
-    ]])
-
-    createScriptBtn("Purple Nebula", [[
-        for _,v in pairs(game.Lighting:GetChildren()) do 
-            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
-                v:Destroy() 
-            end 
-        end
-        local s = Instance.new("Sky", game.Lighting)
-        s.SkyboxBk, s.SkyboxDn, s.SkyboxFt, s.SkyboxLf, s.SkyboxRt, s.SkyboxUp = "rbxassetid://159454299","rbxassetid://159454296","rbxassetid://159454293","rbxassetid://159454286","rbxassetid://159454289","rbxassetid://159454291"
-        game.Lighting.ClockTime = 0
-    ]])
-
+    -- Galaxy Night (giữ nguyên)
     createScriptBtn("Galaxy Night", [[
         for _,v in pairs(game.Lighting:GetChildren()) do 
             if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
@@ -228,13 +207,17 @@ SkyBtn.MouseButton1Click:Connect(function()
             end 
         end
         local s = Instance.new("Sky", game.Lighting)
-        s.SkyboxBk, s.SkyboxDn, s.SkyboxFt, s.SkyboxLf, s.SkyboxRt, s.SkyboxUp = "rbxassetid://570357514","rbxassetid://570357521","rbxassetid://570357508","rbxassetid://570357525","rbxassetid://570357512","rbxassetid://570357501"
+        s.SkyboxBk = "rbxassetid://570357514"
+        s.SkyboxDn = "rbxassetid://570357521"
+        s.SkyboxFt = "rbxassetid://570357508"
+        s.SkyboxLf = "rbxassetid://570357525"
+        s.SkyboxRt = "rbxassetid://570357512"
+        s.SkyboxUp = "rbxassetid://570357501"
         game.Lighting.ClockTime = 0
     ]])
 
-    -- AURORA NIGHT (Chỉ skybox thuần, xóa sạch mây cũ)
+    -- Aurora Night (mới thêm theo ID bạn đưa)
     createScriptBtn("Aurora Night", [[
-        -- Xóa 100% skybox cũ, mây và hiệu ứng
         for _,v in pairs(game.Lighting:GetChildren()) do 
             if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
                 v:Destroy() 
@@ -242,30 +225,39 @@ SkyBtn.MouseButton1Click:Connect(function()
         end
         
         local s = Instance.new("Sky", game.Lighting)
-        s.SkyboxBk = "rbxassetid://126802361950769"   -- Back
-        s.SkyboxDn = "rbxassetid://125031880295948"   -- Down
-        s.SkyboxFt = "rbxassetid://114054873360114"   -- Front
-        s.SkyboxLf = "rbxassetid://113636521190162"   -- Left
-        s.SkyboxRt = "rbxassetid://93720219915142"    -- Right
-        s.SkyboxUp = "rbxassetid://88145295302782"    -- Up
+        s.SkyboxBk = "rbxassetid://88145295302782"    -- Back
+        s.SkyboxDn = "rbxassetid://125031880295948"  -- Down
+        s.SkyboxFt = "rbxassetid://93720219915142"   -- Front
+        s.SkyboxLf = "rbxassetid://113636521190162"  -- Left
+        s.SkyboxRt = "rbxassetid://114054873360114"  -- Right
+        s.SkyboxUp = "rbxassetid://126802361950769"  -- Up
         
         game.Lighting.ClockTime = 0
         game.Lighting.Brightness = 0.3
+        print("Aurora Night đã được áp dụng!")
     ]])
 
+    -- Reset Default Sky
     createScriptBtn("Reset Default Sky", [[
+        for _, v in pairs(game.Lighting:GetChildren()) do
+            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") 
+               or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+                v:Destroy()
+            end
+        end
+        
         game.Lighting.ClockTime = 14
+        game.Lighting.Brightness = 1
         game.Lighting.Ambient = Color3.fromRGB(127, 127, 127)
         game.Lighting.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
         game.Lighting.FogColor = Color3.fromRGB(192, 192, 192)
         game.Lighting.FogEnd = 100000
+        game.Lighting.GlobalShadows = true
         
-        for _,v in pairs(game.Lighting:GetChildren()) do 
-            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
-                v:Destroy() 
-            end 
-        end
-        Instance.new("Sky", game.Lighting)
+        local defaultSky = Instance.new("Sky")
+        defaultSky.Parent = game.Lighting
+        
+        print("Đã reset về sky mặc định Roblox!")
     ]])
 end)
 
