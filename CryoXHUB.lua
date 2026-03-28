@@ -114,7 +114,9 @@ Instance.new("UICorner", SubmitBtn).CornerRadius = UDim.new(0, 8)
 Instance.new("UIStroke", SubmitBtn).Color = Color3.fromRGB(0, 200, 200)
 
 local function clearContent()
-    for _, v in pairs(ContentFrame:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    for _, v in pairs(ContentFrame:GetChildren()) do 
+        if v:IsA("TextButton") then v:Destroy() end 
+    end
 end
 
 local function createScriptBtn(name, code)
@@ -132,7 +134,9 @@ local function createScriptBtn(name, code)
     local s = Instance.new("UIStroke", btn)
     s.Color = Color3.fromRGB(0, 200, 200)
     s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    btn.MouseButton1Click:Connect(function() task.spawn(loadstring(code)) end)
+    btn.MouseButton1Click:Connect(function() 
+        task.spawn(loadstring(code)) 
+    end)
 end
 
 local function createTabBtn(name)
@@ -163,13 +167,18 @@ FPSBtn.MouseButton1Click:Connect(function()
     createScriptBtn("CryoX Anti-Lag", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/CryoX%20Anti-Lag.lua"))()]])
 end)
 
--- TAB TECH
+-- TAB TECH (ĐÃ CHỈNH SỬA)
 local function LoadTechContent()
     clearContent()
     createScriptBtn("Supa Tech", [[loadstring(game:HttpGet("https://rawscripts.net/raw/The-Strongest-Battlegrounds-Supa-tech-v2-77454"))()]])
     createScriptBtn("Kiba Tech", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_1593573630798166.lua.txt"))()]])
     createScriptBtn("Oreo Tech", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/OreoTech/refs/heads/main/Protected_6856895483929371.lua"))()]])
-    createScriptBtn("Lethal Dash", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/InstantLethal/refs/heads/main/Protected_5983112998592296.lua"))()]])
+    
+    -- Lethal Dash đã thay script mới
+    createScriptBtn("Lethal Dash", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57a4d240a2440f0450986c966469092ccfb8d4797392cb8f469fa8b6e605e64d/download"))()]])
+
+    -- Mục mới thêm vào
+    createScriptBtn("Back dash cancel", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/dinhthanhtuankiet1762009-sudo/Js/refs/heads/main/4418648b0e9b71ef.lua"))()]])
 end
 
 local TechBtn = createTabBtn("TECH")
@@ -185,7 +194,7 @@ TechBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- TAB SKY (ĐÃ FIX LỖI BLOODMOON GROW A GARDEN & PURPLE NEBULA)
+-- TAB SKY
 local SkyBtn = createTabBtn("SKY")
 SkyBtn.MouseButton1Click:Connect(function()
     KeyFrame.Visible = false
