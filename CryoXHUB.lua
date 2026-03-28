@@ -198,20 +198,11 @@ SkyBtn.MouseButton1Click:Connect(function()
     KeyFrame.Visible = false
     ContentFrame.Visible = true
     clearContent()
-
-    -- Hàm dọn dẹp môi trường (Dùng chung)
-    local function cleanLighting()
-        for _, v in pairs(game.Lighting:GetChildren()) do
-            if v:IsA("Sky") or v:IsA("Clouds") or v:IsA("Atmosphere") then v:Destroy() end
-        end
-        local c = game.Workspace.Terrain:FindFirstChildOfClass("Clouds")
-        if c then c:Destroy() end
-    end
-
+    
     -- GALAXY NIGHT
     createScriptBtn("Galaxy Night", [[
         local lighting = game:GetService("Lighting")
-        for _, v in pairs(lighting:GetChildren()) do if v:IsA("Sky") then v:Destroy() end end
+        for _, v in pairs(lighting:GetChildren()) do if v:IsA("Sky") or v:IsA("Atmosphere") then v:Destroy() end end
         
         local s = Instance.new("Sky", lighting)
         s.SkyboxBk = "rbxassetid://570357514"
@@ -226,54 +217,54 @@ SkyBtn.MouseButton1Click:Connect(function()
         lighting.ExposureCompensation = 0.5
     ]])
 
-    -- AURORA NIGHT (Theo cấu trúc bạn muốn)
+    -- AURORA NIGHT (Bản Fix Tuyệt Đối)
     createScriptBtn("Aurora Night", [[
         local lighting = game:GetService("Lighting")
-        -- Xóa Sky cũ ngay lập tức
-        for _, v in pairs(lighting:GetChildren()) do if v:IsA("Sky") then v:Destroy() end end
-        
+        local contentProvider = game:GetService("ContentProvider")
+
+        -- Xóa sạch mọi thứ cũ
+        for _, v in pairs(lighting:GetChildren()) do if v:IsA("Sky") or v:IsA("Atmosphere") then v:Destroy() end end
+        for _, v in pairs(game.Workspace:GetChildren()) do if v:IsA("Terrain") then local c = v:FindFirstChildOfClass("Clouds") if c then c:Destroy() end end end
+
         local s = Instance.new("Sky", lighting)
-        s.Name = "AuroraSky"
+        s.Name = "AuroraFinal"
         
-        -- Dùng rbxthumb để ép hiển thị ID mới upload
-        s.SkyboxUp = "rbxthumb://type=Asset&id=126802361950769&w=420&h=420"
-        s.SkyboxRt = "rbxthumb://type=Asset&id=114054873360114&w=420&h=420"
-        s.SkyboxLf = "rbxthumb://type=Asset&id=113636521190162&w=420&h=420"
-        s.SkyboxFt = "rbxthumb://type=Asset&id=93720219915142&w=420&h=420"
-        s.SkyboxDn = "rbxthumb://type=Asset&id=125031880295948&w=420&h=420"
-        s.SkyboxBk = "rbxthumb://type=Asset&id=88145295302782&w=420&h=420"
-        
+        -- Gán ID (Đã lược bỏ rbxthumb để dùng assetid gốc của bạn)
+        s.SkyboxUp = "rbxassetid://126802361950769"
+        s.SkyboxRt = "rbxassetid://114054873360114"
+        s.SkyboxLf = "rbxassetid://113636521190162"
+        s.SkyboxFt = "rbxassetid://93720219915142"
+        s.SkyboxDn = "rbxassetid://125031880295948"
+        s.SkyboxBk = "rbxassetid://88145295302782"
+
+        -- Ép hệ thống tải Texture ngay lập tức
+        contentProvider:PreloadAsync({s})
+
+        -- Cài đặt ánh sáng tối ưu cho Aurora
         lighting.ClockTime = 0
-        lighting.Brightness = 2
-        lighting.ExposureCompensation = 1
+        lighting.Brightness = 3 -- Tăng mạnh độ sáng
+        lighting.ExposureCompensation = 1.5
+        lighting.OutdoorAmbient = Color3.fromRGB(0, 50, 50) -- Ánh sáng xanh mờ của cực quang
         
-        -- Vòng lặp dọn mây liên tục như script bạn đưa
-        task.spawn(function()
-            while s.Parent == lighting do
-                local c = game.Workspace.Terrain:FindFirstChildOfClass("Clouds")
-                if c then c.Enabled = false end
-                task.wait(1)
-            end
-        end)
+        print("Aurora đã ép tải thành công!")
     ]])
 
-    -- RESET DEFAULT
+    -- RESET DEFAULT (Fix tối)
     createScriptBtn("Reset Default Sky", [[
         local lighting = game:GetService("Lighting")
         for _, v in pairs(lighting:GetChildren()) do
-            if v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") then v:Destroy() end
+            if v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") or v:IsA("ColorCorrectionEffect") then v:Destroy() end
         end
         
         lighting.ClockTime = 14
         lighting.Brightness = 2
         lighting.ExposureCompensation = 0
-        lighting.Ambient = Color3.fromRGB(127, 127, 127)
-        lighting.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
+        lighting.Ambient = Color3.fromRGB(130, 130, 130)
+        lighting.OutdoorAmbient = Color3.fromRGB(130, 130, 130)
         
-        Instance.new("Sky", lighting) -- Tạo lại bầu trời mặc định xanh trắng
+        Instance.new("Sky", lighting) -- Sky mặc định trắng xanh
     ]])
 end)
-
 
 -- TAB SCRIPT
 local ScriptBtn = createTabBtn("SCRIPT")
