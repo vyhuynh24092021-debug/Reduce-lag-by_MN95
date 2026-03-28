@@ -199,13 +199,20 @@ SkyBtn.MouseButton1Click:Connect(function()
     ContentFrame.Visible = true
     clearContent()
     
-    -- Galaxy Night (giữ nguyên)
-    createScriptBtn("Galaxy Night", [[
-        for _,v in pairs(game.Lighting:GetChildren()) do 
-            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
-                v:Destroy() 
-            end 
+    -- Hàm dùng chung để xóa sạch mây trong game
+    local clearCloudsScript = [[
+        for _, v in pairs(game.Lighting:GetChildren()) do 
+            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") or v:IsA("Clouds") then v:Destroy() end 
         end
+        for _, v in pairs(game.Workspace:GetChildren()) do
+            if v:IsA("Terrain") then
+                for _, cloud in pairs(v:GetChildren()) do if cloud:IsA("Clouds") then cloud:Destroy() end end
+            end
+        end
+    ]]
+
+    -- Galaxy Night
+    createScriptBtn("Galaxy Night", clearCloudsScript .. [[
         local s = Instance.new("Sky", game.Lighting)
         s.SkyboxBk = "rbxassetid://570357514"
         s.SkyboxDn = "rbxassetid://570357521"
@@ -213,53 +220,57 @@ SkyBtn.MouseButton1Click:Connect(function()
         s.SkyboxLf = "rbxassetid://570357525"
         s.SkyboxRt = "rbxassetid://570357512"
         s.SkyboxUp = "rbxassetid://570357501"
+        s.SunAngularSize = 0 -- Xóa mặt trời/mây mặc định
+        s.MoonAngularSize = 0
+        
         game.Lighting.ClockTime = 0
+        game.Lighting.Brightness = 2
+        game.Lighting.ExposureCompensation = 0.5
     ]])
 
-    -- Aurora Night (mới thêm theo ID bạn đưa)
-    createScriptBtn("Aurora Night", [[
-        for _,v in pairs(game.Lighting:GetChildren()) do 
-            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
-                v:Destroy() 
-            end 
-        end
-        
+    -- Aurora Night (Sử dụng rbxthumb & Fix hiển thị)
+    createScriptBtn("Aurora Night", clearCloudsScript .. [[
         local s = Instance.new("Sky", game.Lighting)
-        s.SkyboxBk = "rbxassetid://88145295302782"    -- Back
-        s.SkyboxDn = "rbxassetid://125031880295948"  -- Down
-        s.SkyboxFt = "rbxassetid://93720219915142"   -- Front
-        s.SkyboxLf = "rbxassetid://113636521190162"  -- Left
-        s.SkyboxRt = "rbxassetid://114054873360114"  -- Right
-        s.SkyboxUp = "rbxassetid://126802361950769"  -- Up
+        -- Sử dụng rbxthumb để hiển thị ID mới upload ngay lập tức
+        s.SkyboxUp = "rbxthumb://type=Asset&id=126802361950769&w=420&h=420"
+        s.SkyboxRt = "rbxthumb://type=Asset&id=114054873360114&w=420&h=420"
+        s.SkyboxLf = "rbxthumb://type=Asset&id=113636521190162&w=420&h=420"
+        s.SkyboxFt = "rbxthumb://type=Asset&id=93720219915142&w=420&h=420"
+        s.SkyboxDn = "rbxthumb://type=Asset&id=125031880295948&w=420&h=420"
+        s.SkyboxBk = "rbxthumb://type=Asset&id=88145295302782&w=420&h=420"
+        
+        s.SunAngularSize = 0
+        s.MoonAngularSize = 0
         
         game.Lighting.ClockTime = 0
-        game.Lighting.Brightness = 0.3
-        print("Aurora Night đã được áp dụng!")
+        game.Lighting.Brightness = 2 -- Tăng độ sáng để không bị tối
+        game.Lighting.ExposureCompensation = 1
+        print("Aurora Night đã áp dụng (Không mây)!")
     ]])
 
-    -- Reset Default Sky
+    -- Reset Default Sky (Fix lỗi tối màn hình)
     createScriptBtn("Reset Default Sky", [[
         for _, v in pairs(game.Lighting:GetChildren()) do
             if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") 
-               or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") then
+               or v:IsA("BloomEffect") or v:IsA("DepthOfFieldEffect") or v:IsA("Clouds") then
                 v:Destroy()
             end
         end
         
+        -- Reset các thông số Lighting về mặc định của Roblox
         game.Lighting.ClockTime = 14
-        game.Lighting.Brightness = 1
-        game.Lighting.Ambient = Color3.fromRGB(127, 127, 127)
-        game.Lighting.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
-        game.Lighting.FogColor = Color3.fromRGB(192, 192, 192)
-        game.Lighting.FogEnd = 100000
+        game.Lighting.Brightness = 2
+        game.Lighting.ExposureCompensation = 0
+        game.Lighting.Ambient = Color3.fromRGB(138, 138, 138)
+        game.Lighting.OutdoorAmbient = Color3.fromRGB(128, 128, 128)
         game.Lighting.GlobalShadows = true
         
-        local defaultSky = Instance.new("Sky")
-        defaultSky.Parent = game.Lighting
+        local defaultSky = Instance.new("Sky", game.Lighting)
         
-        print("Đã reset về sky mặc định Roblox!")
+        print("Đã reset về mặc định và sửa lỗi tối!")
     ]])
 end)
+
 
 -- TAB SCRIPT
 local ScriptBtn = createTabBtn("SCRIPT")
