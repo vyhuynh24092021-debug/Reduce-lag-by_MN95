@@ -278,14 +278,61 @@ SkyBtn.MouseButton1Click:Connect(function()
         
         -- Thông số mặc định chuẩn của Roblox (Không bao giờ tối)
         L.ClockTime = 14
-        L.Brightness = 2
-        L.ExposureCompensation = 0
-        L.Ambient = Color3.fromRGB(127, 127, 127)
-        L.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
-        L.GlobalShadows = true
-        
-        local defaultSky = Instance.new("Sky", L)
-        print("Đã Reset sạch sẽ!")
+-- TAB SKY
+local SkyBtn = createTabBtn("SKY")
+SkyBtn.MouseButton1Click:Connect(function()
+    KeyFrame.Visible = false
+    ContentFrame.Visible = true
+    clearContent()
+    
+    -- Hàm dọn dẹp cực mạnh
+    local function cleanAll()
+        local L = game:GetService("Lighting")
+        for _, v in pairs(L:GetChildren()) do
+            if v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") then
+                v:Destroy()
+            end
+        end
+        local clouds = game.Workspace.Terrain:FindFirstChildOfClass("Clouds")
+        if clouds then clouds:Destroy() end
+    end
+
+    -- GALAXY
+    createScriptBtn("Galaxy", [[
+        local L = game:GetService("Lighting")
+        for _, v in pairs(L:GetChildren()) do
+            if v:IsA("Sky") then
+                v:Destroy()
+            end
+        end
+
+        local s = Instance.new("Sky", L)
+        s.SkyboxBk = "rbxassetid://570357514"
+        s.SkyboxDn = "rbxassetid://570357521"
+        s.SkyboxFt = "rbxassetid://570357508"
+        s.SkyboxLf = "rbxassetid://570357525"
+        s.SkyboxRt = "rbxassetid://570357512"
+        s.SkyboxUp = "rbxassetid://570357501"
+    ]])
+
+    -- AURORA SKY (CHỈ THAY SKYBOX)
+    createScriptBtn("Aurora", [[
+        local L = game:GetService("Lighting")
+        for _, v in pairs(L:GetChildren()) do
+            if v:IsA("Sky") then
+                v:Destroy()
+            end
+        end
+
+        local s = Instance.new("Sky", L)
+        s.Name = "AuroraSky"
+
+        s.SkyboxUp = "rbxassetid://126802361950769"
+        s.SkyboxRt = "rbxassetid://114054873360114"
+        s.SkyboxLf = "rbxassetid://113636521190162"
+        s.SkyboxFt = "rbxassetid://93720219915142"
+        s.SkyboxDn = "rbxassetid://125031880295948"
+        s.SkyboxBk = "rbxassetid://88145295302782"
     ]])
 end)
 
