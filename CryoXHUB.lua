@@ -196,15 +196,15 @@ TechBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- TAB SKY (đã xóa hết mục cũ, chỉ còn đúng 1 mục Custom SKY)
-local SkyBtn = createTabBtn("SKY")
-SkyBtn.MouseButton1Click:Connect(function()
+-- TAB SHADER (đã đổi từ SKY)
+local ShaderBtn = createTabBtn("SHADER")
+ShaderBtn.MouseButton1Click:Connect(function()
     KeyFrame.Visible = false
     ContentFrame.Visible = true
     clearContent()
     
-    createScriptBtn("Custom SKY", [[
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-UniversHub-l-Graphics-Script-Shader-and-Fps-86717"))()
+    createScriptBtn("Custom Shader", [[
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()
     ]])
 end)
 
