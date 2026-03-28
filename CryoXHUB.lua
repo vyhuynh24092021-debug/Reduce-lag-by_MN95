@@ -200,30 +200,57 @@ SkyBtn.MouseButton1Click:Connect(function()
     clearContent()
     
     createScriptBtn("Trăng Máu (Blood Moon)", [[
-        for _,v in pairs(game.Lighting:GetChildren()) do if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then v:Destroy() end end
+        for _,v in pairs(game.Lighting:GetChildren()) do 
+            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
+                v:Destroy() 
+            end 
+        end
         local s = Instance.new("Sky", game.Lighting)
         s.SkyboxBk, s.SkyboxDn, s.SkyboxFt, s.SkyboxLf, s.SkyboxRt, s.SkyboxUp = "rbxassetid://151327142","rbxassetid://151327159","rbxassetid://151327149","rbxassetid://151327140","rbxassetid://151327153","rbxassetid://151327164"
-        local cc = Instance.new("ColorCorrectionEffect", game.Lighting)
-        cc.TintColor = Color3.fromRGB(255, 120, 120)
-        cc.Saturation = 0.4
         game.Lighting.ClockTime = 0
-        game.Lighting.Ambient = Color3.fromRGB(60, 0, 0)
     ]])
 
     createScriptBtn("Purple Nebula", [[
-        for _,v in pairs(game.Lighting:GetChildren()) do if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then v:Destroy() end end
+        for _,v in pairs(game.Lighting:GetChildren()) do 
+            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
+                v:Destroy() 
+            end 
+        end
         local s = Instance.new("Sky", game.Lighting)
         s.SkyboxBk, s.SkyboxDn, s.SkyboxFt, s.SkyboxLf, s.SkyboxRt, s.SkyboxUp = "rbxassetid://159454299","rbxassetid://159454296","rbxassetid://159454293","rbxassetid://159454286","rbxassetid://159454289","rbxassetid://159454291"
-        local cc = Instance.new("ColorCorrectionEffect", game.Lighting)
-        cc.TintColor = Color3.fromRGB(210, 160, 255)
         game.Lighting.ClockTime = 0
     ]])
 
     createScriptBtn("Galaxy Night", [[
-        for _,v in pairs(game.Lighting:GetChildren()) do if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then v:Destroy() end end
+        for _,v in pairs(game.Lighting:GetChildren()) do 
+            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
+                v:Destroy() 
+            end 
+        end
         local s = Instance.new("Sky", game.Lighting)
         s.SkyboxBk, s.SkyboxDn, s.SkyboxFt, s.SkyboxLf, s.SkyboxRt, s.SkyboxUp = "rbxassetid://570357514","rbxassetid://570357521","rbxassetid://570357508","rbxassetid://570357525","rbxassetid://570357512","rbxassetid://570357501"
         game.Lighting.ClockTime = 0
+    ]])
+
+    -- AURORA NIGHT (Chỉ skybox thuần, xóa sạch mây cũ)
+    createScriptBtn("Aurora Night", [[
+        -- Xóa 100% skybox cũ, mây và hiệu ứng
+        for _,v in pairs(game.Lighting:GetChildren()) do 
+            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
+                v:Destroy() 
+            end 
+        end
+        
+        local s = Instance.new("Sky", game.Lighting)
+        s.SkyboxBk = "rbxassetid://126802361950769"   -- Back
+        s.SkyboxDn = "rbxassetid://125031880295948"   -- Down
+        s.SkyboxFt = "rbxassetid://114054873360114"   -- Front
+        s.SkyboxLf = "rbxassetid://113636521190162"   -- Left
+        s.SkyboxRt = "rbxassetid://93720219915142"    -- Right
+        s.SkyboxUp = "rbxassetid://88145295302782"    -- Up
+        
+        game.Lighting.ClockTime = 0
+        game.Lighting.Brightness = 0.3
     ]])
 
     createScriptBtn("Reset Default Sky", [[
@@ -232,7 +259,12 @@ SkyBtn.MouseButton1Click:Connect(function()
         game.Lighting.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
         game.Lighting.FogColor = Color3.fromRGB(192, 192, 192)
         game.Lighting.FogEnd = 100000
-        for _,v in pairs(game.Lighting:GetChildren()) do if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then v:Destroy() end end
+        
+        for _,v in pairs(game.Lighting:GetChildren()) do 
+            if v:IsA("Sky") or v:IsA("ColorCorrectionEffect") or v:IsA("Atmosphere") then 
+                v:Destroy() 
+            end 
+        end
         Instance.new("Sky", game.Lighting)
     ]])
 end)
