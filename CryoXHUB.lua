@@ -199,12 +199,24 @@ SkyBtn.MouseButton1Click:Connect(function()
     ContentFrame.Visible = true
     clearContent()
     
+    -- Hàm dọn dẹp cực mạnh (Xóa mọi thứ gây tối và mây)
+    local function cleanAll()
+        local L = game:GetService("Lighting")
+        for _, v in pairs(L:GetChildren()) do
+            if v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") then
+                v:Destroy()
+            end
+        end
+        local clouds = game.Workspace.Terrain:FindFirstChildOfClass("Clouds")
+        if clouds then clouds:Destroy() end
+    end
+
     -- GALAXY NIGHT
     createScriptBtn("Galaxy Night", [[
-        local lighting = game:GetService("Lighting")
-        for _, v in pairs(lighting:GetChildren()) do if v:IsA("Sky") or v:IsA("Atmosphere") then v:Destroy() end end
+        local L = game:GetService("Lighting")
+        for _, v in pairs(L:GetChildren()) do if v:IsA("Sky") then v:Destroy() end end
         
-        local s = Instance.new("Sky", lighting)
+        local s = Instance.new("Sky", L)
         s.SkyboxBk = "rbxassetid://570357514"
         s.SkyboxDn = "rbxassetid://570357521"
         s.SkyboxFt = "rbxassetid://570357508"
@@ -212,59 +224,71 @@ SkyBtn.MouseButton1Click:Connect(function()
         s.SkyboxRt = "rbxassetid://570357512"
         s.SkyboxUp = "rbxassetid://570357501"
         
-        lighting.ClockTime = 0
-        lighting.Brightness = 2
-        lighting.ExposureCompensation = 0.5
+        L.ClockTime = 0
+        L.Brightness = 2
+        L.ExposureCompensation = 1
+        L.Ambient = Color3.fromRGB(50, 50, 50)
     ]])
 
-    -- AURORA NIGHT (Bản Fix Tuyệt Đối)
+    -- AURORA NIGHT (BẢN FIX CUỐI CÙNG - ÉP THAY ĐỔI)
     createScriptBtn("Aurora Night", [[
-        local lighting = game:GetService("Lighting")
-        local contentProvider = game:GetService("ContentProvider")
-
-        -- Xóa sạch mọi thứ cũ
-        for _, v in pairs(lighting:GetChildren()) do if v:IsA("Sky") or v:IsA("Atmosphere") then v:Destroy() end end
-        for _, v in pairs(game.Workspace:GetChildren()) do if v:IsA("Terrain") then local c = v:FindFirstChildOfClass("Clouds") if c then c:Destroy() end end end
-
-        local s = Instance.new("Sky", lighting)
-        s.Name = "AuroraFinal"
+        local L = game:GetService("Lighting")
         
-        -- Gán ID (Đã lược bỏ rbxthumb để dùng assetid gốc của bạn)
+        -- Xóa Sky cũ
+        for _, v in pairs(L:GetChildren()) do if v:IsA("Sky") then v:Destroy() end end
+        
+        local s = Instance.new("Sky", L)
+        s.Name = "Aurora_New"
+        
+        -- Dùng định dạng rbxassetid trực tiếp với ID của bạn
         s.SkyboxUp = "rbxassetid://126802361950769"
         s.SkyboxRt = "rbxassetid://114054873360114"
         s.SkyboxLf = "rbxassetid://113636521190162"
         s.SkyboxFt = "rbxassetid://93720219915142"
         s.SkyboxDn = "rbxassetid://125031880295948"
         s.SkyboxBk = "rbxassetid://88145295302782"
-
-        -- Ép hệ thống tải Texture ngay lập tức
-        contentProvider:PreloadAsync({s})
-
-        -- Cài đặt ánh sáng tối ưu cho Aurora
-        lighting.ClockTime = 0
-        lighting.Brightness = 3 -- Tăng mạnh độ sáng
-        lighting.ExposureCompensation = 1.5
-        lighting.OutdoorAmbient = Color3.fromRGB(0, 50, 50) -- Ánh sáng xanh mờ của cực quang
         
-        print("Aurora đã ép tải thành công!")
+        -- ÉP THAY ĐỔI LIGHTING ĐỂ THẤY KHÁC BIỆT MÀU SẮC
+        L.ClockTime = 0
+        L.Brightness = 3
+        L.ExposureCompensation = 1.5
+        L.OutdoorAmbient = Color3.fromRGB(0, 255, 150) -- Ép màu xanh Aurora vào môi trường
+        L.Ambient = Color3.fromRGB(0, 50, 50)
+        
+        -- Vòng lặp xóa mây và giữ Sky này ưu tiên
+        task.spawn(function()
+            for i = 1, 10 do
+                local clouds = game.Workspace.Terrain:FindFirstChildOfClass("Clouds")
+                if clouds then clouds.Enabled = false end
+                task.wait(0.5)
+            end
+        end)
+        
+        print("Đã ép chạy Aurora Night!")
     ]])
 
-    -- RESET DEFAULT (Fix tối)
+    -- RESET DEFAULT SKY (FIX LỖI TỐI)
     createScriptBtn("Reset Default Sky", [[
-        local lighting = game:GetService("Lighting")
-        for _, v in pairs(lighting:GetChildren()) do
-            if v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") or v:IsA("ColorCorrectionEffect") then v:Destroy() end
+        local L = game:GetService("Lighting")
+        for _, v in pairs(L:GetChildren()) do
+            if v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") or v:IsA("ColorCorrectionEffect") then
+                v:Destroy()
+            end
         end
         
-        lighting.ClockTime = 14
-        lighting.Brightness = 2
-        lighting.ExposureCompensation = 0
-        lighting.Ambient = Color3.fromRGB(130, 130, 130)
-        lighting.OutdoorAmbient = Color3.fromRGB(130, 130, 130)
+        -- Thông số mặc định chuẩn của Roblox (Không bao giờ tối)
+        L.ClockTime = 14
+        L.Brightness = 2
+        L.ExposureCompensation = 0
+        L.Ambient = Color3.fromRGB(127, 127, 127)
+        L.OutdoorAmbient = Color3.fromRGB(127, 127, 127)
+        L.GlobalShadows = true
         
-        Instance.new("Sky", lighting) -- Sky mặc định trắng xanh
+        local defaultSky = Instance.new("Sky", L)
+        print("Đã Reset sạch sẽ!")
     ]])
 end)
+
 
 -- TAB SCRIPT
 local ScriptBtn = createTabBtn("SCRIPT")
