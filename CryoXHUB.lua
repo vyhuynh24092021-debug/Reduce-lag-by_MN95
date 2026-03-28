@@ -114,7 +114,9 @@ Instance.new("UICorner", SubmitBtn).CornerRadius = UDim.new(0, 8)
 Instance.new("UIStroke", SubmitBtn).Color = Color3.fromRGB(0, 200, 200)
 
 local function clearContent()
-    for _, v in pairs(ContentFrame:GetChildren()) do if v:IsA("TextButton") then v:Destroy() end end
+    for _, v in pairs(ContentFrame:GetChildren()) do 
+        if v:IsA("TextButton") then v:Destroy() end 
+    end
 end
 
 local function createScriptBtn(name, code)
@@ -132,7 +134,9 @@ local function createScriptBtn(name, code)
     local s = Instance.new("UIStroke", btn)
     s.Color = Color3.fromRGB(0, 200, 200)
     s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    btn.MouseButton1Click:Connect(function() task.spawn(loadstring(code)) end)
+    btn.MouseButton1Click:Connect(function() 
+        task.spawn(loadstring(code)) 
+    end)
 end
 
 local function createTabBtn(name)
@@ -192,65 +196,17 @@ TechBtn.MouseButton1Click:Connect(function()
     end
 end)
 
- 
--- TAB SKY
+-- TAB SKY (đã xóa hết mục cũ, chỉ còn đúng 1 mục Custom SKY)
 local SkyBtn = createTabBtn("SKY")
 SkyBtn.MouseButton1Click:Connect(function()
     KeyFrame.Visible = false
     ContentFrame.Visible = true
     clearContent()
     
-    -- Hàm dọn dẹp cực mạnh
-    local function cleanAll()
-        local L = game:GetService("Lighting")
-        for _, v in pairs(L:GetChildren()) do
-            if v:IsA("Sky") or v:IsA("Atmosphere") or v:IsA("Clouds") or v:IsA("ColorCorrectionEffect") or v:IsA("BloomEffect") then
-                v:Destroy()
-            end
-        end
-        local clouds = game.Workspace.Terrain:FindFirstChildOfClass("Clouds")
-        if clouds then clouds:Destroy() end
-    end
-
-    -- GALAXY
-    createScriptBtn("Galaxy", [[
-        local L = game:GetService("Lighting")
-        for _, v in pairs(L:GetChildren()) do
-            if v:IsA("Sky") then
-                v:Destroy()
-            end
-        end
-
-        local s = Instance.new("Sky", L)
-        s.SkyboxBk = "rbxassetid://570357514"
-        s.SkyboxDn = "rbxassetid://570357521"
-        s.SkyboxFt = "rbxassetid://570357508"
-        s.SkyboxLf = "rbxassetid://570357525"
-        s.SkyboxRt = "rbxassetid://570357512"
-        s.SkyboxUp = "rbxassetid://570357501"
-    ]])
-
-    -- AURORA SKY (CHỈ THAY SKYBOX)
-    createScriptBtn("Aurora", [[
-        local L = game:GetService("Lighting")
-        for _, v in pairs(L:GetChildren()) do
-            if v:IsA("Sky") then
-                v:Destroy()
-            end
-        end
-
-        local s = Instance.new("Sky", L)
-        s.Name = "AuroraSky"
-
-        s.SkyboxUp = "rbxassetid://126802361950769"
-        s.SkyboxRt = "rbxassetid://114054873360114"
-        s.SkyboxLf = "rbxassetid://113636521190162"
-        s.SkyboxFt = "rbxassetid://93720219915142"
-        s.SkyboxDn = "rbxassetid://125031880295948"
-        s.SkyboxBk = "rbxassetid://88145295302782"
+    createScriptBtn("Custom SKY", [[
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-UniversHub-l-Graphics-Script-Shader-and-Fps-86717"))()
     ]])
 end)
-
 
 -- TAB SCRIPT
 local ScriptBtn = createTabBtn("SCRIPT")
@@ -296,7 +252,8 @@ OpenButton.Parent = ScreenGui
 Instance.new("UICorner", OpenButton).CornerRadius = UDim.new(1, 0)
 
 local CloseBtn = Instance.new("TextButton")
-CloseBtn.Text = "×"; CloseBtn.Size = UDim2.new(0, 30, 0, 30)
+CloseBtn.Text = "×"
+CloseBtn.Size = UDim2.new(0, 30, 0, 30)
 CloseBtn.Position = UDim2.new(1, -38, 0, 8)
 CloseBtn.BackgroundColor3 = Color3.fromRGB(200, 50, 50)
 CloseBtn.TextColor3 = Color3.new(1,1,1)
@@ -304,7 +261,15 @@ CloseBtn.ZIndex = 5
 CloseBtn.Parent = MainFrame
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 
-CloseBtn.MouseButton1Click:Connect(function() MainFrame.Visible = false; OpenButton.Visible = true end)
-OpenButton.MouseButton1Click:Connect(function() MainFrame.Visible = true; OpenButton.Visible = false end)
+CloseBtn.MouseButton1Click:Connect(function() 
+    MainFrame.Visible = false 
+    OpenButton.Visible = true 
+end)
 
+OpenButton.MouseButton1Click:Connect(function() 
+    MainFrame.Visible = true 
+    OpenButton.Visible = false 
+end)
+
+-- Mở tab FPS mặc định khi chạy
 FPSBtn.MouseButton1Click:Fire()
