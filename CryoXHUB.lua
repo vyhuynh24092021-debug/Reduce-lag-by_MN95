@@ -196,7 +196,7 @@ TechBtn.MouseButton1Click:Connect(function()
     end
 end)
 
--- TAB SHADER (đã đổi từ SKY)
+-- TAB SHADER
 local ShaderBtn = createTabBtn("SHADER")
 ShaderBtn.MouseButton1Click:Connect(function()
     KeyFrame.Visible = false
@@ -208,13 +208,22 @@ ShaderBtn.MouseButton1Click:Connect(function()
     ]])
 end)
 
--- TAB SCRIPT
+-- TAB SCRIPT (ĐÃ THÊM 2 MỤC)
 local ScriptBtn = createTabBtn("SCRIPT")
 ScriptBtn.MouseButton1Click:Connect(function()
     if ScriptUnlocked then
         KeyFrame.Visible = false
         ContentFrame.Visible = true
         clearContent()
+
+        createScriptBtn("Fly GuiV3", [[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+        ]])
+
+        createScriptBtn("Anti Death Counter", [[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Anti-Death-Counter.lua"))()
+        ]])
+
     else
         CurrentKeyTarget = "SCRIPT"
         ContentFrame.Visible = false
@@ -229,7 +238,6 @@ SubmitBtn.MouseButton1Click:Connect(function()
             LoadTechContent()
         elseif CurrentKeyTarget == "SCRIPT" then
             ScriptUnlocked = true
-            clearContent()
         end
         KeyFrame.Visible = false
         ContentFrame.Visible = true
@@ -271,5 +279,5 @@ OpenButton.MouseButton1Click:Connect(function()
     OpenButton.Visible = false 
 end)
 
--- Mở tab FPS mặc định khi chạy
+-- Mở tab FPS mặc định
 FPSBtn.MouseButton1Click:Fire()
