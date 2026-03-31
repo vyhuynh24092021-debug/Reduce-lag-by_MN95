@@ -39,38 +39,37 @@ task.delay(0.2, function()
 end)
 
 -- =========================
--- 📊 MN95 FPS + PING (FIXED)
+-- 📊 CryoXHUB FPS + PING
 -- =========================
 local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
 local Stats = game:GetService("Stats")
 local CoreGui = game:GetService("CoreGui")
 
--- Xóa GUI cũ nếu có
 pcall(function()
     if CoreGui:FindFirstChild("MN95_GUI") then
         CoreGui.MN95_GUI:Destroy()
     end
 end)
 
--- Tạo GUI
 local gui = Instance.new("ScreenGui")
 gui.Name = "MN95_GUI"
 gui.ResetOnSpawn = false
 gui.Parent = CoreGui
 
 local textLabel = Instance.new("TextLabel")
-textLabel.Size = UDim2.new(0, 220, 0, 20)
-textLabel.Position = UDim2.new(0, 5, 0, 5)
-textLabel.BackgroundTransparency = 1
+textLabel.Size = UDim2.new(0, 320, 0, 40) -- to hơn
+textLabel.Position = UDim2.new(1, -330, 1, -60) -- góc phải dưới
+textLabel.BackgroundTransparency = 0.3
+textLabel.BackgroundColor3 = Color3.new(0,0,0)
 textLabel.Font = Enum.Font.SourceSansBold
-textLabel.TextSize = 14
+textLabel.TextSize = 20
 textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
 textLabel.TextXAlignment = Enum.TextXAlignment.Left
 textLabel.Text = "CryoXHUB | FPS: 0 | PING: 0"
 textLabel.Parent = gui
 
--- Rainbow color
+-- Rainbow
 local function rainbowColor(hue)
 	return Color3.fromHSV(hue, 1, 1)
 end
@@ -90,7 +89,7 @@ RunService.RenderStepped:Connect(function()
 	end
 end)
 
--- Update text + ping + rainbow
+-- Update
 task.spawn(function()
 	local hue = 0
 	while true do
@@ -108,10 +107,10 @@ task.spawn(function()
 	end
 end)
 
-print(" Added: MN95 FPS + Ping UI")
+print("✅ Added: CryoXHUB FPS + Ping UI")
 
 -- =========================
---  NOTIFICATION
+-- 🔔 NOTIFICATION
 -- =========================
 pcall(function()
     game:GetService("StarterGui"):SetCore("SendNotification", {
