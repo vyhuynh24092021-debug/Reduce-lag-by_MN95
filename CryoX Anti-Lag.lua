@@ -104,7 +104,7 @@ task.spawn(function()
 			ping = Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
 		end)
 
-		textLabel.Text = "MN95 ANTI LAG | FPS: " .. fps .. " | PING: " .. math.floor(ping) .. "ms"
+		textLabel.Text = "CryoXHUB | FPS: " .. fps .. " | PING: " .. math.floor(ping) .. "ms"
 	end
 end)
 
