@@ -36,47 +36,7 @@ task.delay(0.2, function()
 
 end)
 
--- =========================
--- Script xóa Texture môi trường, GIỮ LẠI phụ kiện/tóc/quần áo nhân vật
-local Players = game:GetService("Players")
-local lplr = Players.LocalPlayer
 
-local function cleanTextures(obj)
-    -- Kiểm tra nếu vật thể nằm trong nhân vật của người chơi thì bỏ qua
-    if lplr.Character and obj:IsDescendantOf(lplr.Character) then 
-        return 
-    end
-
-    -- Xóa Texture và Decal trên môi trường
-    if obj:IsA("Texture") or obj:IsA("Decal") then
-        obj:Destroy()
-    -- Đưa các khối về dạng nhựa trơn để giảm lag GPU
-    elseif obj:IsA("BasePart") or obj:IsA("UnionOperation") or obj:IsA("MeshPart") then
-        obj.Material = Enum.Material.SmoothPlastic
-        obj.Reflectance = 0
-        -- Nếu là MeshPart môi trường thì xóa TextureID
-        if obj:IsA("MeshPart") then
-            obj.TextureID = ""
-        end
-    end
-end
-
--- Quét toàn bộ map hiện tại
-for _, v in pairs(game.Workspace:GetDescendants()) do
-    cleanTextures(v)
-end
-
--- Tự động quét các vật thể mới xuất hiện (trừ nhân vật)
-game.Workspace.DescendantAdded:Connect(cleanTextures)
-
--- Tối ưu thêm ánh sáng
-game:GetService("Lighting").GlobalShadows = false
-print("Đã xóa texture môi trường - Giữ lại nhân vật!")
-
-        
-        
-
--- =========================
 -- 📊 FPS + PING (GÓC TRÁI DƯỚI LOGO)
 -- =========================
 local RunService = game:GetService("RunService")
