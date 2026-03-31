@@ -7,8 +7,8 @@ Remove_Walls = true
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/louismich4el/ItsLouisPlayz-Scripts/refs/heads/main/Anti%20Lag%20V2.lua"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/marianscriptKing/SUPER-MAX.lau/main/SUPER%20MAX%20PERFORMANCE"))()
--- 🔥 CryoX Rename UI (NO LAG - 1 block duy nhất)
 
+-- 🔥 CryoX Rename UI (NO LAG - 1 block duy nhất)
 task.delay(0.2, function()
 
     local function rename(v)
@@ -27,61 +27,91 @@ task.delay(0.2, function()
             end
         end
     end
+
     for _, v in pairs(game.Players.LocalPlayer.PlayerGui:GetDescendants()) do
         rename(v)
     end
+
     game.Players.LocalPlayer.PlayerGui.DescendantAdded:Connect(function(v)
         rename(v)
     end)
 
 end)
 
-
--- 📊 FPS + PING (GÓC TRÁI DƯỚI LOGO)
 -- =========================
+-- 📊 MN95 FPS + PING (FIXED)
+-- =========================
+local Players = game:GetService("Players")
 local RunService = game:GetService("RunService")
-local StatsService = game:GetService("Stats")
+local Stats = game:GetService("Stats")
+local CoreGui = game:GetService("CoreGui")
 
-local player = Players.LocalPlayer
-
-local gui = Instance.new("ScreenGui")
-gui.Name = "FPS_PING_UI"
-gui.ResetOnSpawn = false
-gui.Parent = player:WaitForChild("PlayerGui")
-
-local label = Instance.new("TextLabel")
-label.Size = UDim2.new(0, 180, 0, 40)
-label.Position = UDim2.new(0, 10, 0, 36) -- dưới logo Roblox
-label.BackgroundTransparency = 0.3
-label.BackgroundColor3 = Color3.new(0,0,0)
-label.TextColor3 = Color3.new(1,1,1)
-label.TextScaled = true
-label.Font = Enum.Font.SourceSansBold
-label.Parent = gui
-
--- FPS
-local fps = 0
-RunService.RenderStepped:Connect(function(dt)
-    fps = math.floor(1/dt)
-end)
-
--- Update ping + fps
-task.spawn(function()
-    while true do
-        task.wait(1)
-
-        local ping = 0
-        pcall(function()
-            ping = StatsService.Network.ServerStatsItem["Data Ping"]:GetValue()
-        end)
-
-        label.Text = "FPS: "..fps.." | Ping: "..math.floor(ping).." ms"
+-- Xóa GUI cũ nếu có
+pcall(function()
+    if CoreGui:FindFirstChild("MN95_GUI") then
+        CoreGui.MN95_GUI:Destroy()
     end
 end)
 
-print("✅ Added: FPS + Ping UI & Removed textures (except player)")
+-- Tạo GUI
+local gui = Instance.new("ScreenGui")
+gui.Name = "MN95_GUI"
+gui.ResetOnSpawn = false
+gui.Parent = CoreGui
+
+local textLabel = Instance.new("TextLabel")
+textLabel.Size = UDim2.new(0, 220, 0, 20)
+textLabel.Position = UDim2.new(0, 5, 0, 5)
+textLabel.BackgroundTransparency = 1
+textLabel.Font = Enum.Font.SourceSansBold
+textLabel.TextSize = 14
+textLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+textLabel.TextXAlignment = Enum.TextXAlignment.Left
+textLabel.Text = "CryoXHUB | FPS: 0 | PING: 0"
+textLabel.Parent = gui
+
+-- Rainbow color
+local function rainbowColor(hue)
+	return Color3.fromHSV(hue, 1, 1)
+end
+
+-- FPS
+local fps = 0
+local frames = 0
+local lastTime = tick()
+
+RunService.RenderStepped:Connect(function()
+	frames += 1
+	local now = tick()
+	if now - lastTime >= 1 then
+		fps = frames
+		frames = 0
+		lastTime = now
+	end
+end)
+
+-- Update text + ping + rainbow
+task.spawn(function()
+	local hue = 0
+	while true do
+		task.wait(0.3)
+
+		hue = (hue + 0.02) % 1
+		textLabel.TextColor3 = rainbowColor(hue)
+
+		local ping = 0
+		pcall(function()
+			ping = Stats.Network.ServerStatsItem["Data Ping"]:GetValue()
+		end)
+
+		textLabel.Text = "MN95 ANTI LAG | FPS: " .. fps .. " | PING: " .. math.floor(ping) .. "ms"
+	end
+end)
+
+print(" Added: MN95 FPS + Ping UI")
+
 -- =========================
--- 🔔 NOTIFICATION
+--  NOTIFICATION
 -- =========================
 pcall(function()
     game:GetService("StarterGui"):SetCore("SendNotification", {
