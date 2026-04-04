@@ -10,7 +10,7 @@ local KEY_CHINH_XAC = "CryoXHUB"
 
 local TechUnlocked = false
 local ScriptUnlocked = false
-local CurrentKeyTarget = "" 
+local CurrentKeyTarget = ""
 
 -- KHUNG CHÍNH
 local MainFrame = Instance.new("Frame")
@@ -114,8 +114,8 @@ Instance.new("UICorner", SubmitBtn).CornerRadius = UDim.new(0, 8)
 Instance.new("UIStroke", SubmitBtn).Color = Color3.fromRGB(0, 200, 200)
 
 local function clearContent()
-    for _, v in pairs(ContentFrame:GetChildren()) do 
-        if v:IsA("TextButton") then v:Destroy() end 
+    for _, v in pairs(ContentFrame:GetChildren()) do
+        if v:IsA("TextButton") then v:Destroy() end
     end
 end
 
@@ -134,14 +134,14 @@ local function createScriptBtn(name, code)
     local s = Instance.new("UIStroke", btn)
     s.Color = Color3.fromRGB(0, 200, 200)
     s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
-    btn.MouseButton1Click:Connect(function() 
-        task.spawn(loadstring(code)) 
+    btn.MouseButton1Click:Connect(function()
+        task.spawn(loadstring(code))
     end)
 end
 
 local function createTabBtn(name)
     local btn = Instance.new("TextButton")
-    btn.Size = UDim2.new(0, 75, 0, 30) 
+    btn.Size = UDim2.new(0, 75, 0, 30)
     btn.Text = name
     btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
     btn.TextColor3 = Color3.fromRGB(0, 0, 0)
@@ -174,12 +174,12 @@ local function LoadTechContent()
     createScriptBtn("Kiba Tech", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_1593573630798166.lua.txt"))()]])
     createScriptBtn("Oreo Tech", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/OreoTech/refs/heads/main/Protected_6856895483929371.lua"))()]])
 
-    createScriptBtn("Lethal Dash", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57a4d240a2440f0450986c966469092ccfb8d4797392cb8f469fa8b6e605e64d/download"))()]])
+    createScriptBtn("Lethal Dash", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57a4d240a2440f0450986c966469092ccfb8d4797392cb8f469fa8b6e605e64d/download"))()]])  
 
-    createScriptBtn("Back dash cancel", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/dinhthanhtuankiet1762009-sudo/Js/refs/heads/main/4418648b0e9b71ef.lua"))()]])
+    createScriptBtn("Back dash cancel", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/dinhthanhtuankiet1762009-sudo/Js/refs/heads/main/4418648b0e9b71ef.lua"))()]])  
 
-    createScriptBtn("Instant twised v2", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/60a7a7c77395006ebd63fce0a17c13241f932bd414c9aba3158b716da00ade01/download"))()]])
-    
+    createScriptBtn("Instant twised v2", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/60a7a7c77395006ebd63fce0a17c13241f932bd414c9aba3158b716da00ade01/download"))()]])  
+  
     createScriptBtn("loop dash", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/28513f51c0ca2c03d4d7d94f59215d13ce1a2a470bf187f0a685b58ccb4dae98/download"))()]])
 end
 
@@ -202,13 +202,13 @@ ShaderBtn.MouseButton1Click:Connect(function()
     KeyFrame.Visible = false
     ContentFrame.Visible = true
     clearContent()
-    
-    createScriptBtn("Custom Shader", [[
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()
+
+    createScriptBtn("Custom Shader", [[  
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()  
     ]])
 end)
 
--- TAB SCRIPT (ĐÃ THÊM 2 MỤC)
+-- TAB SCRIPT (ĐÃ THÊM Avatar Changer và Dex)
 local ScriptBtn = createTabBtn("SCRIPT")
 ScriptBtn.MouseButton1Click:Connect(function()
     if ScriptUnlocked then
@@ -216,18 +216,27 @@ ScriptBtn.MouseButton1Click:Connect(function()
         ContentFrame.Visible = true
         clearContent()
 
-        createScriptBtn("Fly GuiV3", [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()
+        createScriptBtn("Fly GuiV3", [[  
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()  
+        ]])  
+
+        createScriptBtn("Anti Death Counter", [[  
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Anti-Death-Counter.lua"))()  
+        ]])  
+
+        -- === MỤC MỚI ĐƯỢC THÊM ===
+        createScriptBtn("Avatar Changer", [[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/darkdexv2/universalavatarchanger/main/avatarchanger"))()
         ]])
 
-        createScriptBtn("Anti Death Counter", [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Anti-Death-Counter.lua"))()
+        createScriptBtn("Dex", [[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Dex_Explorer_v2.lua"))()
         ]])
 
-    else
-        CurrentKeyTarget = "SCRIPT"
-        ContentFrame.Visible = false
-        KeyFrame.Visible = true
+    else  
+        CurrentKeyTarget = "SCRIPT"  
+        ContentFrame.Visible = false  
+        KeyFrame.Visible = true  
     end
 end)
 
@@ -269,14 +278,14 @@ CloseBtn.ZIndex = 5
 CloseBtn.Parent = MainFrame
 Instance.new("UICorner", CloseBtn).CornerRadius = UDim.new(1, 0)
 
-CloseBtn.MouseButton1Click:Connect(function() 
-    MainFrame.Visible = false 
-    OpenButton.Visible = true 
+CloseBtn.MouseButton1Click:Connect(function()
+    MainFrame.Visible = false
+    OpenButton.Visible = true
 end)
 
-OpenButton.MouseButton1Click:Connect(function() 
-    MainFrame.Visible = true 
-    OpenButton.Visible = false 
+OpenButton.MouseButton1Click:Connect(function()
+    MainFrame.Visible = true
+    OpenButton.Visible = false
 end)
 
 -- Mở tab FPS mặc định
