@@ -134,6 +134,7 @@ local function createScriptBtn(name, code)
     local s = Instance.new("UIStroke", btn)
     s.Color = Color3.fromRGB(0, 200, 200)
     s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+    
     btn.MouseButton1Click:Connect(function()
         task.spawn(loadstring(code))
     end)
@@ -174,12 +175,12 @@ local function LoadTechContent()
     createScriptBtn("Kiba Tech", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_1593573630798166.lua.txt"))()]])
     createScriptBtn("Oreo Tech", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/OreoTech/refs/heads/main/Protected_6856895483929371.lua"))()]])
 
-    createScriptBtn("Lethal Dash", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57a4d240a2440f0450986c966469092ccfb8d4797392cb8f469fa8b6e605e64d/download"))()]])  
+    createScriptBtn("Lethal Dash", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57a4d240a2440f0450986c966469092ccfb8d4797392cb8f469fa8b6e605e64d/download"))()]])    
 
-    createScriptBtn("Back dash cancel", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/dinhthanhtuankiet1762009-sudo/Js/refs/heads/main/4418648b0e9b71ef.lua"))()]])  
+    createScriptBtn("Back dash cancel", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/dinhthanhtuankiet1762009-sudo/Js/refs/heads/main/4418648b0e9b71ef.lua"))()]])    
 
-    createScriptBtn("Instant twised v2", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/60a7a7c77395006ebd63fce0a17c13241f932bd414c9aba3158b716da00ade01/download"))()]])  
-  
+    createScriptBtn("Instant twised v2", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/60a7a7c77395006ebd63fce0a17c13241f932bd414c9aba3158b716da00ade01/download"))()]])    
+
     createScriptBtn("loop dash", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/28513f51c0ca2c03d4d7d94f59215d13ce1a2a470bf187f0a685b58ccb4dae98/download"))()]])
 end
 
@@ -203,12 +204,12 @@ ShaderBtn.MouseButton1Click:Connect(function()
     ContentFrame.Visible = true
     clearContent()
 
-    createScriptBtn("Custom Shader", [[  
-        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()  
+    createScriptBtn("Custom Shader", [[    
+        loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()    
     ]])
 end)
 
--- TAB SCRIPT (ĐÃ THÊM Avatar Changer và Dex)
+-- TAB SCRIPT (ĐÃ THÊM Shield và TouchFling)
 local ScriptBtn = createTabBtn("SCRIPT")
 ScriptBtn.MouseButton1Click:Connect(function()
     if ScriptUnlocked then
@@ -216,27 +217,35 @@ ScriptBtn.MouseButton1Click:Connect(function()
         ContentFrame.Visible = true
         clearContent()
 
-        createScriptBtn("Fly GuiV3", [[  
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()  
+        createScriptBtn("Fly GuiV3", [[    
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()    
+        ]])    
+
+        createScriptBtn("Anti Death Counter", [[    
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Anti-Death-Counter.lua"))()    
+        ]])    
+
+        createScriptBtn("Avatar Changer", [[  
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/darkdexv2/universalavatarchanger/main/avatarchanger"))()  
         ]])  
 
-        createScriptBtn("Anti Death Counter", [[  
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Anti-Death-Counter.lua"))()  
+        createScriptBtn("Dex", [[  
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Dex_Explorer_v2.lua"))()  
         ]])  
 
         -- === MỤC MỚI ĐƯỢC THÊM ===
-        createScriptBtn("Avatar Changer", [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/darkdexv2/universalavatarchanger/main/avatarchanger"))()
+        createScriptBtn("Shield", [[
+            Instance.new("ForceField", game.Players.LocalPlayer.Character)
         ]])
 
-        createScriptBtn("Dex", [[
-            loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Dex_Explorer_v2.lua"))()
+        createScriptBtn("TouchFling", [[
+            loadstring(game:HttpGet("https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"))()
         ]])
 
-    else  
-        CurrentKeyTarget = "SCRIPT"  
-        ContentFrame.Visible = false  
-        KeyFrame.Visible = true  
+    else    
+        CurrentKeyTarget = "SCRIPT"    
+        ContentFrame.Visible = false    
+        KeyFrame.Visible = true    
     end
 end)
 
