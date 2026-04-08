@@ -407,6 +407,8 @@ createAbcBtn("dimension")
 createAbcBtn("everytime we touch")
 createAbcBtn("into the night")
 createAbcBtn("sphere[creo]")
+createAbcBtn("love machine[ft teto]")
+createAbcBtn("at the speed of light")
 
 local sideOpen = false
 
