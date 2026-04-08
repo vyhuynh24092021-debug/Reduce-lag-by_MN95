@@ -400,13 +400,13 @@ local function createAbcBtn(text)
 	return btn
 end
 
-createAbcBtn("Abc1")
-createAbcBtn("Abc2")
-createAbcBtn("Abc3")
-createAbcBtn("Abc4")
-createAbcBtn("Abc5")
-createAbcBtn("Abc6")
-createAbcBtn("Abc7")
+createAbcBtn("It going down now")
+createAbcBtn("Monster[yoasobi]")
+createAbcBtn("overthink")
+createAbcBtn("dimension")
+createAbcBtn("everytime we touch")
+createAbcBtn("into the night")
+createAbcBtn("sphere[creo]")
 
 local sideOpen = false
 
