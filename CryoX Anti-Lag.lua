@@ -3,7 +3,7 @@
 -- =========================
 Remove_Grass = true
 Remove_Trees = true
-Remove_Walls = true
+Remove_Walls = false
 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/louismich4el/ItsLouisPlayz-Scripts/refs/heads/main/Anti%20Lag%20V2.lua"))()
 loadstring(game:HttpGet("https://raw.githubusercontent.com/marianscriptKing/SUPER-MAX.lau/main/SUPER%20MAX%20PERFORMANCE"))()
