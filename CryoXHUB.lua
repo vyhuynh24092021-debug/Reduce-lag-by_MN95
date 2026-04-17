@@ -308,7 +308,8 @@ local function LoadMovesetContent()
     clearContent()
     -- Bạn có thể thêm các script Moveset vào đây
     createScriptBtn("Custom Moveset V1", [[loadstring(game:HttpGet("Link_Script_Moveset_Tai_Day"))()]])
-    createScriptBtn("Gojo Moveset", [[loadstring(game:HttpGet("Link_Script_Moveset_2"))()]])
+    createScriptBtn("Gojo Moveset", [[getgenv().morph = false -- turn false to true if you want custom accessories
+loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletfan2007/BaldyToSorcerer/refs/heads/main/LatestV2.lua"))()"))()]])
 end
 
 local MovesetBtn = createTabBtn("MOVESET")
