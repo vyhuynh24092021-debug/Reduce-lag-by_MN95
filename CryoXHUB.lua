@@ -61,11 +61,17 @@ TitleText.TextSize = 18
 TitleText.TextXAlignment = Enum.TextXAlignment.Left
 TitleText.Parent = MainFrame
 
-local TabFrame = Instance.new("Frame")
-TabFrame.Size = UDim2.new(0, 350, 0, 35)
-TabFrame.Position = UDim2.new(0, 125, 0, 10)
+-- PHẦN ĐÃ FIX: CHUYỂN THÀNH SCROLLINGFRAME ĐỂ KÉO NGANG
+local TabFrame = Instance.new("ScrollingFrame")
+TabFrame.Size = UDim2.new(0, 355, 0, 42) -- Giới hạn khung nhìn 355px
+TabFrame.Position = UDim2.new(0, 125, 0, 5)
 TabFrame.BackgroundTransparency = 1
+TabFrame.BorderSizePixel = 0
 TabFrame.ZIndex = 2
+TabFrame.ScrollBarThickness = 0 -- Ẩn thanh cuộn để đẹp hơn
+TabFrame.CanvasSize = UDim2.new(0, 0, 0, 0)
+TabFrame.AutomaticCanvasSize = Enum.AutomaticSize.X -- Tự động dài vùng chứa để kéo
+TabFrame.ScrollingDirection = Enum.ScrollingDirection.X -- Chỉ cho phép kéo ngang
 TabFrame.Parent = MainFrame
 
 local TabListLayout = Instance.new("UIListLayout")
@@ -73,6 +79,12 @@ TabListLayout.FillDirection = Enum.FillDirection.Horizontal
 TabListLayout.Padding = UDim.new(0, 8)
 TabListLayout.VerticalAlignment = Enum.VerticalAlignment.Center
 TabListLayout.Parent = TabFrame
+
+-- Thêm khoảng đệm để nút không sát mép
+local TabPadding = Instance.new("UIPadding")
+TabPadding.PaddingLeft = UDim.new(0, 5)
+TabPadding.PaddingRight = UDim.new(0, 10)
+TabPadding.Parent = TabFrame
 
 local TopLine = Instance.new("Frame")
 TopLine.Size = UDim2.new(1, -30, 0, 2)
@@ -149,18 +161,19 @@ local function createScriptBtn(name, code)
 	ApplyCyanButtonStyle(btn, 12)
 
 	btn.MouseButton1Click:Connect(function()
-		task.spawn(loadstring(code))
+		local func, err = loadstring(code)
+        if func then task.spawn(func) else warn(err) end
 	end)
 end
 
 local function createTabBtn(name)
 	local btn = Instance.new("TextButton")
-	btn.Size = UDim2.new(0, 75, 0, 30)
+	btn.Size = UDim2.new(0, 80, 0, 30) -- Kích thước tab đồng nhất
 	btn.Text = name
 	btn.BackgroundColor3 = Color3.fromRGB(255, 255, 255)
 	btn.TextColor3 = Color3.fromRGB(0, 0, 0)
 	btn.Font = Enum.Font.GothamBold
-	btn.TextSize = 13
+	btn.TextSize = 12
 	btn.TextXAlignment = Enum.TextXAlignment.Center
 	btn.TextYAlignment = Enum.TextYAlignment.Center
 	btn.ZIndex = 3
@@ -168,6 +181,8 @@ local function createTabBtn(name)
 	ApplyCyanButtonStyle(btn, 12)
 	return btn
 end
+
+
 
 -- TAB FPS
 local function LoadFPSContent()
