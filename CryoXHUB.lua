@@ -307,9 +307,10 @@ local function LoadMovesetContent()
     ContentFrame.Visible = true
     clearContent()
     -- Bạn có thể thêm các script Moveset vào đây
-    createScriptBtn("Custom Moveset V1", [[loadstring(game:HttpGet("Link_Script_Moveset_Tai_Day"))()]])
-    createScriptBtn("Gojo Moveset", [[getgenv().morph = false
+    createScriptBtn("SUKUNA[SAITAMA]", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/damir512/whendoesbrickdie/main/tspno.txt",true))()]])
+    createScriptBtn("Gojo[SAITAMA]", [[getgenv().morph = false
 loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletfan2007/BaldyToSorcerer/refs/heads/main/LatestV2.lua"))()]])
+	createScriptBtn("SungJinWoo[SAITAMA]", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/hamletirl/sunjingwoo/refs/heads/main/sunjingwoo"))()]])
 end
 
 local MovesetBtn = createTabBtn("MOVESET")
