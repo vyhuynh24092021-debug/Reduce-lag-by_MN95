@@ -273,6 +273,33 @@ CloseBtn.ZIndex = 5
 CloseBtn.Parent = MainFrame
 ApplyCyanButtonStyle(CloseBtn, 15)
 
+-- TAB AURA
+local function LoadAuraContent()
+    KeyFrame.Visible = false
+    ContentFrame.Visible = true
+    clearContent()
+    -- Bạn có thể thêm các script Aura vào đây
+    createScriptBtn("Blue Flame Aura", [[loadstring(game:HttpGet("Link_Script_Aura_Tai_Day"))()]])
+    createScriptBtn("Ultra Instinct Aura", [[loadstring(game:HttpGet("Link_Script_Aura_2"))()]])
+end
+
+local AuraBtn = createTabBtn("AURA")
+AuraBtn.MouseButton1Click:Connect(LoadAuraContent)
+
+-- TAB MOVESET
+local function LoadMovesetContent()
+    KeyFrame.Visible = false
+    ContentFrame.Visible = true
+    clearContent()
+    -- Bạn có thể thêm các script Moveset vào đây
+    createScriptBtn("Custom Moveset V1", [[loadstring(game:HttpGet("Link_Script_Moveset_Tai_Day"))()]])
+    createScriptBtn("Gojo Moveset", [[loadstring(game:HttpGet("Link_Script_Moveset_2"))()]])
+end
+
+local MovesetBtn = createTabBtn("MOVESET")
+MovesetBtn.MouseButton1Click:Connect(LoadMovesetContent)
+
+
 -- ===== SIDE UI + PANEL DƯỚI =====
 local RunService = game:GetService("RunService")
 
