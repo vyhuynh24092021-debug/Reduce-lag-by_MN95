@@ -310,7 +310,7 @@ local function LoadMovesetContent()
     createScriptBtn("SUKUNA[SAITAMA]", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/damir512/whendoesbrickdie/main/tspno.txt",true))()]])
     createScriptBtn("Gojo[SAITAMA]", [[getgenv().morph = false
 loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletfan2007/BaldyToSorcerer/refs/heads/main/LatestV2.lua"))()]])
-	createScriptBtn("SungJinWoo[SAITAMA]", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/hamletirl/sunjingwoo/refs/heads/main/sunjingwoo"))()]])
+	createScriptBtn("CHARA[SAITAMA]", [[loadstring(game:HttpGet("https://pastefy.app/gFRaeMGz/raw"))()]])
 end
 
 local MovesetBtn = createTabBtn("MOVESET")
