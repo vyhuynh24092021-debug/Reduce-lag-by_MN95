@@ -630,6 +630,7 @@ local function LoadMoveset()
     makeScriptBtn("Gojo [SAITAMA]",[[getgenv().morph=false
 loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletfan2007/BaldyToSorcerer/refs/heads/main/LatestV2.lua"))()]])
     makeScriptBtn("CHARA [SAITAMA]",[[loadstring(game:HttpGet("https://pastefy.app/gFRaeMGz/raw"))()]])
+    makeScriptBtn("Sancho[SAITAMA]",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/Sancho-Moveset/refs/heads/main/TSB"))()]])
 end
 
 -- ══════════════════════════════════════════
