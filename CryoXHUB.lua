@@ -16,30 +16,66 @@ local ID_ANH_NEN    = "rbxthumb://type=Asset&id=116367849760314&w=420&h=420"
 local ID_LOGO_DONG  = "rbxthumb://type=Asset&id=135753950157111&w=420&h=420"
 local KEY_CHINH_XAC = "CryoXHUB"
 
--- ══ KEY 24H SYSTEM (Delta compatible - dùng getgenv) ══
+-- ══════════════════════════════════════════
+--   FILE SAVE SYSTEM (Delta workspace)
+-- ══════════════════════════════════════════
+local SAVE_FILE = "CryoXHUB_save.json"
+
+local DEFAULT_SAVE = {
+	keyVerified = false,
+	keyTime     = 0,
+	accentR     = 0,
+	accentG     = 210,
+	accentB     = 255,
+	showFPS     = false,
+	showPing    = false,
+	showPlayers = false,
+}
+
+local function loadSave()
+	local ok, result = pcall(function()
+		if isfile and isfile(SAVE_FILE) then
+			return HttpService:JSONDecode(readfile(SAVE_FILE))
+		end
+	end)
+	if ok and result then
+		for k, v in pairs(DEFAULT_SAVE) do
+			if result[k] == nil then result[k] = v end
+		end
+		return result
+	end
+	return DEFAULT_SAVE
+end
+
+local function writeSave(data)
+	pcall(function()
+		writefile(SAVE_FILE, HttpService:JSONEncode(data))
+	end)
+end
+
+local SaveData = loadSave()
+
+-- ══ KEY 24H SYSTEM ══
 local keyVerified = false
 
--- getgenv() giữ data xuyên suốt session Delta (không mất khi rejoin cùng game)
-if not getgenv().CryoXHUB_KeyData then
-	getgenv().CryoXHUB_KeyData = {verified = false, time = 0}
-end
-
-local function saveKeyTime()
-	getgenv().CryoXHUB_KeyData = {verified = true, time = os.time()}
-end
-
 local function checkKeyValid()
-	local d = getgenv().CryoXHUB_KeyData
-	if d and d.verified then
-		local diff = os.time() - (d.time or 0)
-		if diff < 86400 then -- 24 giờ
+	if SaveData.keyVerified then
+		local diff = os.time() - (SaveData.keyTime or 0)
+		if diff < 86400 then
 			return true
 		else
-			-- Hết hạn, reset
-			getgenv().CryoXHUB_KeyData = {verified = false, time = 0}
+			SaveData.keyVerified = false
+			SaveData.keyTime = 0
+			writeSave(SaveData)
 		end
 	end
 	return false
+end
+
+local function saveKeyTime()
+	SaveData.keyVerified = true
+	SaveData.keyTime = os.time()
+	writeSave(SaveData)
 end
 
 keyVerified = checkKeyValid()
@@ -49,20 +85,30 @@ local C = {
 	BG     = Color3.fromRGB(4,   8,  18),
 	PANEL  = Color3.fromRGB(8,  16,  32),
 	PANEL2 = Color3.fromRGB(12, 22,  42),
-	CYAN   = Color3.fromRGB(0,  210, 255),
+	CYAN   = Color3.fromRGB(SaveData.accentR, SaveData.accentG, SaveData.accentB),
 	TEXT   = Color3.fromRGB(220,240, 255),
 	SUB    = Color3.fromRGB(100,160, 200),
 	RED    = Color3.fromRGB(200, 50,  50),
 	GREEN  = Color3.fromRGB(50,  220, 120),
 }
 
--- Setting state
+-- Setting state — load từ file
 local Settings = {
-	accentColor  = Color3.fromRGB(0, 210, 255), -- cyan mặc định
-	showFPS      = false,
-	showPing     = false,
-	showPlayers  = false,
+	accentColor = Color3.fromRGB(SaveData.accentR, SaveData.accentG, SaveData.accentB),
+	showFPS     = SaveData.showFPS,
+	showPing    = SaveData.showPing,
+	showPlayers = SaveData.showPlayers,
 }
+
+local function saveSettings()
+	SaveData.accentR     = math.floor(Settings.accentColor.R * 255)
+	SaveData.accentG     = math.floor(Settings.accentColor.G * 255)
+	SaveData.accentB     = math.floor(Settings.accentColor.B * 255)
+	SaveData.showFPS     = Settings.showFPS
+	SaveData.showPing    = Settings.showPing
+	SaveData.showPlayers = Settings.showPlayers
+	writeSave(SaveData)
+end
 
 local function tw(obj, props, t, style, dir)
 	TweenService:Create(obj, TweenInfo.new(
@@ -288,7 +334,7 @@ local KeySub = Instance.new("TextLabel")
 KeySub.Size = UDim2.new(1,-20,0,16)
 KeySub.Position = UDim2.new(0,10,0.1,68)
 KeySub.BackgroundTransparency = 1
-KeySub.Text = "vui lòng nhập key hợp lệ"
+KeySub.Text = "Key hợp lệ trong 24 giờ  •  Key: CryoXHUB"
 KeySub.TextColor3 = C.SUB
 KeySub.Font = Enum.Font.Gotham
 KeySub.TextSize = 11
@@ -1272,6 +1318,7 @@ local function applyAccentColor(newColor)
 		end
 	end
 	StatPlayersLbl.TextColor3 = newColor
+	saveSettings()
 	showToast("🎨  Đã đổi màu accent!", newColor, 2)
 end
 
@@ -1299,16 +1346,19 @@ local function LoadSetting()
 	makeToggle("📊  Show FPS", Settings.showFPS, function(v)
 		Settings.showFPS = v
 		updateStatWidget()
+		saveSettings()
 	end)
 
 	makeToggle("📶  Show Ping", Settings.showPing, function(v)
 		Settings.showPing = v
 		updateStatWidget()
+		saveSettings()
 	end)
 
 	makeToggle("👥  Show Players", Settings.showPlayers, function(v)
 		Settings.showPlayers = v
 		updateStatWidget()
+		saveSettings()
 	end)
 end
 
