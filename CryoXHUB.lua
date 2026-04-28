@@ -16,9 +16,6 @@ local ID_ANH_NEN    = "rbxthumb://type=Asset&id=116367849760314&w=420&h=420"
 local ID_LOGO_DONG  = "rbxthumb://type=Asset&id=135753950157111&w=420&h=420"
 local KEY_CHINH_XAC = "CryoXHUB"
 
--- ══════════════════════════════════════════
---   FILE SAVE SYSTEM (Delta workspace)
--- ══════════════════════════════════════════
 local SAVE_FILE = "CryoXHUB_save.json"
 
 local DEFAULT_SAVE = {
@@ -56,7 +53,6 @@ end
 
 local SaveData = loadSave()
 
--- ══ KEY 24H SYSTEM ══
 local keyVerified = false
 
 local function checkKeyValid()
@@ -81,7 +77,6 @@ end
 
 keyVerified = checkKeyValid()
 
--- ══ MÀUSẮC ══
 local C = {
 	BG     = Color3.fromRGB(4,   8,  18),
 	PANEL  = Color3.fromRGB(8,  16,  32),
@@ -93,7 +88,6 @@ local C = {
 	GREEN  = Color3.fromRGB(50,  220, 120),
 }
 
--- Setting state — load từ file
 local Settings = {
 	accentColor = Color3.fromRGB(SaveData.accentR, SaveData.accentG, SaveData.accentB),
 	showFPS     = SaveData.showFPS,
@@ -146,7 +140,6 @@ local function glowOrb(p, tr)
 	g.Parent = p
 end
 
--- KÍCH THƯỚC
 local PAD       = 5
 local GAP       = 5
 local LEFT_W    = 148
@@ -158,9 +151,6 @@ local AVATAR_H  = 148
 local UPDATE_H  = ROOT_H - PAD*2 - AVATAR_H - GAP
 local CONTENT_H = ROOT_H - PAD*2 - TAB_H - GAP
 
--- ══════════════════════════════════════════
---   TOAST NOTIFICATION
--- ══════════════════════════════════════════
 local function showToast(msg, color, duration)
 	color = color or C.CYAN
 	duration = duration or 3
@@ -222,7 +212,6 @@ local function showToast(msg, color, duration)
 	ToastMsg.ZIndex = 51
 	ToastMsg.Parent = Toast
 
-	-- Slide lên
 	tw(Toast, {Position = UDim2.new(0.5, -150, 1, -70)}, 0.35, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 	task.wait(duration)
 	tw(Toast, {Position = UDim2.new(0.5, -150, 1, 70)}, 0.28, Enum.EasingStyle.Quint, Enum.EasingDirection.In)
@@ -230,9 +219,6 @@ local function showToast(msg, color, duration)
 	Toast:Destroy()
 end
 
--- ══════════════════════════════════════════
---   ROOT
--- ══════════════════════════════════════════
 local Root = Instance.new("Frame")
 Root.Size = UDim2.new(0,ROOT_W,0,ROOT_H)
 Root.Position = UDim2.new(0.5,-ROOT_W/2,0.5,-ROOT_H/2)
@@ -270,9 +256,6 @@ RootLayout.FillDirection = Enum.FillDirection.Horizontal
 RootLayout.Padding = UDim.new(0,GAP)
 RootLayout.Parent = Root
 
--- ══════════════════════════════════════════
---   KEY OVERLAY
--- ══════════════════════════════════════════
 local KeyOverlay = Instance.new("Frame")
 KeyOverlay.Size = UDim2.new(1,0,1,0)
 KeyOverlay.Position = UDim2.new(0,0,0,0)
@@ -389,9 +372,6 @@ KeySubmit.MouseLeave:Connect(function()
 	tw(KeySubmit, {BackgroundColor3 = C.CYAN}, 0.12)
 end)
 
--- ══════════════════════════════════════════
---   LEFT COLUMN
--- ══════════════════════════════════════════
 local LeftCol = Instance.new("Frame")
 LeftCol.Size = UDim2.new(0,LEFT_W,1,0)
 LeftCol.BackgroundTransparency = 1
@@ -500,7 +480,6 @@ VerLbl.TextXAlignment = Enum.TextXAlignment.Center
 VerLbl.ZIndex = 5
 VerLbl.Parent = AvatarCard
 
--- ══ STAT LABELS — chỉ chữ, không nền, không GUI, góc trái dưới avatar Roblox ══
 local StatFPSLbl = Instance.new("TextLabel")
 StatFPSLbl.Size = UDim2.new(0, 200, 0, 16)
 StatFPSLbl.Position = UDim2.new(0, 8, 0, 52)
@@ -540,7 +519,6 @@ StatPlayersLbl.ZIndex = 10
 StatPlayersLbl.Visible = false
 StatPlayersLbl.Parent = ScreenGui
 
--- ══ DASH CD LABELS ══
 local DashCDLabel = Instance.new("TextLabel")
 DashCDLabel.Size = UDim2.new(0, 100, 0, 20)
 DashCDLabel.AnchorPoint = Vector2.new(0.5, 1)
@@ -569,7 +547,6 @@ SideCDLabel.Visible = false
 SideCDLabel.ZIndex = 10
 SideCDLabel.Parent = ScreenGui
 
--- ══ DASH CD LOGIC ══
 local cdCooldowns = { Dash = 5.5, Side = 2.3 }
 local activeCD    = { Dash = 0,   Side = 0   }
 local pendingDash = false
@@ -682,13 +659,13 @@ local UP2 = Instance.new("UIPadding", UpdateScroll)
 UP2.PaddingTop = UDim.new(0,2)
 
 local updates = {
+	{"v3.5","Tab Visual, Emote, Accessories mới"},
 	{"v3.5","Tab SERVER + SETTING, Key 24H"},
 	{"v3.5","Toast 30 phút, FPS/Ping live"},
 	{"v3.4","Key overlay che GUI, 1 lần"},
 	{"v3.3","Key mỗi lần vào, đơn giản"},
 	{"v3.2","Key trong content, ẩn tab"},
 	{"v3.0","Tăng kích thước right panel"},
-	{"v2.1","Fix animation + kích thước"},
 	{"v2.0","Redesign toàn bộ GUI"},
 }
 for _, u in ipairs(updates) do
@@ -723,9 +700,6 @@ for _, u in ipairs(updates) do
 	desc.Parent = row
 end
 
--- ══════════════════════════════════════════
---   RIGHT COLUMN
--- ══════════════════════════════════════════
 local RightCol = Instance.new("Frame")
 RightCol.Size = UDim2.new(0,RIGHT_W,1,0)
 RightCol.BackgroundTransparency = 1
@@ -839,9 +813,6 @@ CPad.PaddingTop    = UDim.new(0,3)
 CPad.PaddingBottom = UDim.new(0,3)
 CPad.Parent = ContentFrame
 
--- ══════════════════════════════════════════
---   OPEN BUTTON
--- ══════════════════════════════════════════
 local OpenBtn = Instance.new("ImageButton")
 OpenBtn.Size = UDim2.new(0,46,0,46)
 OpenBtn.Position = UDim2.new(0,12,0.5,-23)
@@ -855,9 +826,6 @@ corner(OpenBtn, 10)
 stroke(OpenBtn, 1.5, 0.15)
 glowOrb(OpenBtn, 0.82)
 
--- ══════════════════════════════════════════
---   ANIMATIONS
--- ══════════════════════════════════════════
 local function animateOpen()
 	Root.Visible = true
 	Root.Size = UDim2.new(0, ROOT_W * 0.9, 0, ROOT_H * 0.9)
@@ -881,9 +849,6 @@ local function animateClose(cb)
 	if cb then cb() end
 end
 
--- ══════════════════════════════════════════
---   TAB SLIDE
--- ══════════════════════════════════════════
 local currentTabIndex = 1
 local isSliding = false
 
@@ -910,9 +875,6 @@ local function slideContent(newIndex, loadFunc)
 	isSliding = false
 end
 
--- ══════════════════════════════════════════
---   TAB FACTORIES
--- ══════════════════════════════════════════
 local activeTab = nil
 
 local function setActive(btn, index, loadFunc)
@@ -1070,8 +1032,14 @@ end
 -- ══════════════════════════════════════════
 --   CONTENT LOADERS
 -- ══════════════════════════════════════════
+
+-- FPS TAB (thêm scripts mới)
 local function LoadFPS()
-	makeScriptBtn("CryoX Anti-Lag",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/CryoX%20Anti-Lag.lua"))()]])
+	makeScriptBtn("CryoX Anti-Lag",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/CryoX%20Anti-Lag.lua"))()]])
+	makeScriptBtn("Blox Strap",            [[loadstring(game:HttpGet("https://raw.githubusercontent.com/qwertyui-is-back/Bloxstrap/main/Initiate.lua"))()]])
+	makeScriptBtn("Turbo Lite",            [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua"))()]])
+	makeScriptBtn("Flags",                 [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ngoclinh02042011-stack/Flags-Smooth/refs/heads/main/Flags%20by%20ThanhDuy.lua"))()]])
+	makeScriptBtn("Anti Lag Remove Effect",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/YQANTGV2/YQANTGV2/refs/heads/main/Protected_5743487458031851.lua.txt"))()]])
 end
 
 local function LoadTech()
@@ -1084,8 +1052,17 @@ local function LoadTech()
 	makeScriptBtn("Loop Dash",         [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/28513f51c0ca2c03d4d7d94f59215d13ce1a2a470bf187f0a685b58ccb4dae98/download"))()]])
 end
 
-local function LoadShader()
-	makeScriptBtn("Custom Shader",[[loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()]])
+-- VISUAL TAB (gộp Shader + Aura + thêm mới)
+local function LoadVisual()
+	makeSectionLabel("EFFECTS")
+	makeScriptBtn("M1 Effect [Red+Blue]", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ngoclinh02042011-stack/Fist-Blue-And-Red/refs/heads/main/HieuUngVuiNhon.lua"))()]])
+	makeScriptBtn("Fake Animation",       [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Mautiku/ehh/main/strong%20guest.lua.txt"))()]])
+	makeScriptBtn("Ping and CPU",         [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ngoclinh02042011-stack/Ping-All-Game/refs/heads/main/Ping%20Player.lua"))()]])
+	makeSectionLabel("SHADER")
+	makeScriptBtn("Custom Shader",        [[loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()]])
+	makeSectionLabel("AURA")
+	makeScriptBtn("Blue Flame Aura",      [[loadstring(game:HttpGet("Link_Script_Aura_Tai_Day"))()]])
+	makeScriptBtn("Ultra Instinct Aura",  [[loadstring(game:HttpGet("Link_Script_Aura_2"))()]])
 end
 
 local function LoadScript()
@@ -1097,11 +1074,6 @@ local function LoadScript()
 	makeScriptBtn("TouchFling",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"))()]])
 end
 
-local function LoadAura()
-	makeScriptBtn("Blue Flame Aura",    [[loadstring(game:HttpGet("Link_Script_Aura_Tai_Day"))()]])
-	makeScriptBtn("Ultra Instinct Aura",[[loadstring(game:HttpGet("Link_Script_Aura_2"))()]])
-end
-
 local function LoadMoveset()
 	makeScriptBtn("KAR [SAITAMA]",  [[loadstring(game:HttpGet("https://raw.githubusercontent.com/OfficialAposty/RBLX-Scripts/refs/heads/main/UltimateLifeForm.lua"))()]])
 	makeScriptBtn("Gojo [SAITAMA]", [[getgenv().morph=false
@@ -1109,7 +1081,24 @@ loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletfan2007/
 	makeScriptBtn("CHARA [SAITAMA]",[[loadstring(game:HttpGet("https://pastefy.app/gFRaeMGz/raw"))()]])
 end
 
--- ══ SERVER TAB ══
+-- EMOTE TAB (mới)
+local function LoadEmote()
+	makeScriptBtn("Divine Form",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/IdkRandomUsernameok/PublicAssets/refs/heads/main/Releases/MUI.lua"))()]])
+	makeScriptBtn("MYKIO Limited Aura", [[loadstring(game:HttpGet("https://arch-http.vercel.app/files/LIMITED EMOTE HUB (75-100) BY MIYKO"))()]])
+	makeScriptBtn("Basic Emote",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/EmoteGui/refs/heads/main/Protected_4900496055951847.lua"))()]])
+	makeScriptBtn("Emerge Emote",       [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Yourfavoriteguy/HAHAHHA/refs/heads/main/EmergeButLow", true))()]])
+	makeScriptBtn("Sukuna Emote",       [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Yourfavoriteguy/Sukunaslash/refs/heads/main/WorldCuttingSlash", true))()]])
+	makeScriptBtn("MIUI",               [[loadstring(game:HttpGet("https://raw.githubusercontent.com/IdkRandomUsernameok/PublicAssets/refs/heads/main/Releases/MUI.lua"))()]])
+end
+
+-- ACCESSORIES TAB (mới)
+local function LoadAccessories()
+	makeScriptBtn("Oinan-Thickhoof-Axe",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Guestly-Scripts/Items-Scripts/refs/heads/main/Oinan-Thickhoof"))()]])
+	makeScriptBtn("Erisyphia-Staff-by-Guestly",    [[loadstring(game:HttpGet("https://raw.githubusercontent.com/GuestlyTheGreatestGuest/Scripts/refs/heads/main/Erisyphia-Staff-made-by-Guestly"))()]])
+	makeScriptBtn("Elemental-Crystal-Golem",       [[loadstring(game:HttpGet("https://raw.githubusercontent.com/GuestlyTheGreatestGuest/Scripts/refs/heads/main/Elemental-Crystal-Golem-made-by-Guestly"))()]])
+end
+
+-- SERVER TAB
 local function LoadServer()
 	makeSectionLabel("SERVER HOP")
 
@@ -1187,7 +1176,6 @@ local function LoadServer()
 
 	makeSectionLabel("JOIN SERVER CỤ THỂ")
 
-	-- Input box nhập Server ID
 	local inputFrame = Instance.new("Frame")
 	inputFrame.Size = UDim2.new(1,-4,0,36)
 	inputFrame.BackgroundColor3 = C.PANEL2
@@ -1267,7 +1255,7 @@ local function LoadServer()
 	end
 end
 
--- ══ SETTING TAB ══
+-- SETTING TAB
 local function makeToggle(labelText, state, onChange)
 	local frame = Instance.new("Frame")
 	frame.Size = UDim2.new(1,-4,0,34)
@@ -1290,7 +1278,6 @@ local function makeToggle(labelText, state, onChange)
 	lbl.ZIndex = 8
 	lbl.Parent = frame
 
-	-- Toggle pill
 	local pill = Instance.new("Frame")
 	pill.Size = UDim2.new(0,38,0,18)
 	pill.Position = UDim2.new(1,-46,0.5,-9)
@@ -1414,7 +1401,6 @@ local THEMES = {
 
 local function LoadSetting()
 	makeSectionLabel("ACCENT COLOR")
-
 	for _, theme in ipairs(THEMES) do
 		local col = theme[2]
 		makeColorBtn(theme[1], col, function()
@@ -1423,25 +1409,21 @@ local function LoadSetting()
 	end
 
 	makeSectionLabel("HIỂN THỊ THÔNG TIN")
-
 	makeToggle("📊  Show FPS", Settings.showFPS, function(v)
 		Settings.showFPS = v
 		updateStatWidget()
 		saveSettings()
 	end)
-
 	makeToggle("📶  Show Ping", Settings.showPing, function(v)
 		Settings.showPing = v
 		updateStatWidget()
 		saveSettings()
 	end)
-
 	makeToggle("👥  Show Players", Settings.showPlayers, function(v)
 		Settings.showPlayers = v
 		updateStatWidget()
 		saveSettings()
 	end)
-
 	makeToggle("⚔️  Show Dash CD", Settings.showDashCD, function(v)
 		Settings.showDashCD = v
 		updateStatWidget()
@@ -1452,23 +1434,25 @@ end
 -- ══════════════════════════════════════════
 --   REGISTER TABS
 -- ══════════════════════════════════════════
-local FPSTab     = makeTab("FPS")
-local TechTab    = makeTab("TECH")
-local ShaderTab  = makeTab("SHADER")
-local ScriptTab  = makeTab("SCRIPT")
-local AuraTab    = makeTab("AURA")
-local MovesetTab = makeTab("MOVESET")
-local ServerTab  = makeTab("SERVER")
-local SettingTab = makeTab("⚙")
+local FPSTab         = makeTab("FPS")
+local TechTab        = makeTab("TECH")
+local VisualTab      = makeTab("VISUAL")
+local ScriptTab      = makeTab("SCRIPT")
+local MovesetTab     = makeTab("MOVESET")
+local EmoteTab       = makeTab("EMOTE")
+local AccessoriesTab = makeTab("ACCESS")
+local ServerTab      = makeTab("SERVER")
+local SettingTab     = makeTab("⚙")
 
-FPSTab.MouseButton1Click:Connect(function()     setActive(FPSTab,1,LoadFPS) end)
-TechTab.MouseButton1Click:Connect(function()    setActive(TechTab,2,LoadTech) end)
-ShaderTab.MouseButton1Click:Connect(function()  setActive(ShaderTab,3,LoadShader) end)
-ScriptTab.MouseButton1Click:Connect(function()  setActive(ScriptTab,4,LoadScript) end)
-AuraTab.MouseButton1Click:Connect(function()    setActive(AuraTab,5,LoadAura) end)
-MovesetTab.MouseButton1Click:Connect(function() setActive(MovesetTab,6,LoadMoveset) end)
-ServerTab.MouseButton1Click:Connect(function()  setActive(ServerTab,7,LoadServer) end)
-SettingTab.MouseButton1Click:Connect(function() setActive(SettingTab,8,LoadSetting) end)
+FPSTab.MouseButton1Click:Connect(function()         setActive(FPSTab,1,LoadFPS) end)
+TechTab.MouseButton1Click:Connect(function()        setActive(TechTab,2,LoadTech) end)
+VisualTab.MouseButton1Click:Connect(function()      setActive(VisualTab,3,LoadVisual) end)
+ScriptTab.MouseButton1Click:Connect(function()      setActive(ScriptTab,4,LoadScript) end)
+MovesetTab.MouseButton1Click:Connect(function()     setActive(MovesetTab,5,LoadMoveset) end)
+EmoteTab.MouseButton1Click:Connect(function()       setActive(EmoteTab,6,LoadEmote) end)
+AccessoriesTab.MouseButton1Click:Connect(function() setActive(AccessoriesTab,7,LoadAccessories) end)
+ServerTab.MouseButton1Click:Connect(function()      setActive(ServerTab,8,LoadServer) end)
+SettingTab.MouseButton1Click:Connect(function()     setActive(SettingTab,9,LoadSetting) end)
 
 -- ══════════════════════════════════════════
 --   KEY SUBMIT — 24H
@@ -1520,7 +1504,6 @@ KeySubmit.MouseButton1Click:Connect(function()
 	end
 end)
 
--- Nếu key còn hạn → tự mở không cần nhập
 if keyVerified then
 	task.spawn(function()
 		task.wait(0.5)
@@ -1528,7 +1511,6 @@ if keyVerified then
 	end)
 end
 
--- CLOSE / OPEN
 CloseBtn.MouseButton1Click:Connect(function()
 	animateClose(function()
 		OpenBtn.Visible = true
@@ -1579,14 +1561,12 @@ RunService.RenderStepped:Connect(function()
 		end
 	end
 
-	-- Dash CD pending
 	if pendingDash then
 		pendingDash = false
 		local dashType = getDashTypeFromDir(savedDir)
 		activeCD[dashType] = cdCooldowns[dashType]
 	end
 
-	-- Dash CD update labels
 	if Settings.showDashCD then
 		for k, v in pairs(activeCD) do
 			if v > 0 then
@@ -1615,7 +1595,7 @@ end)
 -- ══════════════════════════════════════════
 task.spawn(function()
 	while true do
-		task.wait(1800) -- 30 phút
+		task.wait(1800)
 		local msgs = {
 			"💙  Cảm ơn bạn đã dùng CryoXHUB!\nChúc bạn chơi game vui vẻ~",
 			"✨  CryoXHUB v3.5  —  Cảm ơn vì sự tin tưởng!",
@@ -1623,7 +1603,6 @@ task.spawn(function()
 		}
 		local msg = msgs[math.random(1, #msgs)]
 
-		-- Toast đặc biệt hơn — to hơn, neon xanh nổi bật
 		local BigToast = Instance.new("Frame")
 		BigToast.Size = UDim2.new(0, 320, 0, 68)
 		BigToast.Position = UDim2.new(0.5, -160, 1, 80)
@@ -1695,7 +1674,6 @@ task.spawn(function()
 
 		tw(BigToast, {Position = UDim2.new(0.5,-160,1,-88)}, 0.4, Enum.EasingStyle.Back, Enum.EasingDirection.Out)
 
-		-- Animate viền neon nhấp nháy nhẹ
 		for _ = 1, 3 do
 			tw(BTStroke, {Transparency = 0.6}, 0.5)
 			task.wait(0.55)
