@@ -30,6 +30,7 @@ local DEFAULT_SAVE = {
 	showFPS     = false,
 	showPing    = false,
 	showPlayers = false,
+	showDashCD  = false,
 }
 
 local function loadSave()
@@ -98,6 +99,7 @@ local Settings = {
 	showFPS     = SaveData.showFPS,
 	showPing    = SaveData.showPing,
 	showPlayers = SaveData.showPlayers,
+	showDashCD  = SaveData.showDashCD,
 }
 
 local function saveSettings()
@@ -107,6 +109,7 @@ local function saveSettings()
 	SaveData.showFPS     = Settings.showFPS
 	SaveData.showPing    = Settings.showPing
 	SaveData.showPlayers = Settings.showPlayers
+	SaveData.showDashCD  = Settings.showDashCD
 	writeSave(SaveData)
 end
 
@@ -537,10 +540,88 @@ StatPlayersLbl.ZIndex = 10
 StatPlayersLbl.Visible = false
 StatPlayersLbl.Parent = ScreenGui
 
+-- ══ DASH CD LABELS ══
+local DashCDLabel = Instance.new("TextLabel")
+DashCDLabel.Size = UDim2.new(0, 100, 0, 20)
+DashCDLabel.AnchorPoint = Vector2.new(0.5, 1)
+DashCDLabel.Position = UDim2.new(0.5, -60, 1, -125)
+DashCDLabel.BackgroundTransparency = 1
+DashCDLabel.Font = Enum.Font.GothamBold
+DashCDLabel.TextSize = 12
+DashCDLabel.TextColor3 = Color3.fromRGB(50, 220, 120)
+DashCDLabel.TextStrokeTransparency = 0.5
+DashCDLabel.Text = "DASH: READY ✓"
+DashCDLabel.Visible = false
+DashCDLabel.ZIndex = 10
+DashCDLabel.Parent = ScreenGui
+
+local SideCDLabel = Instance.new("TextLabel")
+SideCDLabel.Size = UDim2.new(0, 100, 0, 20)
+SideCDLabel.AnchorPoint = Vector2.new(0.5, 1)
+SideCDLabel.Position = UDim2.new(0.5, 60, 1, -125)
+SideCDLabel.BackgroundTransparency = 1
+SideCDLabel.Font = Enum.Font.GothamBold
+SideCDLabel.TextSize = 12
+SideCDLabel.TextColor3 = Color3.fromRGB(50, 220, 120)
+SideCDLabel.TextStrokeTransparency = 0.5
+SideCDLabel.Text = "SIDE: READY ✓"
+SideCDLabel.Visible = false
+SideCDLabel.ZIndex = 10
+SideCDLabel.Parent = ScreenGui
+
+-- ══ DASH CD LOGIC ══
+local cdCooldowns = { Dash = 5.5, Side = 2.3 }
+local activeCD    = { Dash = 0,   Side = 0   }
+local pendingDash = false
+local savedDir    = Vector3.new(0, 0, 0)
+
+local cdChar     = nil
+local cdHumanoid = nil
+local cdRoot     = nil
+
+local function setupCDChar(c)
+	cdChar     = c
+	cdHumanoid = c:WaitForChild("Humanoid")
+	cdRoot     = c:WaitForChild("HumanoidRootPart")
+end
+setupCDChar(game:GetService("Players").LocalPlayer.Character or game:GetService("Players").LocalPlayer.CharacterAdded:Wait())
+game:GetService("Players").LocalPlayer.CharacterAdded:Connect(function(newChar)
+	setupCDChar(newChar)
+	activeCD.Dash, activeCD.Side = 0, 0
+end)
+
+local function getDashTypeFromDir(dir)
+	if dir.Magnitude < 0.1 then return "Dash" end
+	if cdRoot == nil then return "Dash" end
+	local dot = dir.Unit:Dot(cdRoot.CFrame.LookVector)
+	return (dot > 0.5 or dot < -0.5) and "Dash" or "Side"
+end
+
+local cdMT = getrawmetatable(game)
+setreadonly(cdMT, false)
+local cdOld = cdMT.__namecall
+cdMT.__namecall = newcclosure(function(self, ...)
+	local args = {...}
+	local method = getnamecallmethod()
+	if method == "FireServer" and self.Name == "Communicate" then
+		local data = args[1]
+		if data and data.Key == Enum.KeyCode.Q then
+			if cdHumanoid then
+				savedDir = cdHumanoid.MoveDirection
+			end
+			pendingDash = true
+		end
+	end
+	return cdOld(self, ...)
+end)
+setreadonly(cdMT, true)
+
 local function updateStatWidget()
 	StatFPSLbl.Visible = Settings.showFPS
 	StatPingLbl.Visible = Settings.showPing
 	StatPlayersLbl.Visible = Settings.showPlayers
+	DashCDLabel.Visible = Settings.showDashCD
+	SideCDLabel.Visible = Settings.showDashCD
 end
 
 local UpdateCard = Instance.new("Frame")
@@ -1360,6 +1441,12 @@ local function LoadSetting()
 		updateStatWidget()
 		saveSettings()
 	end)
+
+	makeToggle("⚔️  Show Dash CD", Settings.showDashCD, function(v)
+		Settings.showDashCD = v
+		updateStatWidget()
+		saveSettings()
+	end)
 end
 
 -- ══════════════════════════════════════════
@@ -1489,6 +1576,36 @@ RunService.RenderStepped:Connect(function()
 
 		if Settings.showPlayers then
 			StatPlayersLbl.Text = "👥 Players: "..#Players:GetPlayers()
+		end
+	end
+
+	-- Dash CD pending
+	if pendingDash then
+		pendingDash = false
+		local dashType = getDashTypeFromDir(savedDir)
+		activeCD[dashType] = cdCooldowns[dashType]
+	end
+
+	-- Dash CD update labels
+	if Settings.showDashCD then
+		for k, v in pairs(activeCD) do
+			if v > 0 then
+				activeCD[k] = math.max(0, v - 0.016)
+			end
+		end
+		if activeCD.Dash > 0 then
+			DashCDLabel.Text = "DASH: "..string.format("%.1f", math.floor(activeCD.Dash*10)/10).."s"
+			DashCDLabel.TextColor3 = Color3.fromRGB(220, 60, 60)
+		else
+			DashCDLabel.Text = "DASH: READY ✓"
+			DashCDLabel.TextColor3 = Color3.fromRGB(50, 220, 120)
+		end
+		if activeCD.Side > 0 then
+			SideCDLabel.Text = "SIDE: "..string.format("%.1f", math.floor(activeCD.Side*10)/10).."s"
+			SideCDLabel.TextColor3 = Color3.fromRGB(220, 60, 60)
+		else
+			SideCDLabel.Text = "SIDE: READY ✓"
+			SideCDLabel.TextColor3 = Color3.fromRGB(50, 220, 120)
 		end
 	end
 end)
