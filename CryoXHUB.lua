@@ -659,6 +659,7 @@ local function LoadTech()
 	makeScriptBtn("Loop Dash",         [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/28513f51c0ca2c03d4d7d94f59215d13ce1a2a470bf187f0a685b58ccb4dae98/download"))()]])
 	makeScriptBtn("lix tech",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/MerebennieOfficial/ExoticJn/refs/heads/main/Protected_83737738.txt"))()]])
 	makeScriptBtn("lethal kiba",       [[loadstring(game:HttpGet("https://raw.githubusercontent.com/MinhNhatHUB/MinhNhat/refs/heads/main/Lethal%20Kiba.lua"))()]])
+	makeScriptBtn("Silent aim reworked",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_6124417452209241.lua.txt"))()]])
 end
 
 local function LoadVisual()
@@ -680,6 +681,8 @@ local function LoadScript()
 	makeScriptBtn("Dex Explorer",      [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Dex_Explorer_v2.lua"))()]])
 	makeScriptBtn("Shield",            [[Instance.new("ForceField",game.Players.LocalPlayer.Character)]])
 	makeScriptBtn("TouchFling",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"))()]])
+	makeScriptBtn("orbit farm",        [[loadstring(game:httpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/FARM-KILL/refs/heads/main/TSB"))()]])
+	makeScriptBtn("farm kill",         [[loadstring(game:HttpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/Farm-Kill-V2/refs/heads/main/TSB"))()]])
 end
 
 local function LoadMoveset()
