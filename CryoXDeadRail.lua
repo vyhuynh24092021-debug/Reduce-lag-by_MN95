@@ -1,4 +1,4 @@
--- CryoXHUB x Dead Rails - Integrated
+-- CryoXHUB x Dead Rails - Integrated + Extra Merge Pack
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "CryoX_Furina_Final_v6"
 ScreenGui.Parent = game:GetService("CoreGui")
@@ -94,6 +94,29 @@ _G.UnicornESP      = false
 _G.Speed           = false
 _G.FullBrightEnabled  = false
 _G.FullBrightExecuted = false
+
+-- ══════════════════════════════════════════
+--   REMOTE HELPERS (Extra Pack)
+-- ══════════════════════════════════════════
+local BASE_URL = "https://raw.githubusercontent.com/Shade-vex/Hutao-hub-code-pro-mode/refs/heads/main/"
+
+local function safeHttp(url)
+	local ok, result = pcall(function()
+		return game:HttpGet(url)
+	end)
+	if ok then return result end
+	return nil
+end
+
+local function loadRemote(url)
+	local src = safeHttp(url)
+	if not src then return end
+	local fn = loadstring(src)
+	if fn then
+		local ok, err = pcall(fn)
+		if not ok then warn(err) end
+	end
+end
 
 -- ══════════════════════════════════════════
 --   HELPERS
@@ -627,6 +650,70 @@ local function LoadTeleport()
 		end)
 		showToast("🔫  Heading to Fort...",C.CYAN,2)
 	end)
+	-- Extra Teleport
+	makeSectionLabel("TELEPORT EXTRAS")
+	makeActionBtn("TP to Final Destination","🏁",function()
+		local char=LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local hrp=char:WaitForChild("HumanoidRootPart"); local hum=char:FindFirstChildOfClass("Humanoid")
+		if not (hrp and hum) then return end
+		local originalWalkSpeed=hum.WalkSpeed; hum.WalkSpeed=0
+		hrp.CFrame=CFrame.new(-424.45,26.06,-49040.66); hrp.Anchored=true; task.wait(0.5)
+		for _,part in pairs(char:GetDescendants()) do
+			if part:IsA("BasePart") then part.Velocity=Vector3.new(0,0,0) end
+		end
+		task.wait(1); hrp.CFrame=CFrame.new(-447.38,26.08,-48747.68)
+		task.wait(1); hrp.CFrame=CFrame.new(-312.17,26.08,-48747.68)
+		task.wait(1); hrp.CFrame=CFrame.new(-424.45,26.06,-49040.66)
+		task.wait(2); hrp.Anchored=false; hum.WalkSpeed=originalWalkSpeed
+	end)
+	makeActionBtn("TP To Train (Remote)","🚂",function()
+		loadRemote("https://raw.githubusercontent.com/Shade-vex/KJ/refs/heads/main/TPtotrain.txt")
+	end)
+	makeActionBtn("TP To Tesla Lab (Extra)","⚡",function()
+		local char=LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local hrp=char:WaitForChild("HumanoidRootPart"); local hum=char:FindFirstChildOfClass("Humanoid")
+		if not (hrp and hum) then return end
+		local originalWalkSpeed=hum.WalkSpeed; hum.WalkSpeed=0
+		local generator=workspace:WaitForChild("TeslaLab"):WaitForChild("Generator")
+		local modelPosition=generator:GetPivot().Position
+		hrp:PivotTo(CFrame.new(modelPosition+Vector3.new(0,5,0))); hrp.Anchored=true
+		task.wait(2); hrp.Anchored=false; hum.WalkSpeed=originalWalkSpeed
+		showToast("⚡ TP Tesla Lab done",C.CYAN,2)
+	end)
+	local teleportLocations={
+		["Spawn"]=CFrame.new(56.6396217,3.24999976,29936.3516),
+		["10 KM"]=CFrame.new(-160.576843,2.99617577,19913.252),
+		["20 KM"]=CFrame.new(-556.92572,2.98922157,9956.79883),
+		["30 KM"]=CFrame.new(-569.779663,2.99999976,47.5958443),
+		["40 KM"]=CFrame.new(-184.494064,3.14674306,-9899.91797),
+		["50 KM"]=CFrame.new(55.228714,3.19885039,-19842.3789),
+		["60 KM"]=CFrame.new(-199.620743,3.14927387,-29733.9453),
+		["70 KM"]=CFrame.new(-577.781921,3.49909163,-39654.2148),
+	}
+	local selectedLocation="Spawn"
+	local dropdownValues={}
+	for locationName in pairs(teleportLocations) do table.insert(dropdownValues,locationName) end
+	table.sort(dropdownValues)
+	local dropdown=Instance.new("TextButton"); dropdown.Name="BaseSelect"
+	dropdown.Size=UDim2.new(1,-4,0,34); dropdown.BackgroundColor3=C.PANEL2
+	dropdown.TextColor3=C.TEXT; dropdown.Text="Base: "..selectedLocation; dropdown.Parent=ContentFrame
+	corner(dropdown,8); stroke(dropdown,1.2,0.5)
+	dropdown.MouseButton1Click:Connect(function()
+		local idx=table.find(dropdownValues,selectedLocation) or 1
+		idx=idx+1; if idx>#dropdownValues then idx=1 end
+		selectedLocation=dropdownValues[idx]; dropdown.Text="Base: "..selectedLocation
+		showToast("Selected "..selectedLocation,C.CYAN,1.5)
+	end)
+	makeActionBtn("Teleport to Selected Base","📍",function()
+		local char=LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+		local hrp=char:FindFirstChild("HumanoidRootPart"); local hum=char:FindFirstChildOfClass("Humanoid")
+		if not (hrp and hum) then return end
+		local cf=teleportLocations[selectedLocation]
+		if cf then
+			local originalWalkSpeed=hum.WalkSpeed; hum.WalkSpeed=0
+			hrp.CFrame=cf; hrp.Anchored=true; task.wait(2); hrp.Anchored=false; hum.WalkSpeed=originalWalkSpeed
+		end
+	end)
 end
 
 local function LoadCombat()
@@ -686,6 +773,53 @@ local function LoadCombat()
 			showToast("👻  Noclip tắt!",C.RED,2)
 		end
 	end)
+	makeActionBtn("Fly (10s)","🪽",function()
+		pcall(function()
+			local UIS=game:GetService("UserInputService")
+			local plr=LocalPlayer; local char=plr.Character or plr.CharacterAdded:Wait()
+			local hrp=char:WaitForChild("HumanoidRootPart"); local hum=char:WaitForChild("Humanoid")
+			local flying=true
+			local bv=Instance.new("BodyVelocity"); bv.MaxForce=Vector3.new(9e9,9e9,9e9); bv.Velocity=Vector3.zero; bv.Parent=hrp
+			local bg=Instance.new("BodyGyro"); bg.MaxTorque=Vector3.new(9e9,9e9,9e9); bg.P=9e4; bg.CFrame=hrp.CFrame; bg.Parent=hrp
+			local speed=50; local conn
+			conn=RunService.RenderStepped:Connect(function()
+				if not flying or not char.Parent then
+					if conn then conn:Disconnect() end
+					if bv then bv:Destroy() end
+					if bg then bg:Destroy() end
+					return
+				end
+				local cam=workspace.CurrentCamera.CFrame; local dir=Vector3.zero
+				if UIS:IsKeyDown(Enum.KeyCode.W) then dir+=cam.LookVector end
+				if UIS:IsKeyDown(Enum.KeyCode.S) then dir-=cam.LookVector end
+				if UIS:IsKeyDown(Enum.KeyCode.A) then dir-=cam.RightVector end
+				if UIS:IsKeyDown(Enum.KeyCode.D) then dir+=cam.RightVector end
+				bv.Velocity=dir*speed; bg.CFrame=cam; hum.PlatformStand=true
+			end)
+			task.delay(10,function()
+				flying=false
+				if hum then hum.PlatformStand=false end
+				if conn then conn:Disconnect() end
+				if bv then bv:Destroy() end
+				if bg then bg:Destroy() end
+			end)
+			showToast("🪽 Fly bật 10s",C.GREEN,2)
+		end)
+	end)
+	makeActionBtn("Get Horse Class","🐴",function()
+		pcall(function()
+			if getgenv().HorseCl then return end; getgenv().HorseCl=true
+			local RS=game:GetService("ReplicatedStorage")
+			RS:WaitForChild("Shared"):WaitForChild("RemotePromise"):WaitForChild("Remotes"):WaitForChild("C_BuyClass"):FireServer("Horse")
+			task.wait(1)
+			RS:WaitForChild("Shared"):WaitForChild("RemotePromise"):WaitForChild("Remotes"):WaitForChild("C_EquipClass"):FireServer("Horse")
+			showToast("🐴 Horse class equipped",C.GREEN,2)
+		end)
+	end)
+	makeActionBtn("Tool Air Weld","🧷",function()
+		loadRemote("https://raw.githubusercontent.com/Shade-vex/DeadRails/refs/heads/main/Air-Weld.lua")
+		showToast("🧷 Tool Air Weld loaded",C.CYAN,2)
+	end)
 end
 
 local function LoadVisual()
@@ -741,6 +875,10 @@ local function LoadVisual()
 			showToast("🦄  Unicorn ESP tắt!",C.RED,2)
 		end
 	end)
+	makeActionBtn("Load ESP Module","👁️",function()
+		loadRemote(BASE_URL.."ESP.lua.txt")
+		showToast("👁️ ESP module loaded",C.CYAN,2)
+	end)
 	makeSectionLabel("MISC VISUAL")
 	makeActionBtn("Full Bright","💡",function()
 		local Lighting=game:GetService("Lighting")
@@ -754,11 +892,149 @@ local function LoadVisual()
 			showToast("💡  Full Bright "..((_G.FullBrightEnabled and "bật") or "tắt").."!",_G.FullBrightEnabled and C.GREEN or C.RED,2)
 		end
 	end)
+	makeToggle("Auto Full Bright",false,function(v)
+		local L=game:GetService("Lighting")
+		if v then
+			L.Brightness=1; L.ClockTime=12; L.FogEnd=786543
+			L.GlobalShadows=false; L.Ambient=Color3.fromRGB(178,178,178)
+		end
+	end)
+	makeToggle("NoFog",false,function(v)
+		local L=game:GetService("Lighting")
+		if v then L.FogEnd=999999; L.FogStart=0 end
+	end)
 	makeActionBtn("Unlock Camera","📷",function()
 		LocalPlayer.CameraMode=Enum.CameraMode.Classic
 		LocalPlayer.CameraMinZoomDistance=0; LocalPlayer.CameraMaxZoomDistance=150
 		workspace.CurrentCamera.CameraSubject=LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("Humanoid")
 		showToast("📷  Camera đã mở khóa!",C.CYAN,2)
+	end)
+	makeActionBtn("Load Aimbot V1","🎯",function()
+		loadRemote(BASE_URL.."Aimbot.lua.txt")
+		showToast("🎯 Aimbot V1 loaded",C.CYAN,2)
+	end)
+	makeActionBtn("Load MiddleClick","🖱️",function()
+		loadRemote(BASE_URL.."MiddleClick.lua.txt")
+		showToast("🖱️ MiddleClick loaded",C.CYAN,2)
+	end)
+end
+
+local function LoadFarm()
+	makeSectionLabel("FARM")
+	makeActionBtn("Auto Farm Bonds","💠",function()
+		getgenv().DeadRails=getgenv().DeadRails or {}
+		getgenv().DeadRails.Farm={Enabled=true,Mode="Normal"}
+		loadRemote(BASE_URL.."AutoBondsINF")
+		showToast("💠 Auto Farm Bonds loaded",C.GREEN,2)
+	end)
+	makeActionBtn("Ultimate Auto Farm Bonds","🔥",function()
+		loadRemote(BASE_URL.."AutoBonds2.lua.txt")
+		showToast("🔥 Ultimate Auto Farm Bonds loaded",C.GREEN,2)
+	end)
+	makeActionBtn("Auto Farm Bonds & Win","🏆",function()
+		loadRemote(BASE_URL.."AutoBonds3.lua.txt")
+		showToast("🏆 Auto Farm Bonds & Win loaded",C.GREEN,2)
+	end)
+	makeActionBtn("Auto Spawn Tesla","⚡",function()
+		loadRemote("https://raw.githubusercontent.com/Shade-vex/bruh/refs/heads/main/Auto-Tesla-Boss.lua")
+		showToast("⚡ Auto Spawn Tesla loaded",C.GREEN,2)
+	end)
+	local moneyBagOn=false
+	makeToggle("Auto Collect Money Bag",false,function(v)
+		moneyBagOn=v
+		if v then
+			task.spawn(function()
+				while moneyBagOn do
+					pcall(function()
+						local runtime=workspace:FindFirstChild("RuntimeItems")
+						if runtime and LocalPlayer.Character and LocalPlayer.Character:FindFirstChild("HumanoidRootPart") then
+							for _,obj in ipairs(runtime:GetChildren()) do
+								if obj:IsA("Model") and obj.Name=="Moneybag" and obj:FindFirstChild("MoneyBag") then
+									local prompt=obj.MoneyBag:FindFirstChildOfClass("ProximityPrompt")
+									if prompt then fireproximityprompt(prompt) end
+								end
+							end
+						end
+					end)
+					task.wait(0.5)
+				end
+			end)
+		end
+	end)
+	local pickupItemsOn=false
+	makeToggle("Auto Pickup Snake Oil & Bandage",false,function(v)
+		pickupItemsOn=v
+		if v then
+			task.spawn(function()
+				while pickupItemsOn do
+					pcall(function()
+						local RS=game:GetService("ReplicatedStorage")
+						local runtime=workspace:WaitForChild("RuntimeItems")
+						local pick=RS.Remotes.Tool.PickUpTool
+						for _,name in ipairs({"Bandage","Snake Oil"}) do
+							local item=runtime:FindFirstChild(name)
+							if item then pick:FireServer(item) end
+						end
+					end)
+					task.wait(0.5)
+				end
+			end)
+		end
+	end)
+	makeActionBtn("Auto Pickup Gun(s)","🔫",function()
+		loadRemote("https://raw.githubusercontent.com/Shade-vex/sjsnskk/refs/heads/main/pickupgun")
+		if _G.ToggleAutoPickupGun then _G.ToggleAutoPickupGun(true) end
+		showToast("🔫 Auto Pickup Gun loaded",C.GREEN,2)
+	end)
+	makeActionBtn("Scan Item(s)","📋",function()
+		local itemsList={
+			{"GoldBar",50},{"SilverBar",25},{"GoldPainting",35},{"GoldCup",25},
+			{"SilverPocketWatch",7},{"SilverPainting",12},{"Vampire",15},
+			{"Werewolf",20},{"GoldPlate",20},{"GoldPocketWatch",15},
+			{"Holy Water",20},{"Painting",5},{"Banjo",15},{"Statue",5},
+			{"SilverStatue",20},{"GoldStatue",45},{"VaseTwo",5},{"Bandage",7},
+			{"Book",5},{"Wheel",5},{"Chair",5},{"Barrel",5},{"Rope",5},
+			{"Helmet",60},{"ChestPlate",70},{"Rightshoulderarmor",45},
+			{"Leftshoulderarmor",45},{"Nikola Tesla`s Head",250}
+		}
+		local folder=workspace:FindFirstChild("RuntimeItems")
+		if not folder then return end
+		local totalValue,scannedItems=0,0
+		for _,item in pairs(folder:GetChildren()) do
+			for _,itemData in pairs(itemsList) do
+				if item.Name==itemData[1] then totalValue+=itemData[2]; scannedItems+=1 end
+			end
+		end
+		showToast(("📋 Scanned $%d (%d/%d items)"):format(totalValue,scannedItems,#folder:GetChildren()),C.CYAN,3)
+	end)
+end
+
+local function LoadMisc()
+	makeSectionLabel("MISC")
+	makeActionBtn("FPS Boost","🚀",function()
+		for _,obj in ipairs(game:GetDescendants()) do
+			if obj:IsA("ParticleEmitter") or obj:IsA("Trail") or obj:IsA("Beam") then
+				obj.Enabled=false
+			end
+		end
+		showToast("🚀 FPS boost applied",C.GREEN,2)
+	end)
+	makeActionBtn("Anti AFK","🕒",function()
+		local vu=game:GetService("VirtualUser")
+		LocalPlayer.Idled:Connect(function()
+			vu:Button2Down(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+			task.wait(1)
+			vu:Button2Up(Vector2.new(0,0),workspace.CurrentCamera.CFrame)
+		end)
+		showToast("🕒 Anti AFK armed",C.GREEN,2)
+	end)
+	makeActionBtn("Building Bank Alert","🏦",function()
+		local bank=workspace:FindFirstChild("Towns")
+			and workspace.Towns:FindFirstChild("MediumTownTemplate")
+			and workspace.Towns.MediumTownTemplate:FindFirstChild("Buildings")
+			and workspace.Towns.MediumTownTemplate.Buildings:FindFirstChild("Bank")
+		if bank then showToast("🏦 Bank found!",C.GREEN,3)
+		else showToast("🏦 Bank not found",C.RED,3) end
 	end)
 end
 
@@ -768,10 +1044,14 @@ end
 local TpTab      = makeTab("TELEPORT")
 local CombatTab  = makeTab("COMBAT")
 local VisualTab  = makeTab("VISUAL")
+local FarmTab    = makeTab("FARM")
+local MiscTab    = makeTab("MISC")
 
 TpTab.MouseButton1Click:Connect(function()     setActive(TpTab,1,LoadTeleport) end)
 CombatTab.MouseButton1Click:Connect(function() setActive(CombatTab,2,LoadCombat) end)
 VisualTab.MouseButton1Click:Connect(function() setActive(VisualTab,3,LoadVisual) end)
+FarmTab.MouseButton1Click:Connect(function()   setActive(FarmTab,4,LoadFarm) end)
+MiscTab.MouseButton1Click:Connect(function()   setActive(MiscTab,5,LoadMisc) end)
 
 -- ══════════════════════════════════════════
 --   ANIMATE
