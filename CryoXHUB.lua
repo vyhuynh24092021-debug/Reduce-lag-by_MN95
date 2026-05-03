@@ -672,6 +672,7 @@ local function LoadVisual()
 	makeSectionLabel("AURA")
 	makeScriptBtn("Blue Flame Aura",     [[loadstring(game:HttpGet("Link_Script_Aura_Tai_Day"))()]])
 	makeScriptBtn("Ultra Instinct Aura", [[loadstring(game:HttpGet("Link_Script_Aura_2"))()]])
+	makeScriptBtn("curse energy effect",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Curse%20energy%20effect%5Bsaitama%5D"))()]])
 end
 
 local function LoadScript()
