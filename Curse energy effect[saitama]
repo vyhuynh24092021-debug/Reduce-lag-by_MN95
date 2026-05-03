@@ -1,0 +1,414 @@
+-- M1 Effect Script (Visual Only)
+-- Requires: LightningBolt, ParticleHandler, Trove modules
+
+local RunService = game:GetService('RunService')
+local Players = game:GetService('Players')
+local TweenService = game:GetService('TweenService')
+
+local LocalPlayer = Players.LocalPlayer
+local Character = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+local Humanoid = Character:WaitForChild('Humanoid')
+local HumanoidRootPart = Character:WaitForChild('HumanoidRootPart')
+local Animator = Humanoid:WaitForChild('Animator')
+
+-- Load modules
+local ParticleHandler = loadstring(game:HttpGet('https://raw.githubusercontent.com/skibiditoiletfan2007/KOKUSENNN/refs/heads/main/ParticleHandler.lua'))()
+local LightningBolt = loadstring(game:HttpGet('https://raw.githubusercontent.com/skibiditoiletfan2007/KOKUSENNN/refs/heads/main/LightningBolt.lua'))()
+local Trove = loadstring(game:HttpGet('https://raw.githubusercontent.com/skibiditoiletfan2007/KOKUSENNN/refs/heads/main/Trove.lua'))()
+
+-- Load asset model
+local GojoAsset = game.ReplicatedStorage.Resources:FindFirstChild('Gojo') 
+    or game:GetObjects('rbxassetid://97406440754007')[1]
+GojoAsset.Parent = game.ReplicatedStorage.Resources
+GojoAsset.Name = 'Gojo'
+
+-- Config
+local LightningColor = Color3.fromRGB(125, 0, 0)
+local RNG = Random.new()
+
+-- Connections table
+local Connections = {}
+
+-- ==================== UTILITY FUNCTIONS ====================
+
+local function GetAsset(original, props)
+    local clone = original:Clone()
+    if props then
+        for k, v in pairs(props) do
+            clone[k] = v
+        end
+    end
+    return clone
+end
+
+local function EmitAll(model, count)
+    for _, v in pairs(model:GetDescendants()) do
+        if v:IsA('ParticleEmitter') then
+            local emitCount = v:GetAttribute('EmitCount') or count
+            local emitDelay = v:GetAttribute('EmitDelay') or 0
+            task.delay(emitDelay, function()
+                v:Emit(emitCount)
+            end)
+        end
+    end
+end
+
+local function EnableAllVisuals(model, enabled)
+    for _, v in pairs(model:GetDescendants()) do
+        if v:IsA('ParticleEmitter') or v:IsA('Trail') or v:IsA('Beam') then
+            v.Enabled = enabled
+        end
+    end
+end
+
+local function IsAnimPlaying(animator, animId)
+    animId = tostring(animId)
+    for _, track in pairs(animator:GetPlayingAnimationTracks()) do
+        if track.Animation.AnimationId:match(animId) then
+            return track
+        end
+    end
+end
+
+-- ==================== LIGHTNING FUNCTIONS ====================
+
+local function CreateLightningBolt(params)
+    params = params or {}
+    local startPos = params.Start or Vector3.zero
+    local endPos = params.End or Vector3.zero
+    local segments = params.Amount or 12
+
+    local att0 = Instance.new('Attachment')
+    att0.Position = startPos
+    att0.Archivable = false
+    att0.Parent = workspace.Terrain
+
+    local att1 = Instance.new('Attachment')
+    att1.Position = endPos
+    att1.Archivable = false
+    att1.Parent = workspace.Terrain
+
+    local bolt = LightningBolt.new(att0, att1, segments)
+    bolt.Color = LightningColor
+
+    if params.HSVShift then
+        bolt.Color = ParticleHandler.HSVShift(bolt.Color, params.HSVShift)
+    end
+
+    bolt.MinRadius = 0
+    bolt.MaxRadius = 2.5
+    bolt.PulseLength = 1.5
+    bolt.PulseSpeed = 4
+    bolt.Thickness = 0.6
+    bolt.FadeLength = 0.25
+    bolt.AnimationSpeed = 8
+
+    if params.Info then
+        for k, v in pairs(params.Info) do
+            bolt[k] = v
+        end
+    end
+
+    local function Destroy(dissipateTime, dissipateSpeed)
+        if getmetatable(bolt) then
+            bolt:DestroyDissipate(dissipateTime, dissipateSpeed)
+        end
+        att0:Destroy()
+        att1:Destroy()
+    end
+
+    return bolt, Destroy
+end
+
+local function BlackFlashLightning(cf, options)
+    if cf == nil then return end
+    options = options or {}
+
+    if typeof(cf) == 'Instance' and cf:IsA('BasePart') then
+        cf = cf.CFrame
+    end
+
+    local trove = Trove.new()
+
+    -- 4 crossing bolts
+    for _ = 1, 4 do
+        local x = RNG:NextNumber(12, 18) * (RNG:NextInteger(0, 1) == 0 and -1 or 1)
+        local y = RNG:NextNumber(-8, 12)
+        local z = RNG:NextNumber(12, 18) * (RNG:NextInteger(0, 1) == 0 and -1 or 1)
+        local _, destroyFn = CreateLightningBolt({
+            Start = (cf * CFrame.new(-x, -y, -z)).Position,
+            End   = (cf * CFrame.new(x, y, z)).Position,
+            Info  = {
+                Thickness = 0.75, PulseLength = 4,
+                PulseSpeed = 4, MaxRadius = 8, AnimationSpeed = 12,
+            },
+            HSVShift = options.HSVShift,
+        })
+        trove:Add(function() destroyFn() end)
+    end
+
+    -- 3 outward bolts
+    for _ = 1, 3 do
+        local x = RNG:NextNumber(18, 36) * (RNG:NextInteger(0, 1) == 0 and -1 or 1)
+        local y = RNG:NextNumber(6, 12)
+        local z = RNG:NextNumber(2, 12) * (RNG:NextInteger(0, 1) == 0 and -1 or 1)
+        local _, destroyFn = CreateLightningBolt({
+            Start = cf.Position,
+            End   = (cf * CFrame.new(x, y, z)).Position,
+            Info  = {
+                Thickness = 1.75, MaxRadius = 16,
+                PulseLength = 4, PulseSpeed = 12, AnimationSpeed = 64,
+            },
+            HSVShift = options.HSVShift,
+        })
+        trove:Add(function() destroyFn() end)
+    end
+
+    task.wait(1)
+    trove:Destroy()
+end
+
+-- ==================== M1 HIT EFFECTS ====================
+
+-- Animation IDs that correspond to each M1 hit
+local M1AnimIds = {
+    ['rbxassetid://10469493270'] = { CustomAnim = '17888704024', BodyPart = 'Right Arm' },
+    ['rbxassetid://10469630950'] = { CustomAnim = '13532600125', BodyPart = 'Left Arm' },
+    ['rbxassetid://10469639222'] = { CustomAnim = '13295919399', BodyPart = 'Left Arm' },
+    ['rbxassetid://10469643643'] = { CustomAnim = '13294471966', BodyPart = 'Left Leg', Heavy = true },
+}
+
+-- Spawn cursed energy arm effect on M1
+local function SpawnCursedEnergyEffect(bodyPartName)
+    local CursedEnergy = GojoAsset:FindFirstChild('CursedEnergy', true)
+    if not CursedEnergy then return end
+
+    local armEffect = CursedEnergy:FindFirstChild('Arm')
+    if not armEffect then return end
+
+    armEffect = armEffect:Clone()
+
+    local bodyPart = Character:FindFirstChild(bodyPartName)
+    if not (armEffect and bodyPart) then return end
+
+    armEffect.Parent = workspace.Thrown
+
+    local weld = Instance.new('Weld', armEffect)
+    weld.Part0 = armEffect
+    weld.Part1 = bodyPart
+
+    -- Fade in particles/beams then fade out
+    for _, v in pairs(armEffect:GetDescendants()) do
+        if v:IsA('ParticleEmitter') then
+            v.Enabled = true
+            TweenService:Create(v, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Rate = 0}):Play()
+
+        elseif v:IsA('Beam') then
+            v.Enabled = true
+
+            local nv0 = Instance.new('NumberValue', v)
+            local nv1 = Instance.new('NumberValue', v)
+            local nv2 = Instance.new('NumberValue', v)
+            nv2.Value = 0.95
+
+            nv0.Changed:Connect(function()
+                v.Transparency = NumberSequence.new({
+                    NumberSequenceKeypoint.new(0,     1,         0),
+                    NumberSequenceKeypoint.new(0.188, nv0.Value, 0),
+                    NumberSequenceKeypoint.new(0.413, nv1.Value, 0),
+                    NumberSequenceKeypoint.new(0.492, nv2.Value, 0),
+                    NumberSequenceKeypoint.new(1,     1,         0),
+                })
+            end)
+
+            TweenService:Create(nv0, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Value = 1}):Play()
+            TweenService:Create(nv1, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Value = 1}):Play()
+            TweenService:Create(nv2, TweenInfo.new(1.5, Enum.EasingStyle.Quad, Enum.EasingDirection.Out), {Value = 1}):Play()
+        end
+    end
+
+    game.Debris:AddItem(armEffect, 1.5)
+end
+
+-- Play hit effect on a target (light or heavy)
+local function PlayHitEffect(targetRootPart, isHeavy)
+    local Hit = GojoAsset:FindFirstChild('Hit', true)
+    if not Hit then return end
+
+    local hitType = isHeavy and Hit:FindFirstChild('Heavy') or Hit:FindFirstChild('Light')
+    if not hitType then return end
+
+    local hitClone = hitType:Clone()
+    hitClone.Parent = workspace.Thrown
+    hitClone.Anchored = false
+    hitClone.CFrame = CFrame.new(targetRootPart.Position, HumanoidRootPart.Position)
+
+    EmitAll(hitClone, 1)
+    game.Debris:AddItem(hitClone, isHeavy and 2 or 0.6)
+end
+
+-- Black Flash visual burst on target
+local function PlayBlackFlashEffect(targetRootPart, targetChar)
+    local BlackFlashWhiff = GojoAsset:FindFirstChild('BlackFlashWhiff', true)
+    if not BlackFlashWhiff then return end
+
+    local whiffClone = GetAsset(BlackFlashWhiff, {
+        Parent = workspace.Thrown,
+        CFrame  = targetRootPart.CFrame,
+    })
+
+    EmitAll(whiffClone, 3)
+    BlackFlashLightning(targetRootPart)
+    game.Debris:AddItem(whiffClone, 3)
+
+    -- Lightning wraps around victim's body parts
+    local bodyPartNames = {'Torso','Left Arm','Right Arm','Left Leg','Right Leg','Head'}
+    spawn(function()
+        local folder = Instance.new('Folder', workspace)
+
+        for _, partName in pairs(bodyPartNames) do
+            local part = targetChar:FindFirstChild(partName)
+            if part then
+                local ghost = part:Clone()
+                ghost.Parent = folder
+                ghost.Transparency = 1
+                ghost.CanCollide = false
+                ghost.Anchored = false
+                ghost:ClearAllChildren()
+
+                local weld = Instance.new('Weld')
+                weld.Part0 = ghost
+                weld.Part1 = part
+                weld.Parent = ghost
+            end
+        end
+
+        game.Debris:AddItem(folder, 3)
+
+        -- Ambient lightning around the folder
+        local trove = Trove.new()
+        local startTime = tick()
+
+        while folder and folder:IsDescendantOf(game) and (tick() - startTime < 3) do
+            task.wait(0.05)
+            local parts = folder:GetChildren()
+            if #parts == 0 then break end
+
+            local fromPart = parts[RNG:NextInteger(1, #parts)]
+            local toPart   = parts[RNG:NextInteger(1, #parts)]
+            if fromPart == toPart then continue end
+
+            local bolt, destroyFn = CreateLightningBolt({
+                Start = fromPart.Position,
+                End   = toPart.Position,
+            })
+            bolt.Thickness = 0.75
+            bolt.MaxRadius = RNG:NextNumber(1.5, 8)
+            bolt.PulseLength = 2
+            bolt.PulseSpeed = 8
+            bolt.Enabled = true
+
+            trove:Add(function() destroyFn() end)
+            task.delay(bolt.PulseLength + 0.5, destroyFn)
+        end
+
+        trove:Destroy()
+    end)
+end
+
+-- ==================== DETECT HITS & APPLY EFFECTS ====================
+
+local function WatchTarget(targetChar)
+    local targetHumanoid = targetChar:WaitForChild('Humanoid', 1)
+    local targetRoot     = targetChar:WaitForChild('HumanoidRootPart', 1)
+    if not (targetHumanoid and targetRoot) then return end
+
+    local prevHealth = targetHumanoid.Health
+
+    if Connections[targetChar.Name] then
+        Connections[targetChar.Name]:Disconnect()
+    end
+
+    Connections[targetChar.Name] = targetHumanoid:GetPropertyChangedSignal('Health'):Connect(function()
+        -- Only react to hits from our character
+        if targetChar:GetAttribute('LastHit') ~= Character.Name then
+            prevHealth = targetHumanoid.Health
+            return
+        end
+
+        local damage = prevHealth - targetHumanoid.Health
+        if damage <= 0 then
+            prevHealth = targetHumanoid.Health
+            return
+        end
+
+        -- Determine which M1 animation is playing
+        local isBlackFlash = IsAnimPlaying(Animator, '10466974800') 
+                          or IsAnimPlaying(Animator, '10471336737')
+        local isHeavy      = IsAnimPlaying(Animator, '13294471966') 
+                          or IsAnimPlaying(Animator, '10470104242')
+        local isSlam       = IsAnimPlaying(Animator, '12510170988')
+
+        if targetHumanoid.Health > 0 then
+            -- Normal M1 hit
+            if damage > 1 then
+                if isBlackFlash or isSlam then
+                    PlayBlackFlashEffect(targetRoot, targetChar)
+                elseif isHeavy then
+                    PlayHitEffect(targetRoot, true)
+                else
+                    PlayHitEffect(targetRoot, false)
+                end
+            end
+        else
+            -- Kill blow with Black Flash
+            if isBlackFlash then
+                PlayBlackFlashEffect(targetRoot, targetChar)
+            end
+        end
+
+        prevHealth = targetHumanoid.Health
+    end)
+end
+
+-- ==================== HOOK ANIMATION FOR ARM EFFECT ====================
+
+Connections['AnimationPlayed'] = Animator.AnimationPlayed:Connect(function(track)
+    local animId = track.Animation.AnimationId
+    local data   = M1AnimIds[animId]
+
+    if data then
+        SpawnCursedEnergyEffect(data.BodyPart)
+    end
+end)
+
+-- ==================== WATCH ALL PLAYERS ====================
+
+for _, player in pairs(Players:GetPlayers()) do
+    if player.Character and player ~= LocalPlayer then
+        WatchTarget(player.Character)
+    end
+    player.CharacterAdded:Connect(function(char)
+        if player ~= LocalPlayer then
+            WatchTarget(char)
+        end
+    end)
+end
+
+Players.PlayerAdded:Connect(function(player)
+    player.CharacterAdded:Connect(function(char)
+        if player ~= LocalPlayer then
+            WatchTarget(char)
+        end
+    end)
+end)
+
+-- Watch workspace.Live if your game uses it
+if workspace:FindFirstChild('Live') then
+    Connections['LiveChildAdded'] = workspace.Live.ChildAdded:Connect(function(child)
+        task.wait()
+        WatchTarget(child)
+    end)
+end
+
+print('[M1 Effect Script] Loaded.')
