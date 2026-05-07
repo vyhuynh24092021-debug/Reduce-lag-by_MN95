@@ -1,8 +1,6 @@
--- CryoXHUB GUI v5.2 — FULL COMPLETE FIX
--- GUI layout mới + ảnh nền + logo + toàn bộ chức năng v4.1
-
+-- CryoXHUB GUI v5.3 — Restructured Tabs
 local ScreenGui = Instance.new("ScreenGui")
-ScreenGui.Name = "CryoXHUB_v52"
+ScreenGui.Name = "CryoXHUB_v53"
 ScreenGui.Parent = game:GetService("CoreGui")
 ScreenGui.ResetOnSpawn = false
 
@@ -15,13 +13,10 @@ local UIS             = game:GetService("UserInputService")
 local StatsService    = game:GetService("Stats")
 local LocalPlayer     = Players.LocalPlayer
 
--- ══════════════════════════════════════════
---   ASSET IDs
--- ══════════════════════════════════════════
 local ID_ANH_NEN   = "rbxthumb://type=Asset&id=116367849760314&w=420&h=420"
 local ID_LOGO_DONG = "rbxthumb://type=Asset&id=135753950157111&w=420&h=420"
 local KEY_CHINH_XAC = "CryoXHUB"
-local SAVE_FILE     = "CryoXHUB_v52_save.json"
+local SAVE_FILE     = "CryoXHUB_v53_save.json"
 
 -- ══════════════════════════════════════════
 --   SAVE SYSTEM
@@ -32,6 +27,7 @@ local DEFAULT_SAVE = {
     showFPS=false, showPing=false, showPlayers=false,
     showDashCD=false, showSkillDetector=false,
     favorites={}, lastTab=1,
+    currentTheme="Dark",
 }
 local function loadSave()
     local ok,result = pcall(function()
@@ -66,8 +62,23 @@ end
 keyVerified = checkKeyValid()
 
 -- ══════════════════════════════════════════
---   COLORS
+--   THEMES
 -- ══════════════════════════════════════════
+local THEMES_LIST = {
+    {name="🌑 Dark",        bg=Color3.fromRGB(4,8,18),   panel=Color3.fromRGB(8,16,32),  panel2=Color3.fromRGB(12,22,42)},
+    {name="☀️ Light",       bg=Color3.fromRGB(200,210,230),panel=Color3.fromRGB(180,190,215),panel2=Color3.fromRGB(160,175,200)},
+    {name="🌊 Ocean",       bg=Color3.fromRGB(2,18,38),   panel=Color3.fromRGB(4,28,58),  panel2=Color3.fromRGB(6,38,75)},
+    {name="🌲 Forest",      bg=Color3.fromRGB(4,18,8),    panel=Color3.fromRGB(8,28,12),  panel2=Color3.fromRGB(12,40,16)},
+    {name="🌸 Sakura",      bg=Color3.fromRGB(28,8,18),   panel=Color3.fromRGB(45,12,30), panel2=Color3.fromRGB(60,16,42)},
+    {name="🔥 Inferno",     bg=Color3.fromRGB(22,4,2),    panel=Color3.fromRGB(38,8,4),   panel2=Color3.fromRGB(55,12,6)},
+    {name="🌌 Galaxy",      bg=Color3.fromRGB(6,2,22),    panel=Color3.fromRGB(12,4,38),  panel2=Color3.fromRGB(18,6,55)},
+    {name="⬛ Amoled",      bg=Color3.fromRGB(0,0,0),     panel=Color3.fromRGB(8,8,8),    panel2=Color3.fromRGB(16,16,16)},
+    {name="🌫️ Ash",         bg=Color3.fromRGB(16,16,20),  panel=Color3.fromRGB(26,26,32), panel2=Color3.fromRGB(36,36,44)},
+    {name="🍬 Candy",       bg=Color3.fromRGB(28,4,28),   panel=Color3.fromRGB(40,6,40),  panel2=Color3.fromRGB(55,8,55)},
+    {name="🧊 Ice",         bg=Color3.fromRGB(8,18,30),   panel=Color3.fromRGB(14,26,44), panel2=Color3.fromRGB(20,35,58)},
+    {name="🌙 Midnight",    bg=Color3.fromRGB(2,2,14),    panel=Color3.fromRGB(4,4,22),   panel2=Color3.fromRGB(6,6,32)},
+}
+
 local C = {
     BG     = Color3.fromRGB(4,  8,  18),
     PANEL  = Color3.fromRGB(8,  16, 32),
@@ -104,11 +115,11 @@ local PAD      = 5
 local GAP      = 4
 local ROOT_W   = 640
 local ROOT_H   = 420
-local LEFT_W   = 148   -- Col 1: avatar + leaderboard + log
-local MID_W    = 80    -- Col 2: main tabs (rộng hơn để hiển thị tên)
-local RIGHT_W  = ROOT_W - PAD*2 - LEFT_W - MID_W - GAP*2  -- ~394
+local LEFT_W   = 148
+local MID_W    = 82
+local RIGHT_W  = ROOT_W - PAD*2 - LEFT_W - MID_W - GAP*2
 local AVATAR_H = 148
-local TAB_H    = 30    -- subtab row height
+local TAB_H    = 30
 local CONTENT_H= ROOT_H - PAD*2 - TAB_H - GAP
 
 -- ══════════════════════════════════════════
@@ -201,7 +212,6 @@ SideCDLabel.Text="SIDE: READY ✓"; SideCDLabel.Visible=false; SideCDLabel.ZInde
 local skillDetectorConn=nil; local skillDetectorState={}
 local strongSkills={["Omni Directional Punch"]=true,["Death Counter"]=true,["Serious Punch"]=true,["Table Flip"]=true}
 local weakSkills={["Consecutive Punches"]=true,["Normal Punch"]=true,["Shove"]=true,["Uppercut"]=true}
-
 local function createBillboard(target,text)
     if not (target and target:FindFirstChild("Head")) then return end
     local head=target.Head; local bb=head:FindFirstChild("SkillTag")
@@ -314,9 +324,7 @@ local function toggleESP(state)
     end
 end
 
--- ══════════════════════════════════════════
---   ESP FRIENDS
--- ══════════════════════════════════════════
+-- ESP FRIENDS
 local espFriendEnabled=false; local espFriendConns={}; local espFriendObjs={}
 local function createFriendESP(plr)
     if plr==LocalPlayer then return end
@@ -357,9 +365,7 @@ local function toggleFriendESP(state)
     end
 end
 
--- ══════════════════════════════════════════
---   HITBOX EXPANDER
--- ══════════════════════════════════════════
+-- HITBOX EXPANDER
 local hitboxEnabled=false; local hitboxSize=6; local hitboxConns={}
 local function applyHitboxToChar(plr)
     if plr==LocalPlayer then return end
@@ -388,9 +394,7 @@ local function toggleHitbox(state, sz)
     end
 end
 
--- ══════════════════════════════════════════
---   NOCLIP
--- ══════════════════════════════════════════
+-- NOCLIP
 local noclipEnabled=false; local noclipConn=nil
 local function toggleNoclip(state)
     noclipEnabled=state
@@ -410,9 +414,7 @@ local function toggleNoclip(state)
     end
 end
 
--- ══════════════════════════════════════════
---   ANTI-AFK
--- ══════════════════════════════════════════
+-- ANTI-AFK
 local antiAFKConn=nil
 local function toggleAntiAFK(state)
     if state then
@@ -429,9 +431,6 @@ local function toggleAntiAFK(state)
     end
 end
 
--- ══════════════════════════════════════════
---   UPDATE STAT WIDGET
--- ══════════════════════════════════════════
 local function updateStatWidget()
     StatFPSLbl.Visible=Settings.showFPS; StatPingLbl.Visible=Settings.showPing
     StatPlayersLbl.Visible=Settings.showPlayers; DashCDLabel.Visible=Settings.showDashCD
@@ -450,18 +449,14 @@ Root.BackgroundColor3=C.BG; Root.BorderSizePixel=0
 Root.Active=true; Root.Draggable=true; Root.ZIndex=2
 Root.ClipsDescendants=true; Root.Visible=false; Root.Parent=ScreenGui
 corner(Root,14); stroke(Root,1.8,0.08); glowOrb(Root,0.88)
-
--- Ảnh nền root
 local RootBg=Instance.new("ImageLabel")
 RootBg.Size=UDim2.new(1,0,1,0); RootBg.BackgroundTransparency=1
 RootBg.Image=ID_ANH_NEN; RootBg.ImageTransparency=0.93
 RootBg.ScaleType=Enum.ScaleType.Crop; RootBg.ZIndex=1; RootBg.Parent=Root; corner(RootBg,14)
-
 local RootPad=Instance.new("UIPadding")
 RootPad.PaddingTop=UDim.new(0,PAD); RootPad.PaddingBottom=UDim.new(0,PAD)
 RootPad.PaddingLeft=UDim.new(0,PAD); RootPad.PaddingRight=UDim.new(0,PAD)
 RootPad.Parent=Root
-
 local RootLayout=Instance.new("UIListLayout")
 RootLayout.FillDirection=Enum.FillDirection.Horizontal
 RootLayout.Padding=UDim.new(0,GAP); RootLayout.Parent=Root
@@ -473,14 +468,11 @@ local KeyOverlay=Instance.new("Frame")
 KeyOverlay.Size=UDim2.new(1,0,1,0); KeyOverlay.BackgroundColor3=C.BG
 KeyOverlay.BackgroundTransparency=0.05; KeyOverlay.BorderSizePixel=0
 KeyOverlay.ZIndex=20; KeyOverlay.Visible=not keyVerified; KeyOverlay.Parent=Root; corner(KeyOverlay,14)
-
 local KOBg=Instance.new("ImageLabel"); KOBg.Size=UDim2.new(1,0,1,0); KOBg.BackgroundTransparency=1
 KOBg.Image=ID_ANH_NEN; KOBg.ImageTransparency=0.55; KOBg.ScaleType=Enum.ScaleType.Stretch
 KOBg.ZIndex=20; KOBg.Parent=KeyOverlay; corner(KOBg,14)
-
 local KODark=Instance.new("Frame"); KODark.Size=UDim2.new(1,0,1,0); KODark.BackgroundColor3=C.BG
 KODark.BackgroundTransparency=0.45; KODark.BorderSizePixel=0; KODark.ZIndex=21; KODark.Parent=KeyOverlay; corner(KODark,14)
-
 local function koLabel(text,sz,col,y,h)
     local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-20,0,h or 22)
     l.Position=UDim2.new(0,10,0,y); l.BackgroundTransparency=1; l.Text=text
@@ -488,20 +480,17 @@ local function koLabel(text,sz,col,y,h)
     l.ZIndex=23; l.Parent=KeyOverlay; return l
 end
 local KIcon=koLabel("🔐",28,C.CYAN,0,40); KIcon.Position=UDim2.new(0,0,0.08,0)
-local KTitle=koLabel("Nhập key để mở CryoXHUB v5.2",15,C.CYAN,0,24); KTitle.Position=UDim2.new(0,10,0.25,0)
+local KTitle=koLabel("Nhập key để mở CryoXHUB v5.3",15,C.CYAN,0,24); KTitle.Position=UDim2.new(0,10,0.25,0)
 local KSub=koLabel("Key hợp lệ 24 giờ  •  Key: CryoXHUB",11,C.SUB,0,18); KSub.Font=Enum.Font.Gotham; KSub.Position=UDim2.new(0,10,0.36,0)
-
 local KeyInput=Instance.new("TextBox")
 KeyInput.Size=UDim2.new(0.75,0,0,38); KeyInput.Position=UDim2.new(0.125,0,0.48,0)
 KeyInput.BackgroundColor3=C.PANEL2; KeyInput.PlaceholderText="Nhập Key tại đây..."; KeyInput.Text=""
 KeyInput.Font=Enum.Font.Gotham; KeyInput.TextSize=13; KeyInput.TextColor3=C.TEXT
 KeyInput.PlaceholderColor3=C.SUB; KeyInput.ZIndex=24; KeyInput.Parent=KeyOverlay; corner(KeyInput,9); stroke(KeyInput,1.5,0.2)
-
 local KeyStatus=Instance.new("TextLabel")
 KeyStatus.Size=UDim2.new(1,-20,0,16); KeyStatus.Position=UDim2.new(0,10,0.48,42)
 KeyStatus.BackgroundTransparency=1; KeyStatus.Text=""; KeyStatus.TextColor3=C.RED
 KeyStatus.Font=Enum.Font.Gotham; KeyStatus.TextSize=11; KeyStatus.ZIndex=23; KeyStatus.Parent=KeyOverlay
-
 local KeySubmit=Instance.new("TextButton")
 KeySubmit.Size=UDim2.new(0.75,0,0,36); KeySubmit.Position=UDim2.new(0.125,0,0.48,62)
 KeySubmit.BackgroundColor3=C.CYAN; KeySubmit.Text="XÁC NHẬN  (24H)"; KeySubmit.Font=Enum.Font.GothamBold
@@ -510,7 +499,7 @@ KeySubmit.MouseEnter:Connect(function() tw(KeySubmit,{BackgroundColor3=Color3.fr
 KeySubmit.MouseLeave:Connect(function() tw(KeySubmit,{BackgroundColor3=C.CYAN},0.12) end)
 
 -- ══════════════════════════════════════════
---   COLUMN 1 — LEFT (Avatar + Leaderboard + UpdateLog)
+--   COLUMN 1 — LEFT
 -- ══════════════════════════════════════════
 local LeftCol=Instance.new("Frame")
 LeftCol.Size=UDim2.new(0,LEFT_W,1,0); LeftCol.BackgroundTransparency=1
@@ -523,20 +512,16 @@ LeftLayout.Padding=UDim.new(0,GAP); LeftLayout.Parent=LeftCol
 local AvatarCard=Instance.new("Frame")
 AvatarCard.Size=UDim2.new(1,0,0,AVATAR_H); AvatarCard.BackgroundColor3=C.PANEL
 AvatarCard.BorderSizePixel=0; AvatarCard.ZIndex=3; AvatarCard.Parent=LeftCol
-corner(AvatarCard,10); stroke(AvatarCard,1.2,0.2)
-bgImg(AvatarCard,0.78,3)
-
+corner(AvatarCard,10); stroke(AvatarCard,1.2,0.2); bgImg(AvatarCard,0.78,3)
 local AvatarGlow=Instance.new("ImageLabel")
 AvatarGlow.Size=UDim2.new(0,70,0,70); AvatarGlow.Position=UDim2.new(0.5,-35,0,2)
 AvatarGlow.BackgroundTransparency=1; AvatarGlow.Image="rbxassetid://5028857084"
 AvatarGlow.ImageColor3=C.CYAN; AvatarGlow.ImageTransparency=0.70; AvatarGlow.ZIndex=4; AvatarGlow.Parent=AvatarCard
-
 local AvatarImg=Instance.new("ImageLabel")
 AvatarImg.Size=UDim2.new(0,54,0,54); AvatarImg.Position=UDim2.new(0.5,-27,0,8)
 AvatarImg.BackgroundColor3=C.PANEL2
 AvatarImg.Image="rbxthumb://type=AvatarHeadShot&id="..LocalPlayer.UserId.."&w=150&h=150"
 AvatarImg.ZIndex=5; AvatarImg.Parent=AvatarCard; corner(AvatarImg,999); stroke(AvatarImg,2,0.05)
-
 local function aLbl(text,sz,col,y,h)
     local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-6,0,h or 14); l.Position=UDim2.new(0,3,0,y)
     l.BackgroundTransparency=1; l.Text=text; l.TextColor3=col or C.TEXT
@@ -545,41 +530,25 @@ local function aLbl(text,sz,col,y,h)
 end
 aLbl(LocalPlayer.DisplayName,12,C.TEXT,66,18)
 aLbl("@"..LocalPlayer.Name,10,C.CYAN,84,14).Font=Enum.Font.Gotham
-
 local ADiv=Instance.new("Frame"); ADiv.Size=UDim2.new(1,-16,0,1); ADiv.Position=UDim2.new(0,8,0,102)
 ADiv.BackgroundColor3=C.CYAN; ADiv.BackgroundTransparency=0.55; ADiv.BorderSizePixel=0; ADiv.ZIndex=4; ADiv.Parent=AvatarCard
-
 aLbl("UID: "..LocalPlayer.UserId,9,C.SUB,106,13).Font=Enum.Font.Gotham
-
 local gn="Unknown Game"
 pcall(function() gn=game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name end)
 local gnLbl=aLbl(gn,8,C.SUB,119,13); gnLbl.Font=Enum.Font.Gotham; gnLbl.TextTruncate=Enum.TextTruncate.AtEnd
-aLbl("CryoXHUB  v5.2  ✦",9,C.CYAN,132,13)
-
--- Dark/Light toggle
-local ThBar=Instance.new("Frame"); ThBar.Size=UDim2.new(1,0,0,22)
-ThBar.BackgroundColor3=C.PANEL2; ThBar.BorderSizePixel=0; ThBar.ZIndex=3; ThBar.Parent=LeftCol; corner(ThBar,6); stroke(ThBar,1,0.3)
-local DarkBtn=Instance.new("TextButton"); DarkBtn.Size=UDim2.new(0.5,-1,1,-2); DarkBtn.Position=UDim2.new(0,1,0,1)
-DarkBtn.BackgroundColor3=Color3.fromRGB(0,38,85); DarkBtn.Text="🌙 Dark"; DarkBtn.Font=Enum.Font.GothamBold
-DarkBtn.TextSize=9; DarkBtn.TextColor3=C.CYAN; DarkBtn.ZIndex=5; DarkBtn.Parent=ThBar; corner(DarkBtn,5)
-local LightBtn=Instance.new("TextButton"); LightBtn.Size=UDim2.new(0.5,-1,1,-2); LightBtn.Position=UDim2.new(0.5,0,0,1)
-LightBtn.BackgroundColor3=C.PANEL2; LightBtn.Text="☀️ Light"; LightBtn.Font=Enum.Font.GothamBold
-LightBtn.TextSize=9; LightBtn.TextColor3=C.SUB; LightBtn.ZIndex=5; LightBtn.Parent=ThBar; corner(LightBtn,5)
+aLbl("CryoXHUB  v5.3  ✦",9,C.CYAN,132,13)
 
 -- Leaderboard
-local RANKH = 96
+local RANKH = 112
 local RankCard=Instance.new("Frame"); RankCard.Size=UDim2.new(1,0,0,RANKH)
 RankCard.BackgroundColor3=C.PANEL; RankCard.BorderSizePixel=0; RankCard.ZIndex=3; RankCard.Parent=LeftCol
 corner(RankCard,8); stroke(RankCard,1.2,0.2); bgImg(RankCard,0.88,3)
-
 local RankTitle=Instance.new("TextLabel"); RankTitle.Size=UDim2.new(1,-10,0,16); RankTitle.Position=UDim2.new(0,6,0,3)
 RankTitle.BackgroundTransparency=1; RankTitle.Text="🏆 LEADERBOARD"; RankTitle.TextColor3=C.CYAN
 RankTitle.Font=Enum.Font.GothamBold; RankTitle.TextSize=9; RankTitle.TextXAlignment=Enum.TextXAlignment.Left
 RankTitle.ZIndex=5; RankTitle.Parent=RankCard
-
 local RDiv=Instance.new("Frame"); RDiv.Size=UDim2.new(1,-10,0,1); RDiv.Position=UDim2.new(0,5,0,20)
 RDiv.BackgroundColor3=C.CYAN; RDiv.BackgroundTransparency=0.55; RDiv.BorderSizePixel=0; RDiv.ZIndex=4; RDiv.Parent=RankCard
-
 local RankScroll=Instance.new("ScrollingFrame")
 RankScroll.Size=UDim2.new(1,-4,0,RANKH-24); RankScroll.Position=UDim2.new(0,2,0,23)
 RankScroll.BackgroundTransparency=1; RankScroll.BorderSizePixel=0
@@ -588,7 +557,6 @@ RankScroll.CanvasSize=UDim2.new(0,0,0,0); RankScroll.AutomaticCanvasSize=Enum.Au
 RankScroll.ZIndex=5; RankScroll.Parent=RankCard
 local RankLL=Instance.new("UIListLayout",RankScroll); RankLL.Padding=UDim.new(0,2)
 local RankLP=Instance.new("UIPadding",RankScroll); RankLP.PaddingTop=UDim.new(0,1)
-
 local rankMedals={"🥇","🥈","🥉"}
 local function refreshRank()
     for _,v in pairs(RankScroll:GetChildren()) do if v:IsA("Frame") then v:Destroy() end end
@@ -628,25 +596,17 @@ Players.PlayerRemoving:Connect(function() task.wait(0.5); pcall(refreshRank) end
 
 -- Update Log
 local UpdateCard=Instance.new("Frame")
-UpdateCard.Size=UDim2.new(1,0,1,0); UpdateCard.AutomaticSize=Enum.AutomaticSize.None
--- Fill remaining height via LeftLayout
+do local tempSize=ROOT_H-PAD*2-AVATAR_H-GAP-RANKH-GAP
+UpdateCard.Size=UDim2.new(1,0,0,tempSize) end
 UpdateCard.BackgroundColor3=C.PANEL; UpdateCard.BorderSizePixel=0; UpdateCard.ZIndex=3; UpdateCard.Parent=LeftCol
--- override size with flex
-do
-    local tempSize=ROOT_H-PAD*2-AVATAR_H-GAP-22-GAP-RANKH-GAP
-    UpdateCard.Size=UDim2.new(1,0,0,tempSize)
-end
 corner(UpdateCard,8); stroke(UpdateCard,1.2,0.2); bgImg(UpdateCard,0.88,3)
-
 local UpdateTitle2=Instance.new("TextLabel")
 UpdateTitle2.Size=UDim2.new(1,-10,0,16); UpdateTitle2.Position=UDim2.new(0,6,0,3)
 UpdateTitle2.BackgroundTransparency=1; UpdateTitle2.Text="  Update Log"; UpdateTitle2.TextColor3=C.CYAN
 UpdateTitle2.Font=Enum.Font.GothamBold; UpdateTitle2.TextSize=9; UpdateTitle2.TextXAlignment=Enum.TextXAlignment.Left
 UpdateTitle2.ZIndex=5; UpdateTitle2.Parent=UpdateCard
-
 local UDiv2=Instance.new("Frame"); UDiv2.Size=UDim2.new(1,-10,0,1); UDiv2.Position=UDim2.new(0,5,0,20)
 UDiv2.BackgroundColor3=C.CYAN; UDiv2.BackgroundTransparency=0.55; UDiv2.BorderSizePixel=0; UDiv2.ZIndex=4; UDiv2.Parent=UpdateCard
-
 local UpdateScroll=Instance.new("ScrollingFrame")
 UpdateScroll.Size=UDim2.new(1,-6,1,-24); UpdateScroll.Position=UDim2.new(0,3,0,23)
 UpdateScroll.BackgroundTransparency=1; UpdateScroll.BorderSizePixel=0
@@ -655,15 +615,15 @@ UpdateScroll.CanvasSize=UDim2.new(0,0,0,0); UpdateScroll.AutomaticCanvasSize=Enu
 UpdateScroll.ZIndex=5; UpdateScroll.Parent=UpdateCard
 local UL2=Instance.new("UIListLayout",UpdateScroll); UL2.Padding=UDim.new(0,3)
 local UP3=Instance.new("UIPadding",UpdateScroll); UP3.PaddingTop=UDim.new(0,2)
-
 local updates={
-    {"v5.2","GUI giữa mở rộng + tên tab"},
-    {"v5.2","Fix WalkSpeed/Jump slider"},
-    {"v5.2","Ảnh nền + logo đóng restored"},
+    {"v5.3","Tab mới: COMBAT, FPS, VISUAL, PLAYER, SETTING"},
+    {"v5.3","12 Themes + Theme Picker"},
+    {"v5.3","ESP Box, Hitbox vào Settings"},
+    {"v5.3","Combat gộp Tech + Moveset"},
+    {"v5.2","GUI layout + ảnh nền restored"},
     {"v5.1","ESP Friends + Hitbox Expander"},
     {"v4.1","Walkspeed & JumpPower slider"},
-    {"v4.1","ESP, Noclip, Anti-AFK"},
-    {"v4.0","Search + YÊU THÍCH + EXEC"},
+    {"v4.0","Search + Yêu Thích + EXEC"},
     {"v3.6","MAP + 16 Teleport locations"},
 }
 for _,u in ipairs(updates) do
@@ -678,39 +638,38 @@ for _,u in ipairs(updates) do
 end
 
 -- ══════════════════════════════════════════
---   COLUMN 2 — MID (Main Tabs — rộng hơn, hiện tên)
+--   COLUMN 2 — MID
 -- ══════════════════════════════════════════
 local MidCol=Instance.new("Frame")
 MidCol.Size=UDim2.new(0,MID_W,1,0); MidCol.BackgroundColor3=C.PANEL
 MidCol.BorderSizePixel=0; MidCol.ZIndex=3; MidCol.Parent=Root; MidCol.ClipsDescendants=true
 corner(MidCol,10); stroke(MidCol,1.2,0.2); bgImg(MidCol,0.92,3)
-
-local MidInner=Instance.new("Frame"); MidInner.Size=UDim2.new(1,-6,1,-38); MidInner.Position=UDim2.new(0,3,0,4)
+local MidInner=Instance.new("Frame"); MidInner.Size=UDim2.new(1,-6,1,-36); MidInner.Position=UDim2.new(0,3,0,4)
 MidInner.BackgroundTransparency=1; MidInner.ZIndex=4; MidInner.Parent=MidCol
 local MidLayout=Instance.new("UIListLayout"); MidLayout.FillDirection=Enum.FillDirection.Vertical
 MidLayout.Padding=UDim.new(0,3); MidLayout.HorizontalAlignment=Enum.HorizontalAlignment.Center; MidLayout.Parent=MidInner
 
--- Mini button dưới cùng col2
-local MiniBtn=Instance.new("TextButton"); MiniBtn.Size=UDim2.new(1,-6,0,26); MiniBtn.Position=UDim2.new(0,3,1,-30)
-MiniBtn.BackgroundColor3=C.PANEL2; MiniBtn.Text="◈"; MiniBtn.Font=Enum.Font.GothamBold
-MiniBtn.TextSize=13; MiniBtn.TextColor3=C.CYAN; MiniBtn.ZIndex=5; MiniBtn.Parent=MidCol; corner(MiniBtn,6); stroke(MiniBtn,1,0.5)
+-- Theme Picker Button (bên dưới col2)
+local ThemePickerBtn=Instance.new("TextButton"); ThemePickerBtn.Size=UDim2.new(1,-6,0,28)
+ThemePickerBtn.Position=UDim2.new(0,3,1,-31)
+ThemePickerBtn.BackgroundColor3=C.PANEL2; ThemePickerBtn.Text="🎨 Theme"; ThemePickerBtn.Font=Enum.Font.GothamBold
+ThemePickerBtn.TextSize=9; ThemePickerBtn.TextColor3=C.CYAN; ThemePickerBtn.ZIndex=5; ThemePickerBtn.Parent=MidCol
+corner(ThemePickerBtn,7); stroke(ThemePickerBtn,1,0.3)
 
 -- ══════════════════════════════════════════
---   COLUMN 3 — RIGHT (SubTab row + Content)
+--   COLUMN 3 — RIGHT
 -- ══════════════════════════════════════════
 local RightCol=Instance.new("Frame")
 RightCol.Size=UDim2.new(0,RIGHT_W,1,0); RightCol.BackgroundTransparency=1
 RightCol.BorderSizePixel=0; RightCol.ZIndex=3; RightCol.Parent=Root
 
--- SubTab row (top of right col)
+-- SubTab row
 local TabRow=Instance.new("Frame")
 TabRow.Size=UDim2.new(1,0,0,TAB_H); TabRow.Position=UDim2.new(0,0,0,0)
 TabRow.BackgroundColor3=C.PANEL; TabRow.BorderSizePixel=0; TabRow.ZIndex=4; TabRow.Parent=RightCol
 corner(TabRow,9); stroke(TabRow,1.2,0.2)
-
 local TabBar=Instance.new("Frame")
 TabBar.Size=UDim2.new(1,-(TAB_H+GAP),1,0); TabBar.BackgroundTransparency=1; TabBar.ZIndex=4; TabBar.Parent=TabRow
-
 local TabScroll=Instance.new("ScrollingFrame")
 TabScroll.Size=UDim2.new(1,-4,1,-4); TabScroll.Position=UDim2.new(0,2,0,2)
 TabScroll.BackgroundTransparency=1; TabScroll.BorderSizePixel=0; TabScroll.ScrollBarThickness=0
@@ -718,7 +677,6 @@ TabScroll.CanvasSize=UDim2.new(0,0,0,0); TabScroll.AutomaticCanvasSize=Enum.Auto
 TabScroll.ScrollingDirection=Enum.ScrollingDirection.X; TabScroll.ZIndex=5; TabScroll.Parent=TabBar
 local TabLayout=Instance.new("UIListLayout"); TabLayout.FillDirection=Enum.FillDirection.Horizontal
 TabLayout.Padding=UDim.new(0,4); TabLayout.VerticalAlignment=Enum.VerticalAlignment.Center; TabLayout.Parent=TabScroll
-
 local CloseBtn=Instance.new("TextButton")
 CloseBtn.Size=UDim2.new(0,TAB_H,0,TAB_H); CloseBtn.Position=UDim2.new(1,-TAB_H,0,0)
 CloseBtn.BackgroundColor3=C.RED; CloseBtn.Text="✕"; CloseBtn.TextColor3=C.TEXT
@@ -726,11 +684,10 @@ CloseBtn.Font=Enum.Font.GothamBold; CloseBtn.TextSize=13; CloseBtn.ZIndex=6; Clo
 CloseBtn.MouseEnter:Connect(function() tw(CloseBtn,{BackgroundColor3=Color3.fromRGB(240,70,70)},0.12) end)
 CloseBtn.MouseLeave:Connect(function() tw(CloseBtn,{BackgroundColor3=C.RED},0.12) end)
 
--- Search Row (below subtab)
+-- Search Row
 local SearchRow=Instance.new("Frame")
 SearchRow.Size=UDim2.new(1,0,0,26); SearchRow.Position=UDim2.new(0,0,0,TAB_H+GAP)
 SearchRow.BackgroundTransparency=1; SearchRow.ZIndex=4; SearchRow.Parent=RightCol
-
 local SearchBox=Instance.new("TextBox")
 SearchBox.Size=UDim2.new(1,0,1,0); SearchBox.BackgroundColor3=C.PANEL
 SearchBox.PlaceholderText="🔍  Tìm kiếm script..."; SearchBox.Text=""
@@ -745,14 +702,11 @@ ContentBg.Size=UDim2.new(1,0,0,ROOT_H-PAD*2-TAB_H-GAP-26-GAP)
 ContentBg.Position=UDim2.new(0,0,0,TAB_H+GAP+26+GAP)
 ContentBg.BackgroundColor3=C.PANEL; ContentBg.BorderSizePixel=0; ContentBg.ClipsDescendants=true
 ContentBg.ZIndex=3; ContentBg.Parent=RightCol; corner(ContentBg,10); stroke(ContentBg,1.2,0.2)
-
 local CBgImg=Instance.new("ImageLabel"); CBgImg.Size=UDim2.new(1,0,1,0); CBgImg.BackgroundTransparency=1
 CBgImg.Image=ID_ANH_NEN; CBgImg.ImageTransparency=0.42; CBgImg.ScaleType=Enum.ScaleType.Stretch
 CBgImg.ZIndex=3; CBgImg.Parent=ContentBg; corner(CBgImg,10)
-
 local COvl=Instance.new("Frame"); COvl.Size=UDim2.new(1,0,1,0); COvl.BackgroundColor3=C.BG
 COvl.BackgroundTransparency=0.48; COvl.BorderSizePixel=0; COvl.ZIndex=4; COvl.Parent=ContentBg; corner(COvl,10)
-
 local ContentFrame=Instance.new("ScrollingFrame")
 ContentFrame.Size=UDim2.new(1,-6,1,-8); ContentFrame.Position=UDim2.new(0,3,0,4)
 ContentFrame.BackgroundTransparency=1; ContentFrame.ZIndex=6
@@ -775,7 +729,7 @@ local SRL=Instance.new("UIListLayout"); SRL.Padding=UDim.new(0,5); SRL.Parent=SR
 local SRPAD=Instance.new("UIPadding"); SRPAD.PaddingTop=UDim.new(0,4); SRPAD.PaddingBottom=UDim.new(0,4)
 SRPAD.PaddingLeft=UDim.new(0,2); SRPAD.PaddingRight=UDim.new(0,2); SRPAD.Parent=SRScroll
 
--- Open Button (logo khi đóng GUI)
+-- Open Button
 local OpenBtn=Instance.new("ImageButton")
 OpenBtn.Size=UDim2.new(0,46,0,46); OpenBtn.Position=UDim2.new(0,12,0.5,-23)
 OpenBtn.Image=ID_LOGO_DONG; OpenBtn.BackgroundColor3=C.PANEL; OpenBtn.Visible=false; OpenBtn.Draggable=true
@@ -795,10 +749,9 @@ local function animateClose(cb)
 end
 
 -- ══════════════════════════════════════════
---   TAB SYSTEM (main tabs — Col2)
+--   TAB SYSTEM
 -- ══════════════════════════════════════════
 local currentTabIndex=1; local isSliding=false
-
 local function slideContent(newIndex,loadFunc)
     if isSliding then return end; isSliding=true
     local W=ContentBg.AbsoluteSize.X
@@ -814,7 +767,6 @@ local function slideContent(newIndex,loadFunc)
     tw(ContentFrame,{Position=UDim2.new(0,3,0,4)},0.18,Enum.EasingStyle.Cubic,Enum.EasingDirection.Out)
     task.wait(0.19); isSliding=false
 end
-
 local activeMainTab=nil
 local function setMainActive(btn,index,loadFunc)
     if activeMainTab==btn or isSliding then return end
@@ -826,8 +778,6 @@ local function setMainActive(btn,index,loadFunc)
     local s=btn:FindFirstChildOfClass("UIStroke"); if s then tw(s,{Transparency=0},0.18) end
     if loadFunc then task.spawn(function() slideContent(index,loadFunc) end) end
 end
-
--- SubTab system (TabScroll in right col)
 local activeSubTab=nil
 local function setSubActive(btn,loadFunc)
     if activeSubTab==btn then return end
@@ -845,16 +795,12 @@ local function setSubActive(btn,loadFunc)
         loadFunc()
     end
 end
-
 local function clearContent()
     for _,v in pairs(ContentFrame:GetChildren()) do
         if v:IsA("GuiObject") and not (v:IsA("UIListLayout") or v:IsA("UIPadding")) then v:Destroy() end
     end
 end
-
--- Build subtab buttons helper
 local function buildSubTabs(tabDefs)
-    -- Clear old subtabs
     for _,v in pairs(TabScroll:GetChildren()) do
         if v:IsA("TextButton") then v:Destroy() end
     end
@@ -891,22 +837,17 @@ local function makeScriptBtn(name,code,parent)
     local found=false
     for _,s in ipairs(AllScripts) do if s.name==name then found=true; break end end
     if not found then table.insert(AllScripts,{name=name,code=code}) end
-
     local btn=Instance.new("Frame"); btn.Size=UDim2.new(1,0,0,36); btn.BackgroundColor3=C.PANEL2
     btn.BorderSizePixel=0; btn.ZIndex=7; btn.Parent=parent; corner(btn,8); stroke(btn,1.2,0.5)
-
     local runBtn=Instance.new("TextButton"); runBtn.Size=UDim2.new(1,-70,1,0); runBtn.Position=UDim2.new(0,0,0,0)
     runBtn.BackgroundTransparency=1; runBtn.Text=""; runBtn.ZIndex=9; runBtn.Parent=btn
-
     local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(0,28,1,0); ic.Position=UDim2.new(0,5,0,0)
     ic.BackgroundTransparency=1; ic.Text="▶"; ic.TextColor3=C.CYAN; ic.Font=Enum.Font.GothamBold
     ic.TextSize=12; ic.ZIndex=8; ic.Parent=btn
-
     local nl=Instance.new("TextLabel"); nl.Size=UDim2.new(1,-104,1,0); nl.Position=UDim2.new(0,30,0,0)
     nl.BackgroundTransparency=1; nl.Text=name; nl.TextColor3=C.TEXT; nl.Font=Enum.Font.GothamBold
     nl.TextSize=11; nl.TextXAlignment=Enum.TextXAlignment.Left; nl.TextTruncate=Enum.TextTruncate.AtEnd
     nl.ZIndex=8; nl.Parent=btn
-
     local favState=isFavorited(name)
     local favBtn=Instance.new("TextButton"); favBtn.Size=UDim2.new(0,28,0,28); favBtn.Position=UDim2.new(1,-64,0.5,-14)
     favBtn.BackgroundColor3=favState and Color3.fromRGB(255,200,30) or C.PANEL
@@ -923,7 +864,6 @@ local function makeScriptBtn(name,code,parent)
             task.spawn(function() showToast("⭐  Thêm Yêu Thích: "..name,C.CYAN,2) end)
         end
     end)
-
     local copyBtn=Instance.new("TextButton"); copyBtn.Size=UDim2.new(0,28,0,28); copyBtn.Position=UDim2.new(1,-32,0.5,-14)
     copyBtn.BackgroundColor3=C.PANEL; copyBtn.Text="⧉"; copyBtn.Font=Enum.Font.GothamBold; copyBtn.TextSize=13
     copyBtn.TextColor3=C.SUB; copyBtn.ZIndex=9; copyBtn.Parent=btn; corner(copyBtn,6)
@@ -931,7 +871,6 @@ local function makeScriptBtn(name,code,parent)
         if setclipboard then setclipboard(code); task.spawn(function() showToast("📋  Đã copy: "..name,C.GREEN,2) end)
         else task.spawn(function() showToast("❌  Không hỗ trợ clipboard",C.RED,2) end) end
     end)
-
     runBtn.MouseEnter:Connect(function() tw(btn,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.12); tw(nl,{TextColor3=C.CYAN},0.12) end)
     runBtn.MouseLeave:Connect(function() tw(btn,{BackgroundColor3=C.PANEL2},0.12); tw(nl,{TextColor3=C.TEXT},0.12) end)
     runBtn.MouseButton1Click:Connect(function()
@@ -991,101 +930,82 @@ local function makeToggle(labelText,state,onChange,parent)
     end)
 end
 
--- ══════════════════════════════════════════
---   SLIDER — FIX HOÀN TOÀN (không bị trượt khi thả)
--- ══════════════════════════════════════════
 local function makeSlider(labelText,minVal,maxVal,currentVal,onChange,parent)
     parent=parent or ContentFrame
     local frame=Instance.new("Frame"); frame.Size=UDim2.new(1,0,0,46); frame.BackgroundColor3=C.PANEL2
     frame.BorderSizePixel=0; frame.ZIndex=7; frame.Parent=parent; corner(frame,8); stroke(frame,1.2,0.5)
-
     local lbl=Instance.new("TextLabel"); lbl.Size=UDim2.new(0.65,0,0,20); lbl.Position=UDim2.new(0,10,0,4)
     lbl.BackgroundTransparency=1; lbl.Text=labelText; lbl.TextColor3=C.TEXT; lbl.Font=Enum.Font.GothamBold
     lbl.TextSize=11; lbl.TextXAlignment=Enum.TextXAlignment.Left; lbl.ZIndex=8; lbl.Parent=frame
-
     local valLbl=Instance.new("TextLabel"); valLbl.Size=UDim2.new(0.3,0,0,20); valLbl.Position=UDim2.new(0.68,0,0,4)
     valLbl.BackgroundTransparency=1; valLbl.Text=tostring(currentVal); valLbl.TextColor3=C.CYAN
     valLbl.Font=Enum.Font.GothamBold; valLbl.TextSize=12; valLbl.TextXAlignment=Enum.TextXAlignment.Right
     valLbl.ZIndex=8; valLbl.Parent=frame
-
     local track=Instance.new("Frame"); track.Size=UDim2.new(1,-20,0,6); track.Position=UDim2.new(0,10,0,30)
     track.BackgroundColor3=C.PANEL; track.BorderSizePixel=0; track.ZIndex=8; track.Parent=frame; corner(track,999)
-
     local fill=Instance.new("Frame"); fill.Size=UDim2.new((currentVal-minVal)/math.max(maxVal-minVal,1),0,1,0)
     fill.BackgroundColor3=C.CYAN; fill.BorderSizePixel=0; fill.ZIndex=9; fill.Parent=track; corner(fill,999)
-
     local handle=Instance.new("Frame"); handle.Size=UDim2.new(0,16,0,16)
     handle.Position=UDim2.new((currentVal-minVal)/math.max(maxVal-minVal,1),-8,0.5,-8)
     handle.BackgroundColor3=C.TEXT; handle.BorderSizePixel=0; handle.ZIndex=10; handle.Parent=track; corner(handle,999)
-
-    -- Invisible drag button trải dài toàn track + buffer
     local dragBtn=Instance.new("TextButton")
     dragBtn.Size=UDim2.new(1,20,0,30); dragBtn.Position=UDim2.new(0,-10,0.5,-15)
     dragBtn.BackgroundTransparency=1; dragBtn.Text=""; dragBtn.ZIndex=12; dragBtn.Parent=track
-
     local dragging=false
-
-    -- Dùng InputBegan/InputEnded trên dragBtn, InputChanged trên ScreenGui khi đang drag
-    -- Tránh hiện tượng tự chạy sau khi thả
-
     dragBtn.InputBegan:Connect(function(input)
         if input.UserInputType==Enum.UserInputType.MouseButton1
-        or input.UserInputType==Enum.UserInputType.Touch then
-            dragging=true
-        end
+        or input.UserInputType==Enum.UserInputType.Touch then dragging=true end
     end)
-
     dragBtn.InputEnded:Connect(function(input)
         if input.UserInputType==Enum.UserInputType.MouseButton1
-        or input.UserInputType==Enum.UserInputType.Touch then
-            dragging=false
-        end
+        or input.UserInputType==Enum.UserInputType.Touch then dragging=false end
     end)
-
-    -- Global input ended để bắt thả chuột ra ngoài
     UIS.InputEnded:Connect(function(input)
         if input.UserInputType==Enum.UserInputType.MouseButton1
-        or input.UserInputType==Enum.UserInputType.Touch then
-            dragging=false
-        end
+        or input.UserInputType==Enum.UserInputType.Touch then dragging=false end
     end)
-
-    -- Chỉ update khi đang giữ chuột
     UIS.InputChanged:Connect(function(input)
         if not dragging then return end
         if input.UserInputType~=Enum.UserInputType.MouseMovement
         and input.UserInputType~=Enum.UserInputType.Touch then return end
-
         local abs=track.AbsolutePosition; local sz=track.AbsoluteSize
         local mouseX=input.UserInputType==Enum.UserInputType.Touch
             and input.Position.X or UIS:GetMouseLocation().X
         local rel=math.clamp((mouseX-abs.X)/math.max(sz.X,1),0,1)
         local val=math.floor(minVal+(maxVal-minVal)*rel)
-
         fill.Size=UDim2.new(rel,0,1,0)
         handle.Position=UDim2.new(rel,-8,0.5,-8)
         valLbl.Text=tostring(val)
         if onChange then onChange(val) end
     end)
-
     return frame
 end
 
-local function makeColorBtn(label,color,onClick)
-    local frame=Instance.new("Frame"); frame.Size=UDim2.new(1,0,0,32); frame.BackgroundColor3=C.PANEL2
-    frame.BorderSizePixel=0; frame.ZIndex=7; frame.Parent=ContentFrame; corner(frame,8); stroke(frame,1.2,0.5)
-    local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,14,0,14); dot.Position=UDim2.new(0,8,0.5,-7)
-    dot.BackgroundColor3=color; dot.BorderSizePixel=0; dot.ZIndex=8; dot.Parent=frame; corner(dot,999)
-    local lbl2=Instance.new("TextLabel"); lbl2.Size=UDim2.new(0.68,0,1,0); lbl2.Position=UDim2.new(0,28,0,0)
-    lbl2.BackgroundTransparency=1; lbl2.Text=label; lbl2.TextColor3=C.TEXT; lbl2.Font=Enum.Font.GothamBold
-    lbl2.TextSize=11; lbl2.TextXAlignment=Enum.TextXAlignment.Left; lbl2.ZIndex=8; lbl2.Parent=frame
-    local al=Instance.new("TextLabel"); al.Size=UDim2.new(0.28,0,1,0); al.Position=UDim2.new(0.70,0,0,0)
-    al.BackgroundTransparency=1; al.Text="Chọn ▸"; al.TextColor3=C.CYAN; al.Font=Enum.Font.GothamBold
-    al.TextSize=9; al.ZIndex=8; al.Parent=frame
-    local tBtn=Instance.new("TextButton"); tBtn.Size=UDim2.new(1,0,1,0); tBtn.BackgroundTransparency=1
-    tBtn.Text=""; tBtn.ZIndex=9; tBtn.Parent=frame; tBtn.MouseButton1Click:Connect(onClick)
-    tBtn.MouseEnter:Connect(function() tw(frame,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.12) end)
-    tBtn.MouseLeave:Connect(function() tw(frame,{BackgroundColor3=C.PANEL2},0.12) end)
+-- ══════════════════════════════════════════
+--   THEME APPLY FUNCTION
+-- ══════════════════════════════════════════
+local function applyTheme(theme)
+    C.BG=theme.bg; C.PANEL=theme.panel; C.PANEL2=theme.panel2
+    tw(Root,{BackgroundColor3=theme.bg},0.3)
+    tw(MidCol,{BackgroundColor3=theme.panel},0.3)
+    tw(AvatarCard,{BackgroundColor3=theme.panel},0.3)
+    tw(RankCard,{BackgroundColor3=theme.panel},0.3)
+    tw(UpdateCard,{BackgroundColor3=theme.panel},0.3)
+    tw(TabRow,{BackgroundColor3=theme.panel},0.3)
+    tw(ContentBg,{BackgroundColor3=theme.panel},0.3)
+    tw(COvl,{BackgroundColor3=theme.bg},0.3)
+    SaveData.currentTheme=theme.name; writeSave(SaveData)
+    task.spawn(function() showToast("🎨 Theme: "..theme.name,C.CYAN,2) end)
+end
+
+local function applyAccentColor(newColor)
+    local old=Settings.accentColor; Settings.accentColor=newColor; C.CYAN=newColor
+    for _,v in ipairs(Root:GetDescendants()) do
+        if v:IsA("UIStroke") then v.Color=newColor end
+        if v:IsA("TextLabel") and v.TextColor3==old then v.TextColor3=newColor end
+        if v:IsA("ImageLabel") and v.ImageColor3==old then v.ImageColor3=newColor end
+    end
+    saveSettings(); task.spawn(function() showToast("🎨  Đã đổi màu!",newColor,2) end)
 end
 
 -- ══════════════════════════════════════════
@@ -1114,88 +1034,89 @@ SearchBox:GetPropertyChangedSignal("Text"):Connect(function()
 end)
 
 -- ══════════════════════════════════════════
---   CONTENT LOADERS
+--   CONTENT LOADERS — COMBAT TAB
 -- ══════════════════════════════════════════
+local function LoadCombat_Tech()
+    makeSectionLabel("TECH SCRIPTS")
+    makeScriptBtn("Supa Tech",          [[loadstring(game:HttpGet("https://rawscripts.net/raw/The-Strongest-Battlegrounds-Supa-tech-v2-77454"))()]])
+    makeScriptBtn("Kiba Tech",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_1593573630798166.lua.txt"))()]])
+    makeScriptBtn("Oreo Tech",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/OreoTech/refs/heads/main/Protected_6856895483929371.lua"))()]])
+    makeScriptBtn("lix tech",           [[loadstring(game:HttpGet("https://raw.githubusercontent.com/MerebennieOfficial/ExoticJn/refs/heads/main/Protected_83737738.txt"))()]])
+    makeScriptBtn("lethal kiba",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/MinhNhatHUB/MinhNhat/refs/heads/main/Lethal%20Kiba.lua"))()]])
+    makeScriptBtn("Silent aim reworked",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_6124417452209241.lua.txt"))()]])
+end
+local function LoadCombat_Dash()
+    makeSectionLabel("DASH TECHNIQUES")
+    makeScriptBtn("Lethal Dash",        [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57a4d240a2440f0450986c966469092ccfb8d4797392cb8f469fa8b6e605e64d/download"))()]])
+    makeScriptBtn("Back Dash Cancel",   [[loadstring(game:HttpGet("https://raw.githubusercontent.com/dinhthanhtuankiet1762009-sudo/Js/refs/heads/main/4418648b0e9b71ef.lua"))()]])
+    makeScriptBtn("Instant Twisted v2", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/60a7a7c77395006ebd63fce0a17c13241f932bd414c9aba3158b716da00ade01/download"))()]])
+    makeScriptBtn("Loop Dash",          [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/28513f51c0ca2c03d4d7d94f59215d13ce1a2a470bf187f0a685b58ccb4dae98/download"))()]])
+end
+local function LoadCombat_Moveset()
+    makeSectionLabel("MOVESET / MORPH")
+    makeScriptBtn("KAR [SAITAMA]",  [[loadstring(game:HttpGet("https://raw.githubusercontent.com/OfficialAposty/RBLX-Scripts/refs/heads/main/UltimateLifeForm.lua"))()]])
+    makeScriptBtn("Gojo [SAITAMA]", [[getgenv().morph=false loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletfan2007/BaldyToSorcerer/refs/heads/main/LatestV2.lua"))()]])
+    makeScriptBtn("CHARA [SAITAMA]",[[loadstring(game:HttpGet("https://pastefy.app/gFRaeMGz/raw"))()]])
+    makeSectionLabel("UTILITY COMBAT")
+    makeScriptBtn("Anti Death Counter",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Anti-Death-Counter.lua"))()]])
+    makeScriptBtn("Orbit Farm",        [[loadstring(game:httpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/FARM-KILL/refs/heads/main/TSB"))()]])
+    makeScriptBtn("Farm Kill",         [[loadstring(game:HttpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/Farm-Kill-V2/refs/heads/main/TSB"))()]])
+    makeScriptBtn("TouchFling",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"))()]])
+end
 
--- FPS
-local function LoadFPS()
+-- ══════════════════════════════════════════
+--   CONTENT LOADERS — FPS TAB
+-- ══════════════════════════════════════════
+local function LoadFPS_AntiLag()
+    makeSectionLabel("ANTI LAG SCRIPTS")
     makeScriptBtn("CryoX Anti-Lag",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/CryoX%20Anti-Lag.lua"))()]])
     makeScriptBtn("Blox Strap",            [[loadstring(game:HttpGet("https://raw.githubusercontent.com/qwertyui-is-back/Bloxstrap/main/Initiate.lua"))()]])
     makeScriptBtn("Turbo Lite",            [[loadstring(game:HttpGet("https://raw.githubusercontent.com/TurboLite/Script/main/FixLag.lua"))()]])
     makeScriptBtn("Flags Smooth",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ngoclinh02042011-stack/Flags-Smooth/refs/heads/main/Flags%20by%20ThanhDuy.lua"))()]])
     makeScriptBtn("Anti Lag Remove Effect",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/YQANTGV2/YQANTGV2/refs/heads/main/Protected_5743487458031851.lua.txt"))()]])
 end
-local function LoadFPS_Settings()
-    makeToggle("📊  Show FPS",Settings.showFPS,function(v) Settings.showFPS=v; updateStatWidget(); saveSettings() end)
+local function LoadFPS_HUD()
+    makeSectionLabel("HUD SETTINGS")
+    makeToggle("📊  Show FPS Counter",Settings.showFPS,function(v) Settings.showFPS=v; updateStatWidget(); saveSettings() end)
     makeToggle("📶  Show Ping",Settings.showPing,function(v) Settings.showPing=v; updateStatWidget(); saveSettings() end)
-    makeToggle("👥  Show Players",Settings.showPlayers,function(v) Settings.showPlayers=v; updateStatWidget(); saveSettings() end)
-    makeToggle("⚔️  Dash CD",Settings.showDashCD,function(v) Settings.showDashCD=v; updateStatWidget(); saveSettings() end)
+    makeToggle("👥  Show Player Count",Settings.showPlayers,function(v) Settings.showPlayers=v; updateStatWidget(); saveSettings() end)
+    makeToggle("⚔️  Show Dash CD",Settings.showDashCD,function(v) Settings.showDashCD=v; updateStatWidget(); saveSettings() end)
+    makeSectionLabel("PERFORMANCE INFO")
+    makeScriptBtn("Ping and CPU",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/ngoclinh02042011-stack/Ping-All-Game/refs/heads/main/Ping%20Player.lua"))()]])
 end
 
--- TECH
-local function LoadTech()
-    makeScriptBtn("Supa Tech",          [[loadstring(game:HttpGet("https://rawscripts.net/raw/The-Strongest-Battlegrounds-Supa-tech-v2-77454"))()]])
-    makeScriptBtn("Kiba Tech",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_1593573630798166.lua.txt"))()]])
-    makeScriptBtn("Oreo Tech",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/OreoTech/refs/heads/main/Protected_6856895483929371.lua"))()]])
-    makeScriptBtn("Lethal Dash",        [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/57a4d240a2440f0450986c966469092ccfb8d4797392cb8f469fa8b6e605e64d/download"))()]])
-    makeScriptBtn("Back Dash Cancel",   [[loadstring(game:HttpGet("https://raw.githubusercontent.com/dinhthanhtuankiet1762009-sudo/Js/refs/heads/main/4418648b0e9b71ef.lua"))()]])
-    makeScriptBtn("Instant Twisted v2", [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/60a7a7c77395006ebd63fce0a17c13241f932bd414c9aba3158b716da00ade01/download"))()]])
-    makeScriptBtn("Loop Dash",          [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/28513f51c0ca2c03d4d7d94f59215d13ce1a2a470bf187f0a685b58ccb4dae98/download"))()]])
-    makeScriptBtn("lix tech",           [[loadstring(game:HttpGet("https://raw.githubusercontent.com/MerebennieOfficial/ExoticJn/refs/heads/main/Protected_83737738.txt"))()]])
-    makeScriptBtn("lethal kiba",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/MinhNhatHUB/MinhNhat/refs/heads/main/Lethal%20Kiba.lua"))()]])
-    makeScriptBtn("Silent aim reworked",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_6124417452209241.lua.txt"))()]])
-end
-local function LoadMoveset()
-    makeScriptBtn("KAR [SAITAMA]",  [[loadstring(game:HttpGet("https://raw.githubusercontent.com/OfficialAposty/RBLX-Scripts/refs/heads/main/UltimateLifeForm.lua"))()]])
-    makeScriptBtn("Gojo [SAITAMA]", [[getgenv().morph=false loadstring(game:HttpGet("https://raw.githubusercontent.com/skibiditoiletfan2007/BaldyToSorcerer/refs/heads/main/LatestV2.lua"))()]])
-    makeScriptBtn("CHARA [SAITAMA]",[[loadstring(game:HttpGet("https://pastefy.app/gFRaeMGz/raw"))()]])
-end
-
--- VISUAL
-local function LoadVisual()
-    makeSectionLabel("EFFECTS")
+-- ══════════════════════════════════════════
+--   CONTENT LOADERS — VISUAL TAB
+-- ══════════════════════════════════════════
+local function LoadVisual_Effects()
+    makeSectionLabel("M1 EFFECTS")
     makeScriptBtn("M1 Effect [Red+Blue]",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/ngoclinh02042011-stack/Fist-Blue-And-Red/refs/heads/main/HieuUngVuiNhon.lua"))()]])
     makeScriptBtn("Fake Animation",      [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Mautiku/ehh/main/strong%20guest.lua.txt"))()]])
-    makeScriptBtn("Ping and CPU",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/ngoclinh02042011-stack/Ping-All-Game/refs/heads/main/Ping%20Player.lua"))()]])
-    makeSectionLabel("SHADER"); makeScriptBtn("Custom Shader",[[loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()]])
-    makeSectionLabel("AURA"); makeScriptBtn("Curse Energy",   [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Curse%20energy%20effect%5Bsaitama%5D"))()]])
+    makeSectionLabel("AURA & ENERGY")
+    makeScriptBtn("Curse Energy Aura",   [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Curse%20energy%20effect%5Bsaitama%5D"))()]])
+    makeSectionLabel("SHADER")
+    makeScriptBtn("Custom Shader",       [[loadstring(game:HttpGet("https://rawscripts.net/raw/Universal-Script-Simple-Shader-37434"))()]])
 end
-local function LoadESP()
-    makeSectionLabel("ESP")
-    makeToggle("🔵  ESP Người Chơi",false,function(v) toggleESP(v); task.spawn(function() showToast(v and "🔵 ESP BẬT" or "🔵 ESP TẮT",v and C.GREEN or C.RED,2) end) end)
-    makeToggle("👥  ESP Friends",false,function(v) toggleFriendESP(v); task.spawn(function() showToast(v and "👥 Friend ESP BẬT" or "Friend ESP TẮT",v and C.GREEN or C.RED,2) end) end)
-    makeSectionLabel("HITBOX")
-    makeToggle("📦  Hitbox Expander",false,function(v) toggleHitbox(v); task.spawn(function() showToast(v and "📦 Hitbox BẬT" or "📦 Hitbox TẮT",v and C.GREEN or C.RED,2) end) end)
-    makeSlider("Hitbox Size",1,20,6,function(v) hitboxSize=v; if espEnabled then toggleHitbox(false); task.wait(0.1); toggleHitbox(true) end end)
-end
-local function LoadEmote()
+local function LoadVisual_Emote()
+    makeSectionLabel("EMOTE SCRIPTS")
     makeScriptBtn("Divine Form",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/IdkRandomUsernameok/PublicAssets/refs/heads/main/Releases/MUI.lua"))()]])
     makeScriptBtn("MYKIO Limited Aura", [[loadstring(game:HttpGet("https://arch-http.vercel.app/files/LIMITED EMOTE HUB (75-100) BY MIYKO"))()]])
     makeScriptBtn("Basic Emote",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/EmoteGui/refs/heads/main/Protected_4900496055951847.lua"))()]])
     makeScriptBtn("Sukuna Emote",       [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Yourfavoriteguy/Sukunaslash/refs/heads/main/WorldCuttingSlash",true))()]])
     makeScriptBtn("MIUI",               [[loadstring(game:HttpGet("https://raw.githubusercontent.com/IdkRandomUsernameok/PublicAssets/refs/heads/main/Releases/MUI.lua"))()]])
 end
-local function LoadAccessories()
+local function LoadVisual_Accessories()
+    makeSectionLabel("ACCESSORIES")
     makeScriptBtn("Oinan-Thickhoof-Axe",      [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Guestly-Scripts/Items-Scripts/refs/heads/main/Oinan-Thickhoof"))()]])
     makeScriptBtn("Erisyphia-Staff",           [[loadstring(game:HttpGet("https://raw.githubusercontent.com/GuestlyTheGreatestGuest/Scripts/refs/heads/main/Erisyphia-Staff-made-by-Guestly"))()]])
     makeScriptBtn("Elemental-Crystal-Golem",   [[loadstring(game:HttpGet("https://raw.githubusercontent.com/GuestlyTheGreatestGuest/Scripts/refs/heads/main/Elemental-Crystal-Golem-made-by-Guestly"))()]])
 end
 
--- SCRIPT
-local function LoadScript()
-    makeScriptBtn("Fly GuiV3",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()]])
-    makeScriptBtn("Anti Death Counter", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Anti-Death-Counter.lua"))()]])
-    makeScriptBtn("Avatar Changer",     [[loadstring(game:HttpGet("https://raw.githubusercontent.com/darkdexv2/universalavatarchanger/main/avatarchanger"))()]])
-    makeScriptBtn("Dex Explorer",       [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Dex_Explorer_v2.lua"))()]])
-    makeScriptBtn("Shield",             [[Instance.new("ForceField",game.Players.LocalPlayer.Character)]])
-    makeScriptBtn("TouchFling",         [[loadstring(game:HttpGet("https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"))()]])
-    makeScriptBtn("Orbit Farm",         [[loadstring(game:httpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/FARM-KILL/refs/heads/main/TSB"))()]])
-    makeScriptBtn("Farm Kill",          [[loadstring(game:HttpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/Farm-Kill-V2/refs/heads/main/TSB"))()]])
-end
-
--- PLAYER
-local function LoadPlayer()
-    makeSectionLabel("CHARACTER")
+-- ══════════════════════════════════════════
+--   CONTENT LOADERS — PLAYER TAB
+-- ══════════════════════════════════════════
+local function LoadPlayer_Stats()
+    makeSectionLabel("CHARACTER STATS")
     makeSlider("🏃 Walkspeed",16,500,16,function(v)
         pcall(function()
             local char=LocalPlayer.Character; if not char then return end
@@ -1208,13 +1129,7 @@ local function LoadPlayer()
             local hum=char:FindFirstChildOfClass("Humanoid"); if hum then hum.JumpPower=v end
         end)
     end)
-    makeSectionLabel("TOGGLES")
-    makeToggle("👻  Noclip",false,function(v) toggleNoclip(v); task.spawn(function() showToast(v and "👻 Noclip BẬT" or "👻 Noclip TẮT",v and C.GREEN or C.RED,2) end) end)
-    makeToggle("🤖  Anti-AFK",false,function(v) toggleAntiAFK(v); task.spawn(function() showToast(v and "🤖 Anti-AFK BẬT" or "🤖 Anti-AFK TẮT",v and C.GREEN or C.RED,2) end) end)
-    makeToggle("🔵  ESP Người Chơi",false,function(v) toggleESP(v); task.spawn(function() showToast(v and "🔵 ESP BẬT" or "🔵 ESP TẮT",v and C.GREEN or C.RED,2) end) end)
-    makeToggle("👥  ESP Friends",false,function(v) toggleFriendESP(v); task.spawn(function() showToast(v and "👥 Friend ESP BẬT" or "Friend ESP TẮT",v and C.GREEN or C.RED,2) end) end)
-    makeToggle("📦  Hitbox",false,function(v) toggleHitbox(v); task.spawn(function() showToast(v and "📦 Hitbox BẬT" or "📦 Hitbox TẮT",v and C.GREEN or C.RED,2) end) end)
-    makeSectionLabel("HÀNH ĐỘNG")
+    makeSectionLabel("ACTIONS")
     makeActionBtn("Hồi Máu Đầy","❤️",function()
         pcall(function()
             local char=LocalPlayer.Character; if not char then return end
@@ -1232,29 +1147,105 @@ local function LoadPlayer()
         task.spawn(function() showToast("🔁  Đã respawn!",C.CYAN,2) end)
     end)
 end
+local function LoadPlayer_Toggles()
+    makeSectionLabel("MOVEMENT & UTILITY")
+    makeToggle("👻  Noclip",false,function(v) toggleNoclip(v); task.spawn(function() showToast(v and "👻 Noclip BẬT" or "👻 Noclip TẮT",v and C.GREEN or C.RED,2) end) end)
+    makeToggle("🤖  Anti-AFK",false,function(v) toggleAntiAFK(v); task.spawn(function() showToast(v and "🤖 Anti-AFK BẬT" or "🤖 Anti-AFK TẮT",v and C.GREEN or C.RED,2) end) end)
+    makeSectionLabel("OTHER SCRIPTS")
+    makeScriptBtn("Fly GuiV3",      [[loadstring(game:HttpGet("https://raw.githubusercontent.com/XNEOFF/FlyGuiV3/main/FlyGuiV3.txt"))()]])
+    makeScriptBtn("Avatar Changer", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/darkdexv2/universalavatarchanger/main/avatarchanger"))()]])
+    makeScriptBtn("Dex Explorer",   [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Dex_Explorer_v2.lua"))()]])
+    makeScriptBtn("Shield Script",  [[Instance.new("ForceField",game.Players.LocalPlayer.Character)]])
+end
 
--- FAVORITES
-local function LoadFavorites()
-    if #Favorites==0 then
-        local empty=Instance.new("TextLabel"); empty.Size=UDim2.new(1,0,0,60); empty.BackgroundTransparency=1
-        empty.Text="⭐  Chưa có script yêu thích\nNhấn ★ trên bất kỳ script nào để thêm"
-        empty.TextColor3=C.SUB; empty.Font=Enum.Font.GothamBold; empty.TextSize=11
-        empty.TextXAlignment=Enum.TextXAlignment.Center; empty.TextWrapped=true; empty.ZIndex=7; empty.Parent=ContentFrame
-        return
-    end
-    makeSectionLabel("⭐ SCRIPTS YÊU THÍCH ("..#Favorites..")")
-    for _,f in ipairs(Favorites) do makeScriptBtn(f.name,f.code) end
-    local clearBtn=Instance.new("TextButton"); clearBtn.Size=UDim2.new(1,0,0,30); clearBtn.Text="🗑  Xóa tất cả Yêu Thích"
-    clearBtn.BackgroundColor3=Color3.fromRGB(60,12,12); clearBtn.TextColor3=C.RED; clearBtn.Font=Enum.Font.GothamBold
-    clearBtn.TextSize=10; clearBtn.ZIndex=7; clearBtn.Parent=ContentFrame; corner(clearBtn,8); stroke(clearBtn,1.2,0.5)
-    clearBtn.MouseButton1Click:Connect(function()
-        Favorites={}; saveFavorites()
-        task.spawn(function() showToast("🗑  Đã xóa tất cả Yêu Thích",C.RED,2) end)
-        clearContent(); LoadFavorites()
+-- ══════════════════════════════════════════
+--   CONTENT LOADERS — SETTING TAB
+-- ══════════════════════════════════════════
+local function LoadSetting_ESP()
+    makeSectionLabel("ESP PLAYERS")
+    makeToggle("🔵  ESP Người Chơi",false,function(v) toggleESP(v); task.spawn(function() showToast(v and "🔵 ESP BẬT" or "🔵 ESP TẮT",v and C.GREEN or C.RED,2) end) end)
+    makeToggle("👥  ESP Friends",false,function(v) toggleFriendESP(v); task.spawn(function() showToast(v and "👥 Friend ESP BẬT" or "Friend ESP TẮT",v and C.GREEN or C.RED,2) end) end)
+    makeSectionLabel("HITBOX")
+    makeToggle("📦  Hitbox Expander",false,function(v) toggleHitbox(v); task.spawn(function() showToast(v and "📦 Hitbox BẬT" or "📦 Hitbox TẮT",v and C.GREEN or C.RED,2) end) end)
+    makeSlider("📦 Hitbox Size",1,20,6,function(v)
+        hitboxSize=v
+        if hitboxEnabled then toggleHitbox(false); task.wait(0.1); toggleHitbox(true) end
+    end)
+    makeSectionLabel("SKILL DETECTOR")
+    makeToggle("🔍  Skill Detector",Settings.showSkillDetector,function(v)
+        Settings.showSkillDetector=v; updateStatWidget(); saveSettings()
+        task.spawn(function() showToast(v and "🔍 Skill Detector BẬT!" or "🔍 Skill Detector TẮT!",v and C.GREEN or C.RED,2) end)
     end)
 end
 
--- MAP
+local ACCENT_THEMES={
+    {"🔵 Cyan (Default)",Color3.fromRGB(0,210,255)},{"🟣 Purple",Color3.fromRGB(160,80,255)},
+    {"🟢 Neon Green",Color3.fromRGB(50,255,120)},{"🔴 Red",Color3.fromRGB(255,60,60)},
+    {"🟡 Gold",Color3.fromRGB(255,200,30)},{"🩷 Pink",Color3.fromRGB(255,100,200)},
+    {"🟠 Orange",Color3.fromRGB(255,130,40)},{"⚪ White",Color3.fromRGB(220,230,255)},
+    {"🩵 Sky",Color3.fromRGB(80,200,255)},{"🌿 Mint",Color3.fromRGB(80,255,180)},
+    {"🫐 Indigo",Color3.fromRGB(120,60,255)},{"🌹 Rose",Color3.fromRGB(255,80,130)},
+}
+local function LoadSetting_Accent()
+    makeSectionLabel("ACCENT COLOR")
+    for _,theme in ipairs(ACCENT_THEMES) do
+        local col=theme[2]
+        local frame=Instance.new("Frame"); frame.Size=UDim2.new(1,0,0,32); frame.BackgroundColor3=C.PANEL2
+        frame.BorderSizePixel=0; frame.ZIndex=7; frame.Parent=ContentFrame; corner(frame,8); stroke(frame,1.2,0.5)
+        local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,14,0,14); dot.Position=UDim2.new(0,8,0.5,-7)
+        dot.BackgroundColor3=col; dot.BorderSizePixel=0; dot.ZIndex=8; dot.Parent=frame; corner(dot,999)
+        local lbl2=Instance.new("TextLabel"); lbl2.Size=UDim2.new(0.68,0,1,0); lbl2.Position=UDim2.new(0,28,0,0)
+        lbl2.BackgroundTransparency=1; lbl2.Text=theme[1]; lbl2.TextColor3=C.TEXT; lbl2.Font=Enum.Font.GothamBold
+        lbl2.TextSize=11; lbl2.TextXAlignment=Enum.TextXAlignment.Left; lbl2.ZIndex=8; lbl2.Parent=frame
+        local al=Instance.new("TextLabel"); al.Size=UDim2.new(0.28,0,1,0); al.Position=UDim2.new(0.70,0,0,0)
+        al.BackgroundTransparency=1; al.Text="Chọn ▸"; al.TextColor3=C.CYAN; al.Font=Enum.Font.GothamBold
+        al.TextSize=9; al.ZIndex=8; al.Parent=frame
+        local tBtn=Instance.new("TextButton"); tBtn.Size=UDim2.new(1,0,1,0); tBtn.BackgroundTransparency=1
+        tBtn.Text=""; tBtn.ZIndex=9; tBtn.Parent=frame
+        tBtn.MouseButton1Click:Connect(function() applyAccentColor(col) end)
+        tBtn.MouseEnter:Connect(function() tw(frame,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.12) end)
+        tBtn.MouseLeave:Connect(function() tw(frame,{BackgroundColor3=C.PANEL2},0.12) end)
+    end
+end
+
+local function LoadSetting_Theme()
+    makeSectionLabel("GUI THEMES")
+    for _,theme in ipairs(THEMES_LIST) do
+        local t=theme
+        local frame=Instance.new("Frame"); frame.Size=UDim2.new(1,0,0,36); frame.BackgroundColor3=C.PANEL2
+        frame.BorderSizePixel=0; frame.ZIndex=7; frame.Parent=ContentFrame; corner(frame,8); stroke(frame,1.2,0.5)
+        -- preview boxes
+        local p1=Instance.new("Frame"); p1.Size=UDim2.new(0,12,0,12); p1.Position=UDim2.new(0,6,0.5,-6)
+        p1.BackgroundColor3=theme.bg; p1.BorderSizePixel=0; p1.ZIndex=8; p1.Parent=frame; corner(p1,3)
+        local p2=Instance.new("Frame"); p2.Size=UDim2.new(0,12,0,12); p2.Position=UDim2.new(0,20,0.5,-6)
+        p2.BackgroundColor3=theme.panel; p2.BorderSizePixel=0; p2.ZIndex=8; p2.Parent=frame; corner(p2,3)
+        local p3=Instance.new("Frame"); p3.Size=UDim2.new(0,12,0,12); p3.Position=UDim2.new(0,34,0.5,-6)
+        p3.BackgroundColor3=theme.panel2; p3.BorderSizePixel=0; p3.ZIndex=8; p3.Parent=frame; corner(p3,3)
+        local lbl2=Instance.new("TextLabel"); lbl2.Size=UDim2.new(1,-100,1,0); lbl2.Position=UDim2.new(0,52,0,0)
+        lbl2.BackgroundTransparency=1; lbl2.Text=theme.name; lbl2.TextColor3=C.TEXT; lbl2.Font=Enum.Font.GothamBold
+        lbl2.TextSize=11; lbl2.TextXAlignment=Enum.TextXAlignment.Left; lbl2.ZIndex=8; lbl2.Parent=frame
+        local al=Instance.new("TextLabel"); al.Size=UDim2.new(0,42,1,0); al.Position=UDim2.new(1,-44,0,0)
+        al.BackgroundTransparency=1; al.Text="Apply ▸"; al.TextColor3=C.CYAN; al.Font=Enum.Font.GothamBold
+        al.TextSize=9; al.ZIndex=8; al.Parent=frame
+        local tBtn=Instance.new("TextButton"); tBtn.Size=UDim2.new(1,0,1,0); tBtn.BackgroundTransparency=1
+        tBtn.Text=""; tBtn.ZIndex=9; tBtn.Parent=frame
+        tBtn.MouseButton1Click:Connect(function() applyTheme(t) end)
+        tBtn.MouseEnter:Connect(function() tw(frame,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.12) end)
+        tBtn.MouseLeave:Connect(function() tw(frame,{BackgroundColor3=C.PANEL2},0.12) end)
+    end
+    makeSectionLabel("DANGER ZONE")
+    local delSave=Instance.new("TextButton"); delSave.Size=UDim2.new(1,0,0,30); delSave.Text="🗑  Xóa toàn bộ Save (Reset)"
+    delSave.BackgroundColor3=Color3.fromRGB(60,12,12); delSave.TextColor3=C.RED; delSave.Font=Enum.Font.GothamBold
+    delSave.TextSize=10; delSave.ZIndex=7; delSave.Parent=ContentFrame; corner(delSave,8); stroke(delSave,1.2,0.5)
+    delSave.MouseButton1Click:Connect(function()
+        SaveData=DEFAULT_SAVE; Favorites={}; writeSave(SaveData)
+        task.spawn(function() showToast("🗑  Đã xóa save! Reload để áp dụng.",C.RED,3) end)
+    end)
+end
+
+-- ══════════════════════════════════════════
+--   CONTENT LOADERS — MAP TAB
+-- ══════════════════════════════════════════
 local Locations={
     {name="Above Tunnel",cf=CFrame.new(-301,594,-322)},{name="Arena",cf=CFrame.new(-130,440,-373)},
     {name="Atomic Slash",cf=CFrame.new(1064,131,23007)},{name="Baseplate",cf=CFrame.new(1073,406,22984)},
@@ -1297,7 +1288,9 @@ local function LoadMap()
     end
 end
 
--- SERVER
+-- ══════════════════════════════════════════
+--   CONTENT LOADERS — SERVER TAB
+-- ══════════════════════════════════════════
 local function LoadServer()
     makeSectionLabel("SERVER HOP")
     makeActionBtn("Hop Server (Random)","🔀",function()
@@ -1390,7 +1383,32 @@ local function LoadServer()
     end
 end
 
--- QUICK EXEC
+-- ══════════════════════════════════════════
+--   CONTENT LOADERS — FAVORITES
+-- ══════════════════════════════════════════
+local function LoadFavorites()
+    if #Favorites==0 then
+        local empty=Instance.new("TextLabel"); empty.Size=UDim2.new(1,0,0,60); empty.BackgroundTransparency=1
+        empty.Text="⭐  Chưa có script yêu thích\nNhấn ★ trên bất kỳ script nào để thêm"
+        empty.TextColor3=C.SUB; empty.Font=Enum.Font.GothamBold; empty.TextSize=11
+        empty.TextXAlignment=Enum.TextXAlignment.Center; empty.TextWrapped=true; empty.ZIndex=7; empty.Parent=ContentFrame
+        return
+    end
+    makeSectionLabel("⭐ SCRIPTS YÊU THÍCH ("..#Favorites..")")
+    for _,f in ipairs(Favorites) do makeScriptBtn(f.name,f.code) end
+    local clearBtn=Instance.new("TextButton"); clearBtn.Size=UDim2.new(1,0,0,30); clearBtn.Text="🗑  Xóa tất cả Yêu Thích"
+    clearBtn.BackgroundColor3=Color3.fromRGB(60,12,12); clearBtn.TextColor3=C.RED; clearBtn.Font=Enum.Font.GothamBold
+    clearBtn.TextSize=10; clearBtn.ZIndex=7; clearBtn.Parent=ContentFrame; corner(clearBtn,8); stroke(clearBtn,1.2,0.5)
+    clearBtn.MouseButton1Click:Connect(function()
+        Favorites={}; saveFavorites()
+        task.spawn(function() showToast("🗑  Đã xóa tất cả Yêu Thích",C.RED,2) end)
+        clearContent(); LoadFavorites()
+    end)
+end
+
+-- ══════════════════════════════════════════
+--   CONTENT LOADERS — QUICK EXEC
+-- ══════════════════════════════════════════
 local function LoadQuickExec()
     makeSectionLabel("QUICK EXECUTE — Paste URL hoặc Code")
     local inputFrame=Instance.new("Frame"); inputFrame.Size=UDim2.new(1,0,0,90); inputFrame.BackgroundColor3=C.PANEL2
@@ -1436,97 +1454,124 @@ local function LoadQuickExec()
     end
 end
 
--- SETTING
-local function applyAccentColor(newColor)
-    local old=Settings.accentColor; Settings.accentColor=newColor; C.CYAN=newColor
-    for _,v in ipairs(Root:GetDescendants()) do
-        if v:IsA("UIStroke") then v.Color=newColor end
-        if v:IsA("TextLabel") and v.TextColor3==old then v.TextColor3=newColor end
-        if v:IsA("ImageLabel") and v.ImageColor3==old then v.ImageColor3=newColor end
-    end
-    saveSettings(); task.spawn(function() showToast("🎨  Đã đổi màu!",newColor,2) end)
-end
-local THEMES={
-    {"🔵 Cyan (Default)",Color3.fromRGB(0,210,255)},{"🟣 Purple",Color3.fromRGB(160,80,255)},
-    {"🟢 Neon Green",Color3.fromRGB(50,255,120)},{"🔴 Red",Color3.fromRGB(255,60,60)},
-    {"🟡 Gold",Color3.fromRGB(255,200,30)},{"🩷 Pink",Color3.fromRGB(255,100,200)},
-    {"🟠 Orange",Color3.fromRGB(255,130,40)},{"⚪ White",Color3.fromRGB(220,230,255)},
-}
-local function LoadSetting()
-    makeSectionLabel("ACCENT COLOR")
-    for _,theme in ipairs(THEMES) do local col=theme[2]; makeColorBtn(theme[1],col,function() applyAccentColor(col) end) end
-    makeSectionLabel("HIỂN THỊ THÔNG TIN")
-    makeToggle("📊  Show FPS",Settings.showFPS,function(v) Settings.showFPS=v; updateStatWidget(); saveSettings() end)
-    makeToggle("📶  Show Ping",Settings.showPing,function(v) Settings.showPing=v; updateStatWidget(); saveSettings() end)
-    makeToggle("👥  Show Players",Settings.showPlayers,function(v) Settings.showPlayers=v; updateStatWidget(); saveSettings() end)
-    makeToggle("⚔️  Show Dash CD",Settings.showDashCD,function(v) Settings.showDashCD=v; updateStatWidget(); saveSettings() end)
-    makeSectionLabel("UTILITY")
-    makeToggle("🔍  Skill Detector",Settings.showSkillDetector,function(v)
-        Settings.showSkillDetector=v; updateStatWidget(); saveSettings()
-        task.spawn(function() showToast(v and "🔍 Skill Detector BẬT!" or "🔍 Skill Detector TẮT!",v and C.GREEN or C.RED,2) end)
+-- ══════════════════════════════════════════
+--   THEME PICKER POPUP (nút bên dưới col2)
+-- ══════════════════════════════════════════
+local themePickerOpen=false
+local ThemePopup=Instance.new("Frame")
+ThemePopup.Size=UDim2.new(0,RIGHT_W+MID_W,0,220)
+ThemePopup.Position=UDim2.new(0,MID_W+PAD,1,-225)
+ThemePopup.BackgroundColor3=C.PANEL; ThemePopup.BorderSizePixel=0; ThemePopup.ZIndex=30
+ThemePopup.Visible=false; ThemePopup.Parent=Root; corner(ThemePopup,10); stroke(ThemePopup,1.5,0.1)
+local TpTitle=Instance.new("TextLabel"); TpTitle.Size=UDim2.new(1,-8,0,20); TpTitle.Position=UDim2.new(0,8,0,4)
+TpTitle.BackgroundTransparency=1; TpTitle.Text="🎨  Chọn Theme GUI"; TpTitle.TextColor3=C.CYAN
+TpTitle.Font=Enum.Font.GothamBold; TpTitle.TextSize=11; TpTitle.TextXAlignment=Enum.TextXAlignment.Left; TpTitle.ZIndex=31; TpTitle.Parent=ThemePopup
+local TpDiv=Instance.new("Frame"); TpDiv.Size=UDim2.new(1,-10,0,1); TpDiv.Position=UDim2.new(0,5,0,26)
+TpDiv.BackgroundColor3=C.CYAN; TpDiv.BackgroundTransparency=0.5; TpDiv.BorderSizePixel=0; TpDiv.ZIndex=31; TpDiv.Parent=ThemePopup
+local TpScroll=Instance.new("ScrollingFrame"); TpScroll.Size=UDim2.new(1,-6,0,182); TpScroll.Position=UDim2.new(0,3,0,30)
+TpScroll.BackgroundTransparency=1; TpScroll.BorderSizePixel=0; TpScroll.ScrollBarThickness=3
+TpScroll.ScrollBarImageColor3=C.CYAN; TpScroll.CanvasSize=UDim2.new(0,0,0,0)
+TpScroll.AutomaticCanvasSize=Enum.AutomaticSize.Y; TpScroll.ZIndex=31; TpScroll.Parent=ThemePopup
+local TpLayout=Instance.new("UIListLayout"); TpLayout.Padding=UDim.new(0,4); TpLayout.Parent=TpScroll
+local TpPad=Instance.new("UIPadding"); TpPad.PaddingTop=UDim.new(0,3); TpPad.PaddingBottom=UDim.new(0,3)
+TpPad.PaddingLeft=UDim.new(0,2); TpPad.PaddingRight=UDim.new(0,2); TpPad.Parent=TpScroll
+
+-- Build theme buttons in popup
+for _,theme in ipairs(THEMES_LIST) do
+    local t=theme
+    local row=Instance.new("Frame"); row.Size=UDim2.new(1,-4,0,28); row.BackgroundColor3=C.PANEL2
+    row.BorderSizePixel=0; row.ZIndex=32; row.Parent=TpScroll; corner(row,6); stroke(row,1,0.5)
+    local p1=Instance.new("Frame"); p1.Size=UDim2.new(0,10,0,10); p1.Position=UDim2.new(0,5,0.5,-5)
+    p1.BackgroundColor3=theme.bg; p1.BorderSizePixel=0; p1.ZIndex=33; p1.Parent=row; corner(p1,3)
+    local p2=Instance.new("Frame"); p2.Size=UDim2.new(0,10,0,10); p2.Position=UDim2.new(0,17,0.5,-5)
+    p2.BackgroundColor3=theme.panel; p2.BorderSizePixel=0; p2.ZIndex=33; p2.Parent=row; corner(p2,3)
+    local p3=Instance.new("Frame"); p3.Size=UDim2.new(0,10,0,10); p3.Position=UDim2.new(0,29,0.5,-5)
+    p3.BackgroundColor3=theme.panel2; p3.BorderSizePixel=0; p3.ZIndex=33; p3.Parent=row; corner(p3,3)
+    local lbl=Instance.new("TextLabel"); lbl.Size=UDim2.new(1,-56,1,0); lbl.Position=UDim2.new(0,44,0,0)
+    lbl.BackgroundTransparency=1; lbl.Text=theme.name; lbl.TextColor3=C.TEXT; lbl.Font=Enum.Font.GothamBold
+    lbl.TextSize=10; lbl.TextXAlignment=Enum.TextXAlignment.Left; lbl.ZIndex=33; lbl.Parent=row
+    local tBtn=Instance.new("TextButton"); tBtn.Size=UDim2.new(1,0,1,0); tBtn.BackgroundTransparency=1
+    tBtn.Text=""; tBtn.ZIndex=34; tBtn.Parent=row
+    tBtn.MouseButton1Click:Connect(function()
+        applyTheme(t)
+        themePickerOpen=false; tw(ThemePopup,{Position=UDim2.new(0,MID_W+PAD,1,10)},0.2)
+        task.delay(0.22,function() ThemePopup.Visible=false end)
     end)
-    makeSectionLabel("NGUY HIỂM")
-    local delSave=Instance.new("TextButton"); delSave.Size=UDim2.new(1,0,0,30); delSave.Text="🗑  Xóa toàn bộ Save (Reset)"
-    delSave.BackgroundColor3=Color3.fromRGB(60,12,12); delSave.TextColor3=C.RED; delSave.Font=Enum.Font.GothamBold
-    delSave.TextSize=10; delSave.ZIndex=7; delSave.Parent=ContentFrame; corner(delSave,8); stroke(delSave,1.2,0.5)
-    delSave.MouseButton1Click:Connect(function()
-        SaveData=DEFAULT_SAVE; Favorites={}; writeSave(SaveData)
-        task.spawn(function() showToast("🗑  Đã xóa save! Reload để áp dụng.",C.RED,3) end)
-    end)
+    tBtn.MouseEnter:Connect(function() tw(row,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.1) end)
+    tBtn.MouseLeave:Connect(function() tw(row,{BackgroundColor3=C.PANEL2},0.1) end)
 end
 
+ThemePickerBtn.MouseButton1Click:Connect(function()
+    if not themePickerOpen then
+        themePickerOpen=true
+        ThemePopup.Visible=true; ThemePopup.Position=UDim2.new(0,MID_W+PAD,1,10)
+        tw(ThemePopup,{Position=UDim2.new(0,MID_W+PAD,1,-225)},0.25,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
+    else
+        themePickerOpen=false
+        tw(ThemePopup,{Position=UDim2.new(0,MID_W+PAD,1,10)},0.2)
+        task.delay(0.22,function() ThemePopup.Visible=false end)
+    end
+end)
+
 -- ══════════════════════════════════════════
---   MAIN TAB BUTTONS + SUBTAB DEFINITIONS
+--   MAIN TAB DEFINITIONS (restructured)
 -- ══════════════════════════════════════════
 local mainTabDefs={
-    {name="FPS",   icon="📊", subs={
-        {name="Anti-Lag", load=LoadFPS},
-        {name="HUD",      load=LoadFPS_Settings},
+    {name="COMBAT", icon="⚔️", subs={
+        {name="Tech",    load=LoadCombat_Tech},
+        {name="Dash",    load=LoadCombat_Dash},
+        {name="Moveset", load=LoadCombat_Moveset},
     }},
-    {name="TECH",  icon="⚔️", subs={
-        {name="Tech",    load=LoadTech},
-        {name="Moveset", load=LoadMoveset},
+    {name="FPS",    icon="📊", subs={
+        {name="Anti-Lag", load=LoadFPS_AntiLag},
+        {name="HUD",      load=LoadFPS_HUD},
     }},
-    {name="VISUAL",icon="👁️", subs={
-        {name="Scripts", load=LoadVisual},
-        {name="ESP",     load=LoadESP},
-        {name="Emote",   load=LoadEmote},
-        {name="Access",  load=LoadAccessories},
+    {name="VISUAL", icon="👁️", subs={
+        {name="Effects",   load=LoadVisual_Effects},
+        {name="Emote",     load=LoadVisual_Emote},
+        {name="Access",    load=LoadVisual_Accessories},
     }},
-    {name="SCRIPT",icon="📜", subs={
-        {name="Scripts", load=LoadScript},
+    {name="PLAYER", icon="👤", subs={
+        {name="Stats",   load=LoadPlayer_Stats},
+        {name="Toggles", load=LoadPlayer_Toggles},
     }},
-    {name="PLAYER",icon="👤", subs={
-        {name="Player",    load=LoadPlayer},
-        {name="Favorites", load=LoadFavorites},
-    }},
-    {name="MAP",   icon="🗺️", subs={
+    {name="MAP",    icon="🗺️", subs={
         {name="Teleport", load=LoadMap},
     }},
-    {name="SERVER",icon="🖥️", subs={
+    {name="SERVER", icon="🖥️", subs={
         {name="Server", load=LoadServer},
-        {name="EXEC",   load=LoadQuickExec},
+        {name="Exec",   load=LoadQuickExec},
     }},
     {name="SETTING",icon="⚙️", subs={
-        {name="Setting", load=LoadSetting},
+        {name="ESP",    load=LoadSetting_ESP},
+        {name="Accent", load=LoadSetting_Accent},
+        {name="Theme",  load=LoadSetting_Theme},
+    }},
+    {name="FAV",    icon="⭐", subs={
+        {name="Yêu Thích", load=LoadFavorites},
     }},
 }
 
 local mainBtns={}
 for i,td in ipairs(mainTabDefs) do
     local mb=Instance.new("TextButton")
-    mb.Size=UDim2.new(1,0,0,36)
+    mb.Size=UDim2.new(1,0,0,34)
     mb.BackgroundColor3=C.PANEL2; mb.ZIndex=5; mb.Parent=MidInner
     mb.Font=Enum.Font.GothamBold; mb.TextSize=9; mb.TextColor3=C.SUB
-    -- Icon + name trong nút
     mb.Text=td.icon.."  "..td.name
     corner(mb,7); stroke(mb,1.2,0.6)
     mb.MouseEnter:Connect(function() if activeMainTab~=mb then tw(mb,{BackgroundColor3=Color3.fromRGB(0,26,50)},0.12) end end)
     mb.MouseLeave:Connect(function() if activeMainTab~=mb then tw(mb,{BackgroundColor3=C.PANEL2},0.12) end end)
     local subDef=td.subs; local idx=i
     mb.MouseButton1Click:Connect(function()
-        setMainActive(mb,idx,nil) -- chỉ highlight, không slide
-        buildSubTabs(subDef)       -- build subtabs, auto load first
+        -- close theme popup if open
+        if themePickerOpen then
+            themePickerOpen=false
+            tw(ThemePopup,{Position=UDim2.new(0,MID_W+PAD,1,10)},0.2)
+            task.delay(0.22,function() ThemePopup.Visible=false end)
+        end
+        setMainActive(mb,idx,nil)
+        buildSubTabs(subDef)
     end)
     mainBtns[i]=mb
 end
@@ -1544,13 +1589,12 @@ local function unlockGUI()
         elseif v:IsA("Frame") then tw(v,{BackgroundTransparency=1},0.3) end
     end
     task.wait(0.38); KeyOverlay.Visible=false
-    -- Auto select first main tab
     task.spawn(function()
         task.wait(0.3)
         setMainActive(mainBtns[1],1,nil)
         buildSubTabs(mainTabDefs[1].subs)
     end)
-    task.spawn(function() task.wait(1); showToast("✅  CryoXHUB v5.2 mở khóa! 🎉",C.GREEN,3) end)
+    task.spawn(function() task.wait(1); showToast("✅  CryoXHUB v5.3 mở khóa! 🎉",C.GREEN,3) end)
 end
 
 KeySubmit.MouseButton1Click:Connect(function()
@@ -1566,31 +1610,16 @@ end)
 if keyVerified then task.spawn(function() task.wait(0.5); unlockGUI() end) end
 
 -- ══════════════════════════════════════════
---   CLOSE / OPEN BUTTON
+--   CLOSE / OPEN
 -- ══════════════════════════════════════════
 CloseBtn.MouseButton1Click:Connect(function()
+    if themePickerOpen then themePickerOpen=false; ThemePopup.Visible=false end
     animateClose(function()
         OpenBtn.Visible=true; OpenBtn.Size=UDim2.new(0,26,0,26)
         tw(OpenBtn,{Size=UDim2.new(0,46,0,46)},0.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
     end)
 end)
 OpenBtn.MouseButton1Click:Connect(function() OpenBtn.Visible=false; animateOpen() end)
-
--- ══════════════════════════════════════════
---   DARK / LIGHT MODE
--- ══════════════════════════════════════════
-DarkBtn.MouseButton1Click:Connect(function()
-    tw(Root,{BackgroundColor3=Color3.fromRGB(4,8,18)},0.25)
-    tw(DarkBtn,{BackgroundColor3=Color3.fromRGB(0,38,85)},0.15); DarkBtn.TextColor3=C.CYAN
-    tw(LightBtn,{BackgroundColor3=C.PANEL2},0.15); LightBtn.TextColor3=C.SUB
-    showToast("🌙 Dark Mode",C.CYAN,2)
-end)
-LightBtn.MouseButton1Click:Connect(function()
-    tw(Root,{BackgroundColor3=Color3.fromRGB(160,180,210)},0.25)
-    tw(LightBtn,{BackgroundColor3=Color3.fromRGB(195,150,0)},0.15); LightBtn.TextColor3=Color3.fromRGB(20,10,0)
-    tw(DarkBtn,{BackgroundColor3=C.PANEL2},0.15); DarkBtn.TextColor3=C.SUB
-    showToast("☀️ Light Mode",Color3.fromRGB(255,160,30),2)
-end)
 
 -- ══════════════════════════════════════════
 --   FPS / PING / PLAYERS LOOP
@@ -1624,9 +1653,10 @@ task.spawn(function()
     while true do
         task.wait(1800)
         local msgs={
-            "💙  Cảm ơn bạn đã dùng CryoXHUB v5.2!\nChúc bạn chơi vui vẻ~",
-            "✨  CryoXHUB v5.2  —  Cảm ơn vì sự tin tưởng!",
-            "🌊  Thử tab PLAYER — Walkspeed, ESP, Hitbox! 💙",
+            "💙  Cảm ơn bạn đã dùng CryoXHUB v5.3!\nChúc bạn chơi vui vẻ~",
+            "✨  CryoXHUB v5.3  —  Cảm ơn vì sự tin tưởng!",
+            "🌊  Thử tab COMBAT — Tech, Dash, Moveset! 💙",
+            "⚙️  Tab SETTING có ESP, Hitbox, Theme, Accent!",
         }
         task.spawn(function() showToast(msgs[math.random(1,#msgs)],C.CYAN,5) end)
     end
