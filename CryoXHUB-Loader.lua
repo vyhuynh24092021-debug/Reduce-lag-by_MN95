@@ -1,4 +1,4 @@
---// CryoX Multi Game Loader V2 (FIXED)
+--// CryoX Multi Game Loader V2 (Professional Edition)
 
 if not game:IsLoaded() then
     game.Loaded:Wait()
@@ -12,23 +12,39 @@ local Players = game:GetService("Players")
 --// SAFE HTTP
 local function httpget(url)
     if syn and syn.request then
-        return syn.request({Url = url, Method = "GET"}).Body
+        return syn.request({
+            Url = url,
+            Method = "GET"
+        }).Body
+
     elseif http_request then
-        return http_request({Url = url, Method = "GET"}).Body
+        return http_request({
+            Url = url,
+            Method = "GET"
+        }).Body
+
     elseif request then
-        return request({Url = url, Method = "GET"}).Body
+        return request({
+            Url = url,
+            Method = "GET"
+        }).Body
+
     elseif game.HttpGet then
         return game:HttpGet(url)
+
     else
-        error("Exploit không hỗ trợ HTTP")
+        error("Executor không hỗ trợ HTTP Request.")
     end
 end
 
---// TOAST
-local function showToast(msg, color, duration)
+--// UI TOAST
+local function showToast(message, state, duration)
+    duration = duration or 2
+
     local gui = Instance.new("ScreenGui")
-    gui.Name = "CryoX_Toast"
+    gui.Name = "CryoXNotification"
     gui.ResetOnSpawn = false
+    gui.IgnoreGuiInset = true
 
     pcall(function()
         gui.Parent = CoreGui
@@ -38,67 +54,119 @@ local function showToast(msg, color, duration)
         gui.Parent = Players.LocalPlayer:WaitForChild("PlayerGui")
     end
 
-    local frame = Instance.new("Frame", gui)
-    frame.Size = UDim2.new(0, 300, 0, 54)
-    frame.Position = UDim2.new(0.5, -150, 1, 80)
-    frame.BackgroundColor3 = Color3.fromRGB(5, 15, 30)
+    local colors = {
+        info = Color3.fromRGB(0, 170, 255),
+        success = Color3.fromRGB(0, 200, 120),
+        error = Color3.fromRGB(255, 70, 70),
+        warning = Color3.fromRGB(255, 170, 0)
+    }
+
+    local frame = Instance.new("Frame")
+    frame.Parent = gui
+    frame.AnchorPoint = Vector2.new(0.5, 1)
+    frame.Position = UDim2.new(0.5, 0, 1, 80)
+    frame.Size = UDim2.new(0, 340, 0, 56)
+    frame.BackgroundColor3 = Color3.fromRGB(12, 18, 28)
     frame.BorderSizePixel = 0
 
-    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 8)
+    Instance.new("UICorner", frame).CornerRadius = UDim.new(0, 10)
 
-    local text = Instance.new("TextLabel", frame)
-    text.Size = UDim2.new(1, -16, 1, 0)
-    text.Position = UDim2.new(0, 12, 0, 0)
+    local stroke = Instance.new("UIStroke")
+    stroke.Parent = frame
+    stroke.Color = colors[state] or colors.info
+    stroke.Thickness = 1.2
+    stroke.Transparency = 0.15
+
+    local accent = Instance.new("Frame")
+    accent.Parent = frame
+    accent.Size = UDim2.new(0, 4, 1, 0)
+    accent.BackgroundColor3 = colors[state] or colors.info
+    accent.BorderSizePixel = 0
+
+    Instance.new("UICorner", accent).CornerRadius = UDim.new(0, 10)
+
+    local title = Instance.new("TextLabel")
+    title.Parent = frame
+    title.BackgroundTransparency = 1
+    title.Position = UDim2.new(0, 16, 0, 8)
+    title.Size = UDim2.new(1, -20, 0, 18)
+    title.Font = Enum.Font.GothamBold
+    title.Text = "CryoX Loader"
+    title.TextColor3 = Color3.fromRGB(240, 245, 255)
+    title.TextSize = 13
+    title.TextXAlignment = Enum.TextXAlignment.Left
+
+    local text = Instance.new("TextLabel")
+    text.Parent = frame
     text.BackgroundTransparency = 1
-    text.Text = msg
-    text.TextColor3 = Color3.fromRGB(220, 240, 255)
-    text.Font = Enum.Font.GothamBold
-    text.TextSize = 13
+    text.Position = UDim2.new(0, 16, 0, 24)
+    text.Size = UDim2.new(1, -24, 0, 22)
+    text.Font = Enum.Font.Gotham
+    text.Text = message
+    text.TextColor3 = Color3.fromRGB(200, 210, 225)
+    text.TextSize = 12
     text.TextWrapped = true
+    text.TextXAlignment = Enum.TextXAlignment.Left
 
-    TweenService:Create(frame, TweenInfo.new(0.3), {
-        Position = UDim2.new(0.5, -150, 1, -70)
-    }):Play()
+    TweenService:Create(
+        frame,
+        TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out),
+        {
+            Position = UDim2.new(0.5, 0, 1, -28)
+        }
+    ):Play()
 
-    task.wait(duration or 2)
+    task.wait(duration)
 
-    TweenService:Create(frame, TweenInfo.new(0.3), {
-        Position = UDim2.new(0.5, -150, 1, 80)
-    }):Play()
+    TweenService:Create(
+        frame,
+        TweenInfo.new(0.3, Enum.EasingStyle.Quart, Enum.EasingDirection.In),
+        {
+            Position = UDim2.new(0.5, 0, 1, 80),
+            BackgroundTransparency = 1
+        }
+    ):Play()
 
-    task.wait(0.4)
+    task.wait(0.35)
     gui:Destroy()
 end
 
---// MAIN
-local id = game.PlaceId
+--// GAME DETECTION
+local PlaceId = game.PlaceId
 
-showToast("🔍 Đang nhận diện game...", Color3.fromRGB(0,170,255), 2)
+showToast("Detecting current game...", "info", 1.8)
 
-if id == 116495829188952 then
-    showToast("🚂 Dead Rails detected...", Color3.fromRGB(0,255,170), 2)
+if PlaceId == 116495829188952 then
 
-    local ok, err = pcall(function()
-        loadstring(httpget("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/main/CryoXDeadRail.lua"))()
+    showToast("Dead Rails script initialized.", "success", 2)
+
+    local success, result = pcall(function()
+        loadstring(httpget("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/main/CryoXDeadRail.lua"
+        ))()
     end)
 
-    if not ok then
-        warn(err)
-        showToast("❌ Load fail!", Color3.fromRGB(255,80,80), 3)
+    if not success then
+        warn(result)
+        showToast("Failed to load Dead Rails module.", "error", 3)
     end
 
-elseif id == 10449761463 then
-    showToast("⚔️ TSB detected...", Color3.fromRGB(255,170,0), 2)
+elseif PlaceId == 10449761463 then
 
-    local ok, err = pcall(function()
-        loadstring(httpget("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/main/CryoXHUB%5BV4.1%5D.Lua"))()
+    showToast("The Strongest Battlegrounds detected.", "warning", 2)
+
+    local success, result = pcall(function()
+        loadstring(httpget(
+            "https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/main/CryoXHUB%5BV4.1%5D.Lua"
+        ))()
     end)
 
-    if not ok then
-        warn(err)
-        showToast("❌ Load fail!", Color3.fromRGB(255,80,80), 3)
+    if not success then
+        warn(result)
+        showToast("Failed to load TSB module.", "error", 3)
     end
 
 else
-    showToast("❌ Game không hỗ trợ!", Color3.fromRGB(255,80,80), 3)
+
+    showToast("This game is currently unsupported.", "error", 3)
+
 end
