@@ -1,4 +1,4 @@
--- CryoXHUB GUI v3.6
+-- CryoXHUB GUI v3.6 [Mobile DPI 350 Fix]
 local ScreenGui = Instance.new("ScreenGui")
 ScreenGui.Name = "CryoX_Furina_Final_v6"
 ScreenGui.Parent = game:GetService("CoreGui")
@@ -16,6 +16,21 @@ local ID_ANH_NEN    = "rbxthumb://type=Asset&id=116367849760314&w=420&h=420"
 local ID_LOGO_DONG  = "rbxthumb://type=Asset&id=135753950157111&w=420&h=420"
 local KEY_CHINH_XAC = "CryoXHUB"
 local SAVE_FILE     = "CryoXHUB_save.json"
+
+-- ══════════════════════════════════════════
+--   MOBILE SCALE HELPER
+-- ══════════════════════════════════════════
+local function getScale()
+	local vp = workspace.CurrentCamera.ViewportSize
+	-- Tính scale dựa trên chiều rộng viewport, chuẩn hóa cho DPI 350 mobile
+	local baseW = 560
+	local screenW = vp.X
+	-- Mobile thường 360-414px CSS width, nhân DPI ~350 ra ~1080-1440px viewport
+	-- Chia cho 1.55 để fit màn hình nhỏ
+	local scale = math.clamp(screenW / (baseW * 1.55), 0.52, 1.0)
+	return scale
+end
+local SC = getScale()
 
 -- ══════════════════════════════════════════
 --   SAVE SYSTEM
@@ -89,12 +104,13 @@ local C = {
 }
 
 local Settings = {
-	accentColor       = Color3.fromRGB(SaveData.accentR, SaveData.accentG, SaveData.accentB),
-	showFPS           = SaveData.showFPS,
-	showPing          = SaveData.showPing,
-	showPlayers       = SaveData.showPlayers,
-	showDashCD        = SaveData.showDashCD,
-	showSkillDetector = SaveData.showSkillDetector,
+	accentColor        = Color3.fromRGB(SaveData.accentR, SaveData.accentG, SaveData.accentB),
+	showFPS            = SaveData.showFPS,
+	showPing           = SaveData.showPing,
+	showPlayers        = SaveData.showPlayers,
+	showDashCD         = SaveData.showDashCD,
+	showSkillDetector  = SaveData.showSkillDetector,
+	trueDownSlam       = false,  -- runtime only, không lưu
 }
 
 local function saveSettings()
@@ -118,50 +134,61 @@ local function tw(obj, props, t, style, dir)
 	), props):Play()
 end
 local function corner(p, r)
-	local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, r or 10); c.Parent = p
+	local c = Instance.new("UICorner"); c.CornerRadius = UDim.new(0, r or 8); c.Parent = p
 end
 local function stroke(p, t, tr)
 	local s = Instance.new("UIStroke")
-	s.Color = C.CYAN; s.Thickness = t or 1.5; s.Transparency = tr or 0.2
+	s.Color = C.CYAN; s.Thickness = t or 1.2; s.Transparency = tr or 0.2
 	s.ApplyStrokeMode = Enum.ApplyStrokeMode.Border; s.Parent = p; return s
 end
 local function glowOrb(p, tr)
 	local g = Instance.new("ImageLabel")
-	g.Size = UDim2.new(1,50,1,50); g.Position = UDim2.new(0,-25,0,-25)
+	g.Size = UDim2.new(1,40,1,40); g.Position = UDim2.new(0,-20,0,-20)
 	g.BackgroundTransparency = 1; g.Image = "rbxassetid://5028857084"
 	g.ImageColor3 = C.CYAN; g.ImageTransparency = tr or 0.88
 	g.ZIndex = (p.ZIndex or 1) - 1; g.Parent = p
 end
 
-local PAD=5; local GAP=5; local LEFT_W=148; local ROOT_H=340; local TAB_H=34
-local ROOT_W=560; local RIGHT_W=ROOT_W-PAD*2-LEFT_W-GAP
-local AVATAR_H=148; local UPDATE_H=ROOT_H-PAD*2-AVATAR_H-GAP
-local CONTENT_H=ROOT_H-PAD*2-TAB_H-GAP
+-- ══════════════════════════════════════════
+--   LAYOUT SIZES (scaled untuk DPI 350)
+-- ══════════════════════════════════════════
+local PAD      = math.floor(4 * SC)
+local GAP      = math.floor(4 * SC)
+local LEFT_W   = math.floor(118 * SC)
+local ROOT_H   = math.floor(290 * SC)
+local TAB_H    = math.floor(28 * SC)
+local ROOT_W   = math.floor(460 * SC)
+local RIGHT_W  = ROOT_W - PAD*2 - LEFT_W - GAP
+local AVATAR_H = math.floor(122 * SC)
+local UPDATE_H = ROOT_H - PAD*2 - AVATAR_H - GAP
+local CONTENT_H= ROOT_H - PAD*2 - TAB_H - GAP
 
 -- ══════════════════════════════════════════
 --   TOAST
 -- ══════════════════════════════════════════
 local function showToast(msg, color, duration)
 	color = color or C.CYAN; duration = duration or 3
+	local TW = math.floor(260 * SC)
+	local TH = math.floor(44 * SC)
 	local T = Instance.new("Frame")
-	T.Size=UDim2.new(0,300,0,52); T.Position=UDim2.new(0.5,-150,1,70)
-	T.BackgroundColor3=Color3.fromRGB(4,14,28); T.BorderSizePixel=0; T.ZIndex=50; T.Parent=ScreenGui; corner(T,12)
-	local ts=Instance.new("UIStroke"); ts.Color=color; ts.Thickness=1.8; ts.Transparency=0.05
+	T.Size=UDim2.new(0,TW,0,TH); T.Position=UDim2.new(0.5,-TW/2,1,TH+10)
+	T.BackgroundColor3=Color3.fromRGB(4,14,28); T.BorderSizePixel=0; T.ZIndex=50; T.Parent=ScreenGui; corner(T,10)
+	local ts=Instance.new("UIStroke"); ts.Color=color; ts.Thickness=1.5; ts.Transparency=0.05
 	ts.ApplyStrokeMode=Enum.ApplyStrokeMode.Border; ts.Parent=T
-	local tg=Instance.new("ImageLabel"); tg.Size=UDim2.new(1,40,1,40); tg.Position=UDim2.new(0,-20,0,-20)
+	local tg=Instance.new("ImageLabel"); tg.Size=UDim2.new(1,30,1,30); tg.Position=UDim2.new(0,-15,0,-15)
 	tg.BackgroundTransparency=1; tg.Image="rbxassetid://5028857084"; tg.ImageColor3=color
 	tg.ImageTransparency=0.78; tg.ZIndex=49; tg.Parent=T
-	local tb=Instance.new("Frame"); tb.Size=UDim2.new(0,4,1,-16); tb.Position=UDim2.new(0,8,0,8)
+	local tb=Instance.new("Frame"); tb.Size=UDim2.new(0,3,1,-12); tb.Position=UDim2.new(0,6,0,6)
 	tb.BackgroundColor3=color; tb.BorderSizePixel=0; tb.ZIndex=51; tb.Parent=T; corner(tb,3)
-	local ti=Instance.new("TextLabel"); ti.Size=UDim2.new(0,28,1,0); ti.Position=UDim2.new(0,16,0,0)
-	ti.BackgroundTransparency=1; ti.Text="🔵"; ti.TextSize=16; ti.ZIndex=51; ti.Parent=T
-	local tm=Instance.new("TextLabel"); tm.Size=UDim2.new(1,-52,1,0); tm.Position=UDim2.new(0,46,0,0)
+	local ti=Instance.new("TextLabel"); ti.Size=UDim2.new(0,22,1,0); ti.Position=UDim2.new(0,13,0,0)
+	ti.BackgroundTransparency=1; ti.Text="🔵"; ti.TextSize=math.floor(13*SC); ti.ZIndex=51; ti.Parent=T
+	local tm=Instance.new("TextLabel"); tm.Size=UDim2.new(1,-40,1,0); tm.Position=UDim2.new(0,36,0,0)
 	tm.BackgroundTransparency=1; tm.Text=msg; tm.TextColor3=C.TEXT; tm.Font=Enum.Font.GothamBold
-	tm.TextSize=11; tm.TextXAlignment=Enum.TextXAlignment.Left; tm.TextWrapped=true; tm.ZIndex=51; tm.Parent=T
-	tw(T,{Position=UDim2.new(0.5,-150,1,-70)},0.35,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
+	tm.TextSize=math.floor(10*SC); tm.TextXAlignment=Enum.TextXAlignment.Left; tm.TextWrapped=true; tm.ZIndex=51; tm.Parent=T
+	tw(T,{Position=UDim2.new(0.5,-TW/2,1,-TH-14)},0.32,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
 	task.wait(duration)
-	tw(T,{Position=UDim2.new(0.5,-150,1,70)},0.28,Enum.EasingStyle.Quint,Enum.EasingDirection.In)
-	task.wait(0.3); T:Destroy()
+	tw(T,{Position=UDim2.new(0.5,-TW/2,1,TH+10)},0.24,Enum.EasingStyle.Quint,Enum.EasingDirection.In)
+	task.wait(0.28); T:Destroy()
 end
 
 -- ══════════════════════════════════════════
@@ -171,10 +198,10 @@ local Root=Instance.new("Frame")
 Root.Size=UDim2.new(0,ROOT_W,0,ROOT_H); Root.Position=UDim2.new(0.5,-ROOT_W/2,0.5,-ROOT_H/2)
 Root.BackgroundColor3=C.BG; Root.BorderSizePixel=0; Root.Active=true; Root.Draggable=true
 Root.ZIndex=2; Root.ClipsDescendants=true; Root.Visible=false; Root.Parent=ScreenGui
-corner(Root,14); stroke(Root,1.8,0.08); glowOrb(Root,0.88)
+corner(Root,12); stroke(Root,1.5,0.08); glowOrb(Root,0.88)
 local RootBg=Instance.new("ImageLabel"); RootBg.Size=UDim2.new(1,0,1,0); RootBg.BackgroundTransparency=1
 RootBg.Image=ID_ANH_NEN; RootBg.ImageTransparency=0.93; RootBg.ScaleType=Enum.ScaleType.Crop
-RootBg.ZIndex=1; RootBg.Parent=Root; corner(RootBg,14)
+RootBg.ZIndex=1; RootBg.Parent=Root; corner(RootBg,12)
 local RootPad=Instance.new("UIPadding"); RootPad.PaddingTop=UDim.new(0,PAD); RootPad.PaddingBottom=UDim.new(0,PAD)
 RootPad.PaddingLeft=UDim.new(0,PAD); RootPad.PaddingRight=UDim.new(0,PAD); RootPad.Parent=Root
 local RootLayout=Instance.new("UIListLayout"); RootLayout.FillDirection=Enum.FillDirection.Horizontal
@@ -185,33 +212,33 @@ RootLayout.Padding=UDim.new(0,GAP); RootLayout.Parent=Root
 -- ══════════════════════════════════════════
 local KeyOverlay=Instance.new("Frame"); KeyOverlay.Size=UDim2.new(1,0,1,0)
 KeyOverlay.BackgroundColor3=C.BG; KeyOverlay.BackgroundTransparency=0.05; KeyOverlay.BorderSizePixel=0
-KeyOverlay.ZIndex=20; KeyOverlay.Visible=not keyVerified; KeyOverlay.Parent=Root; corner(KeyOverlay,14)
+KeyOverlay.ZIndex=20; KeyOverlay.Visible=not keyVerified; KeyOverlay.Parent=Root; corner(KeyOverlay,12)
 local KeyOverlayBg=Instance.new("ImageLabel"); KeyOverlayBg.Size=UDim2.new(1,0,1,0)
 KeyOverlayBg.BackgroundTransparency=1; KeyOverlayBg.Image=ID_ANH_NEN; KeyOverlayBg.ImageTransparency=0.55
-KeyOverlayBg.ScaleType=Enum.ScaleType.Stretch; KeyOverlayBg.ZIndex=20; KeyOverlayBg.Parent=KeyOverlay; corner(KeyOverlayBg,14)
+KeyOverlayBg.ScaleType=Enum.ScaleType.Stretch; KeyOverlayBg.ZIndex=20; KeyOverlayBg.Parent=KeyOverlay; corner(KeyOverlayBg,12)
 local KeyDark=Instance.new("Frame"); KeyDark.Size=UDim2.new(1,0,1,0); KeyDark.BackgroundColor3=C.BG
-KeyDark.BackgroundTransparency=0.45; KeyDark.BorderSizePixel=0; KeyDark.ZIndex=21; KeyDark.Parent=KeyOverlay; corner(KeyDark,14)
-local KeyGlow=Instance.new("ImageLabel"); KeyGlow.Size=UDim2.new(0,300,0,300); KeyGlow.Position=UDim2.new(0.5,-150,0.5,-150)
+KeyDark.BackgroundTransparency=0.45; KeyDark.BorderSizePixel=0; KeyDark.ZIndex=21; KeyDark.Parent=KeyOverlay; corner(KeyDark,12)
+local KeyGlow=Instance.new("ImageLabel"); KeyGlow.Size=UDim2.new(0,220,0,220); KeyGlow.Position=UDim2.new(0.5,-110,0.5,-110)
 KeyGlow.BackgroundTransparency=1; KeyGlow.Image="rbxassetid://5028857084"; KeyGlow.ImageColor3=C.CYAN
 KeyGlow.ImageTransparency=0.72; KeyGlow.ZIndex=22; KeyGlow.Parent=KeyOverlay
-local KeyIcon=Instance.new("TextLabel"); KeyIcon.Size=UDim2.new(1,0,0,40); KeyIcon.Position=UDim2.new(0,0,0.1,0)
-KeyIcon.BackgroundTransparency=1; KeyIcon.Text="🔐"; KeyIcon.TextSize=28; KeyIcon.ZIndex=23; KeyIcon.Parent=KeyOverlay
-local KeyTitle=Instance.new("TextLabel"); KeyTitle.Size=UDim2.new(1,-20,0,22); KeyTitle.Position=UDim2.new(0,10,0.1,44)
+local KeyIcon=Instance.new("TextLabel"); KeyIcon.Size=UDim2.new(1,0,0,32); KeyIcon.Position=UDim2.new(0,0,0.08,0)
+KeyIcon.BackgroundTransparency=1; KeyIcon.Text="🔐"; KeyIcon.TextSize=math.floor(22*SC); KeyIcon.ZIndex=23; KeyIcon.Parent=KeyOverlay
+local KeyTitle=Instance.new("TextLabel"); KeyTitle.Size=UDim2.new(1,-16,0,18); KeyTitle.Position=UDim2.new(0,8,0.08,34)
 KeyTitle.BackgroundTransparency=1; KeyTitle.Text="Nhập key để mở CryoXHUB"; KeyTitle.TextColor3=C.CYAN
-KeyTitle.Font=Enum.Font.GothamBold; KeyTitle.TextSize=15; KeyTitle.ZIndex=23; KeyTitle.Parent=KeyOverlay
-local KeySub=Instance.new("TextLabel"); KeySub.Size=UDim2.new(1,-20,0,16); KeySub.Position=UDim2.new(0,10,0.1,68)
-KeySub.BackgroundTransparency=1; KeySub.Text="Key hợp lệ trong 24 giờ  •  Key: CryoXHUB"
-KeySub.TextColor3=C.SUB; KeySub.Font=Enum.Font.Gotham; KeySub.TextSize=11; KeySub.ZIndex=23; KeySub.Parent=KeyOverlay
-local KeyInput=Instance.new("TextBox"); KeyInput.Size=UDim2.new(0.75,0,0,38); KeyInput.Position=UDim2.new(0.125,0,0.48,0)
+KeyTitle.Font=Enum.Font.GothamBold; KeyTitle.TextSize=math.floor(12*SC); KeyTitle.ZIndex=23; KeyTitle.Parent=KeyOverlay
+local KeySub=Instance.new("TextLabel"); KeySub.Size=UDim2.new(1,-16,0,14); KeySub.Position=UDim2.new(0,8,0.08,54)
+KeySub.BackgroundTransparency=1; KeySub.Text="Key hợp lệ 24 giờ  •  Key: CryoXHUB"
+KeySub.TextColor3=C.SUB; KeySub.Font=Enum.Font.Gotham; KeySub.TextSize=math.floor(9*SC); KeySub.ZIndex=23; KeySub.Parent=KeyOverlay
+local KeyInput=Instance.new("TextBox"); KeyInput.Size=UDim2.new(0.78,0,0,32); KeyInput.Position=UDim2.new(0.11,0,0.48,0)
 KeyInput.BackgroundColor3=C.PANEL2; KeyInput.PlaceholderText="Nhập Key tại đây..."; KeyInput.Text=""
-KeyInput.Font=Enum.Font.Gotham; KeyInput.TextSize=13; KeyInput.TextColor3=C.TEXT
-KeyInput.PlaceholderColor3=C.SUB; KeyInput.ZIndex=24; KeyInput.Parent=KeyOverlay; corner(KeyInput,9); stroke(KeyInput,1.5,0.2)
-local KeyStatus=Instance.new("TextLabel"); KeyStatus.Size=UDim2.new(1,-20,0,16); KeyStatus.Position=UDim2.new(0,10,0.48,42)
+KeyInput.Font=Enum.Font.Gotham; KeyInput.TextSize=math.floor(11*SC); KeyInput.TextColor3=C.TEXT
+KeyInput.PlaceholderColor3=C.SUB; KeyInput.ZIndex=24; KeyInput.Parent=KeyOverlay; corner(KeyInput,7); stroke(KeyInput,1.2,0.2)
+local KeyStatus=Instance.new("TextLabel"); KeyStatus.Size=UDim2.new(1,-16,0,14); KeyStatus.Position=UDim2.new(0,8,0.48,36)
 KeyStatus.BackgroundTransparency=1; KeyStatus.Text=""; KeyStatus.TextColor3=C.RED
-KeyStatus.Font=Enum.Font.Gotham; KeyStatus.TextSize=11; KeyStatus.ZIndex=23; KeyStatus.Parent=KeyOverlay
-local KeySubmit=Instance.new("TextButton"); KeySubmit.Size=UDim2.new(0.75,0,0,36); KeySubmit.Position=UDim2.new(0.125,0,0.48,62)
+KeyStatus.Font=Enum.Font.Gotham; KeyStatus.TextSize=math.floor(9*SC); KeyStatus.ZIndex=23; KeyStatus.Parent=KeyOverlay
+local KeySubmit=Instance.new("TextButton"); KeySubmit.Size=UDim2.new(0.78,0,0,30); KeySubmit.Position=UDim2.new(0.11,0,0.48,54)
 KeySubmit.BackgroundColor3=C.CYAN; KeySubmit.Text="XÁC NHẬN  (24H)"; KeySubmit.Font=Enum.Font.GothamBold
-KeySubmit.TextSize=13; KeySubmit.TextColor3=C.BG; KeySubmit.ZIndex=24; KeySubmit.Parent=KeyOverlay; corner(KeySubmit,9)
+KeySubmit.TextSize=math.floor(11*SC); KeySubmit.TextColor3=C.BG; KeySubmit.ZIndex=24; KeySubmit.Parent=KeyOverlay; corner(KeySubmit,7)
 KeySubmit.MouseEnter:Connect(function() tw(KeySubmit,{BackgroundColor3=Color3.fromRGB(0,240,255)},0.12) end)
 KeySubmit.MouseLeave:Connect(function() tw(KeySubmit,{BackgroundColor3=C.CYAN},0.12) end)
 
@@ -225,70 +252,72 @@ LeftLayout.Padding=UDim.new(0,GAP); LeftLayout.Parent=LeftCol
 
 local AvatarCard=Instance.new("Frame"); AvatarCard.Size=UDim2.new(1,0,0,AVATAR_H)
 AvatarCard.BackgroundColor3=C.PANEL; AvatarCard.BorderSizePixel=0; AvatarCard.ZIndex=3; AvatarCard.Parent=LeftCol
-corner(AvatarCard,10); stroke(AvatarCard,1.2,0.2)
+corner(AvatarCard,8); stroke(AvatarCard,1,0.2)
 local AvatarCardBg=Instance.new("ImageLabel"); AvatarCardBg.Size=UDim2.new(1,0,1,0); AvatarCardBg.BackgroundTransparency=1
 AvatarCardBg.Image=ID_ANH_NEN; AvatarCardBg.ImageTransparency=0.78; AvatarCardBg.ScaleType=Enum.ScaleType.Crop
-AvatarCardBg.ZIndex=3; AvatarCardBg.Parent=AvatarCard; corner(AvatarCardBg,10)
-local AvatarGlow=Instance.new("ImageLabel"); AvatarGlow.Size=UDim2.new(0,70,0,70); AvatarGlow.Position=UDim2.new(0.5,-35,0,2)
+AvatarCardBg.ZIndex=3; AvatarCardBg.Parent=AvatarCard; corner(AvatarCardBg,8)
+local AvatarGlow=Instance.new("ImageLabel"); AvatarGlow.Size=UDim2.new(0,56,0,56); AvatarGlow.Position=UDim2.new(0.5,-28,0,2)
 AvatarGlow.BackgroundTransparency=1; AvatarGlow.Image="rbxassetid://5028857084"; AvatarGlow.ImageColor3=C.CYAN
 AvatarGlow.ImageTransparency=0.70; AvatarGlow.ZIndex=4; AvatarGlow.Parent=AvatarCard
-local AvatarImg=Instance.new("ImageLabel"); AvatarImg.Size=UDim2.new(0,54,0,54); AvatarImg.Position=UDim2.new(0.5,-27,0,10)
+local AvatarImg=Instance.new("ImageLabel"); AvatarImg.Size=UDim2.new(0,42,0,42); AvatarImg.Position=UDim2.new(0.5,-21,0,8)
 AvatarImg.BackgroundColor3=C.PANEL2; AvatarImg.Image="rbxthumb://type=AvatarHeadShot&id="..LocalPlayer.UserId.."&w=150&h=150"
-AvatarImg.ZIndex=5; AvatarImg.Parent=AvatarCard; corner(AvatarImg,999); stroke(AvatarImg,2,0.05)
-local DName=Instance.new("TextLabel"); DName.Size=UDim2.new(1,-6,0,18); DName.Position=UDim2.new(0,3,0,68)
+AvatarImg.ZIndex=5; AvatarImg.Parent=AvatarCard; corner(AvatarImg,999); stroke(AvatarImg,1.5,0.05)
+local DName=Instance.new("TextLabel"); DName.Size=UDim2.new(1,-4,0,15); DName.Position=UDim2.new(0,2,0,54)
 DName.BackgroundTransparency=1; DName.Text=LocalPlayer.DisplayName; DName.TextColor3=C.TEXT
-DName.Font=Enum.Font.GothamBold; DName.TextSize=12; DName.TextXAlignment=Enum.TextXAlignment.Center
+DName.Font=Enum.Font.GothamBold; DName.TextSize=math.floor(10*SC); DName.TextXAlignment=Enum.TextXAlignment.Center
 DName.ZIndex=5; DName.Parent=AvatarCard
-local UName=Instance.new("TextLabel"); UName.Size=UDim2.new(1,-6,0,14); UName.Position=UDim2.new(0,3,0,85)
+local UName=Instance.new("TextLabel"); UName.Size=UDim2.new(1,-4,0,12); UName.Position=UDim2.new(0,2,0,68)
 UName.BackgroundTransparency=1; UName.Text="@"..LocalPlayer.Name; UName.TextColor3=C.CYAN
-UName.Font=Enum.Font.Gotham; UName.TextSize=10; UName.TextXAlignment=Enum.TextXAlignment.Center
+UName.Font=Enum.Font.Gotham; UName.TextSize=math.floor(8*SC); UName.TextXAlignment=Enum.TextXAlignment.Center
 UName.ZIndex=5; UName.Parent=AvatarCard
-local ADiv=Instance.new("Frame"); ADiv.Size=UDim2.new(1,-16,0,1); ADiv.Position=UDim2.new(0,8,0,103)
+local ADiv=Instance.new("Frame"); ADiv.Size=UDim2.new(1,-12,0,1); ADiv.Position=UDim2.new(0,6,0,83)
 ADiv.BackgroundColor3=C.CYAN; ADiv.BackgroundTransparency=0.55; ADiv.BorderSizePixel=0; ADiv.ZIndex=4; ADiv.Parent=AvatarCard
-local UIDLabel=Instance.new("TextLabel"); UIDLabel.Size=UDim2.new(1,-6,0,13); UIDLabel.Position=UDim2.new(0,3,0,107)
+local UIDLabel=Instance.new("TextLabel"); UIDLabel.Size=UDim2.new(1,-4,0,12); UIDLabel.Position=UDim2.new(0,2,0,87)
 UIDLabel.BackgroundTransparency=1; UIDLabel.Text="UID: "..LocalPlayer.UserId; UIDLabel.TextColor3=C.SUB
-UIDLabel.Font=Enum.Font.Gotham; UIDLabel.TextSize=9; UIDLabel.TextXAlignment=Enum.TextXAlignment.Center
+UIDLabel.Font=Enum.Font.Gotham; UIDLabel.TextSize=math.floor(7*SC); UIDLabel.TextXAlignment=Enum.TextXAlignment.Center
 UIDLabel.ZIndex=5; UIDLabel.Parent=AvatarCard
-local VerLbl=Instance.new("TextLabel"); VerLbl.Size=UDim2.new(1,-6,0,13); VerLbl.Position=UDim2.new(0,3,0,128)
+local VerLbl=Instance.new("TextLabel"); VerLbl.Size=UDim2.new(1,-4,0,12); VerLbl.Position=UDim2.new(0,2,0,103)
 VerLbl.BackgroundTransparency=1; VerLbl.Text="CryoXHUB  v3.6"; VerLbl.TextColor3=C.CYAN
-VerLbl.Font=Enum.Font.GothamBold; VerLbl.TextSize=9; VerLbl.TextXAlignment=Enum.TextXAlignment.Center
+VerLbl.Font=Enum.Font.GothamBold; VerLbl.TextSize=math.floor(8*SC); VerLbl.TextXAlignment=Enum.TextXAlignment.Center
 VerLbl.ZIndex=5; VerLbl.Parent=AvatarCard
 
--- Stat overlays (ScreenGui level)
-local StatFPSLbl=Instance.new("TextLabel"); StatFPSLbl.Size=UDim2.new(0,200,0,16)
-StatFPSLbl.Position=UDim2.new(0,8,0,52); StatFPSLbl.BackgroundTransparency=1; StatFPSLbl.Text=""
-StatFPSLbl.TextColor3=C.GREEN; StatFPSLbl.Font=Enum.Font.GothamBold; StatFPSLbl.TextSize=12
+-- Stat overlays
+local StatFPSLbl=Instance.new("TextLabel"); StatFPSLbl.Size=UDim2.new(0,180,0,14)
+StatFPSLbl.Position=UDim2.new(0,6,0,44); StatFPSLbl.BackgroundTransparency=1; StatFPSLbl.Text=""
+StatFPSLbl.TextColor3=C.GREEN; StatFPSLbl.Font=Enum.Font.GothamBold; StatFPSLbl.TextSize=math.floor(11*SC)
 StatFPSLbl.TextXAlignment=Enum.TextXAlignment.Left; StatFPSLbl.ZIndex=10
 StatFPSLbl.Visible=false; StatFPSLbl.Parent=ScreenGui
 
-local StatPingLbl=Instance.new("TextLabel"); StatPingLbl.Size=UDim2.new(0,200,0,16)
-StatPingLbl.Position=UDim2.new(0,8,0,70); StatPingLbl.BackgroundTransparency=1; StatPingLbl.Text=""
-StatPingLbl.TextColor3=Color3.fromRGB(255,200,60); StatPingLbl.Font=Enum.Font.GothamBold; StatPingLbl.TextSize=12
+local StatPingLbl=Instance.new("TextLabel"); StatPingLbl.Size=UDim2.new(0,180,0,14)
+StatPingLbl.Position=UDim2.new(0,6,0,60); StatPingLbl.BackgroundTransparency=1; StatPingLbl.Text=""
+StatPingLbl.TextColor3=Color3.fromRGB(255,200,60); StatPingLbl.Font=Enum.Font.GothamBold; StatPingLbl.TextSize=math.floor(11*SC)
 StatPingLbl.TextXAlignment=Enum.TextXAlignment.Left; StatPingLbl.ZIndex=10
 StatPingLbl.Visible=false; StatPingLbl.Parent=ScreenGui
 
-local StatPlayersLbl=Instance.new("TextLabel"); StatPlayersLbl.Size=UDim2.new(0,200,0,16)
-StatPlayersLbl.Position=UDim2.new(0,8,0,88); StatPlayersLbl.BackgroundTransparency=1; StatPlayersLbl.Text=""
-StatPlayersLbl.TextColor3=Color3.fromRGB(0,210,255); StatPlayersLbl.Font=Enum.Font.GothamBold; StatPlayersLbl.TextSize=12
+local StatPlayersLbl=Instance.new("TextLabel"); StatPlayersLbl.Size=UDim2.new(0,180,0,14)
+StatPlayersLbl.Position=UDim2.new(0,6,0,76); StatPlayersLbl.BackgroundTransparency=1; StatPlayersLbl.Text=""
+StatPlayersLbl.TextColor3=Color3.fromRGB(0,210,255); StatPlayersLbl.Font=Enum.Font.GothamBold; StatPlayersLbl.TextSize=math.floor(11*SC)
 StatPlayersLbl.TextXAlignment=Enum.TextXAlignment.Left; StatPlayersLbl.ZIndex=10
 StatPlayersLbl.Visible=false; StatPlayersLbl.Parent=ScreenGui
 
-local DashCDLabel=Instance.new("TextLabel"); DashCDLabel.Size=UDim2.new(0,100,0,20)
-DashCDLabel.AnchorPoint=Vector2.new(0.5,1); DashCDLabel.Position=UDim2.new(0.5,-60,1,-125)
-DashCDLabel.BackgroundTransparency=1; DashCDLabel.Font=Enum.Font.GothamBold; DashCDLabel.TextSize=12
+local DashCDLabel=Instance.new("TextLabel"); DashCDLabel.Size=UDim2.new(0,90,0,18)
+DashCDLabel.AnchorPoint=Vector2.new(0.5,1); DashCDLabel.Position=UDim2.new(0.5,-52,1,-105)
+DashCDLabel.BackgroundTransparency=1; DashCDLabel.Font=Enum.Font.GothamBold; DashCDLabel.TextSize=math.floor(11*SC)
 DashCDLabel.TextColor3=Color3.fromRGB(50,220,120); DashCDLabel.TextStrokeTransparency=0.5
 DashCDLabel.Text="DASH: READY ✓"; DashCDLabel.Visible=false; DashCDLabel.ZIndex=10; DashCDLabel.Parent=ScreenGui
 
-local SideCDLabel=Instance.new("TextLabel"); SideCDLabel.Size=UDim2.new(0,100,0,20)
-SideCDLabel.AnchorPoint=Vector2.new(0.5,1); SideCDLabel.Position=UDim2.new(0.5,60,1,-125)
-SideCDLabel.BackgroundTransparency=1; SideCDLabel.Font=Enum.Font.GothamBold; SideCDLabel.TextSize=12
+local SideCDLabel=Instance.new("TextLabel"); SideCDLabel.Size=UDim2.new(0,90,0,18)
+SideCDLabel.AnchorPoint=Vector2.new(0.5,1); SideCDLabel.Position=UDim2.new(0.5,50,1,-105)
+SideCDLabel.BackgroundTransparency=1; SideCDLabel.Font=Enum.Font.GothamBold; SideCDLabel.TextSize=math.floor(11*SC)
 SideCDLabel.TextColor3=Color3.fromRGB(50,220,120); SideCDLabel.TextStrokeTransparency=0.5
 SideCDLabel.Text="SIDE: READY ✓"; SideCDLabel.Visible=false; SideCDLabel.ZIndex=10; SideCDLabel.Parent=ScreenGui
 
 -- ══════════════════════════════════════════
 --   DASH CD SYSTEM
+--   Dash = 5s, Side = 2s (hiển thị, không đổi CD thật)
 -- ══════════════════════════════════════════
-local cdCooldowns={Dash=5.5,Side=2.3}; local activeCD={Dash=0,Side=0}
+local cdCooldowns={Dash=5.0, Side=2.0}
+local activeCD={Dash=0, Side=0}
 local pendingDash=false; local savedDir=Vector3.new(0,0,0)
 local cdChar,cdHumanoid,cdRoot=nil,nil,nil
 
@@ -331,7 +360,7 @@ local function createBillboard(target,text)
 	if not (target and target:FindFirstChild("Head")) then return end
 	local head=target.Head; local bb=head:FindFirstChild("SkillTag")
 	if not bb then
-		bb=Instance.new("BillboardGui"); bb.Name="SkillTag"; bb.Size=UDim2.new(0,100,0,40)
+		bb=Instance.new("BillboardGui"); bb.Name="SkillTag"; bb.Size=UDim2.new(0,80,0,32)
 		bb.StudsOffset=Vector3.new(0,2.5,0); bb.AlwaysOnTop=true; bb.Adornee=head; bb.Parent=head
 		local lbl=Instance.new("TextLabel"); lbl.Name="Label"; lbl.Size=UDim2.new(1,0,1,0)
 		lbl.BackgroundTransparency=1; lbl.Font=Enum.Font.GothamBold; lbl.TextScaled=true
@@ -390,8 +419,87 @@ local function stopSkillDetector()
 end
 
 -- ══════════════════════════════════════════
+--   TRUE DOWNSLAM SYSTEM
+-- ══════════════════════════════════════════
+local downSlamConn = nil
+
+local LIFT_IDS = {
+	["rbxassetid://13532600125"]=true,["rbxassetid://10469630950"]=true,
+	["rbxassetid://13296577783"]=true,["rbxassetid://13370310513"]=true,
+	["rbxassetid://15240216931"]=true,["rbxassetid://16515520431"]=true,
+	["rbxassetid://17889461810"]=true,
+}
+local JUMP_IDS = {
+	["rbxassetid://13532604085"]=true,["rbxassetid://10469639222"]=true,
+	["rbxassetid://13295919399"]=true,["rbxassetid://13378751717"]=true,
+	["rbxassetid://15240176873"]=true,["rbxassetid://16515448089"]=true,
+	["rbxassetid://17889471098"]=true,
+}
+
+local dsLastUsed = {}
+local dsChar, dsHumanoid = nil, nil
+
+local function dsWaitForChar()
+	local c = LocalPlayer.Character or LocalPlayer.CharacterAdded:Wait()
+	local h = c:WaitForChild("Humanoid")
+	local hrp = c:WaitForChild("HumanoidRootPart")
+	c.PrimaryPart = hrp
+	return c, h
+end
+
+local function liftCharacter()
+	if not dsChar or not dsChar.PrimaryPart then return end
+	local cam = workspace.CurrentCamera
+	local origSubj = cam.CameraSubject
+	cam.CameraSubject = nil
+	local startCF = dsChar:GetPivot()
+	local targetCF = startCF + Vector3.new(0, 7, 0)
+	for i = 1, 10 do
+		local alpha = i / 10
+		dsChar:PivotTo(startCF:Lerp(targetCF, alpha))
+		task.wait(0.1 / 10)
+	end
+	cam.CameraSubject = origSubj
+end
+
+local function startDownSlam()
+	if downSlamConn then return end
+	dsChar, dsHumanoid = dsWaitForChar()
+	LocalPlayer.CharacterAdded:Connect(function()
+		dsChar, dsHumanoid = dsWaitForChar()
+		dsLastUsed = {}
+	end)
+	downSlamConn = RunService.RenderStepped:Connect(function()
+		if not Settings.trueDownSlam then return end
+		if LocalPlayer.Character ~= dsChar then
+			dsChar, dsHumanoid = dsWaitForChar()
+		end
+		if not dsHumanoid then return end
+		for _, track in pairs(dsHumanoid:GetPlayingAnimationTracks()) do
+			local animId = tostring(track.Animation.AnimationId)
+			local now = tick()
+			if LIFT_IDS[animId] and (not dsLastUsed[animId] or now - dsLastUsed[animId] > 0.5) then
+				dsLastUsed[animId] = now
+				task.delay(0.15, liftCharacter)
+			elseif JUMP_IDS[animId] and (not dsLastUsed[animId] or now - dsLastUsed[animId] > 0.5) then
+				dsLastUsed[animId] = now
+				task.delay(0.15, function()
+					if dsHumanoid then
+						dsHumanoid:ChangeState(Enum.HumanoidStateType.Jumping)
+					end
+				end)
+			end
+		end
+	end)
+end
+
+local function stopDownSlam()
+	if downSlamConn then downSlamConn:Disconnect(); downSlamConn=nil end
+	dsLastUsed = {}
+end
+
+-- ══════════════════════════════════════════
 --   UPDATE STAT WIDGET
---   FIX: gọi ngay khi load để áp dụng save
 -- ══════════════════════════════════════════
 local function updateStatWidget()
 	StatFPSLbl.Visible     = Settings.showFPS
@@ -400,52 +508,52 @@ local function updateStatWidget()
 	DashCDLabel.Visible    = Settings.showDashCD
 	SideCDLabel.Visible    = Settings.showDashCD
 	if Settings.showSkillDetector then startSkillDetector() else stopSkillDetector() end
+	if Settings.trueDownSlam then startDownSlam() else stopDownSlam() end
 end
 
-updateStatWidget() -- áp dụng ngay lúc khởi động
+updateStatWidget()
 
 -- ══════════════════════════════════════════
 --   UPDATE LOG CARD
 -- ══════════════════════════════════════════
 local UpdateCard=Instance.new("Frame"); UpdateCard.Size=UDim2.new(1,0,0,UPDATE_H)
 UpdateCard.BackgroundColor3=C.PANEL; UpdateCard.BorderSizePixel=0; UpdateCard.ZIndex=3; UpdateCard.Parent=LeftCol
-corner(UpdateCard,10); stroke(UpdateCard,1.2,0.2)
+corner(UpdateCard,8); stroke(UpdateCard,1,0.2)
 local UpdateCardBg=Instance.new("ImageLabel"); UpdateCardBg.Size=UDim2.new(1,0,1,0)
 UpdateCardBg.BackgroundTransparency=1; UpdateCardBg.Image=ID_ANH_NEN; UpdateCardBg.ImageTransparency=0.85
-UpdateCardBg.ScaleType=Enum.ScaleType.Crop; UpdateCardBg.ZIndex=3; UpdateCardBg.Parent=UpdateCard; corner(UpdateCardBg,10)
-local UpdateTitle=Instance.new("TextLabel"); UpdateTitle.Size=UDim2.new(1,-10,0,20); UpdateTitle.Position=UDim2.new(0,7,0,5)
+UpdateCardBg.ScaleType=Enum.ScaleType.Crop; UpdateCardBg.ZIndex=3; UpdateCardBg.Parent=UpdateCard; corner(UpdateCardBg,8)
+local UpdateTitle=Instance.new("TextLabel"); UpdateTitle.Size=UDim2.new(1,-8,0,16); UpdateTitle.Position=UDim2.new(0,5,0,3)
 UpdateTitle.BackgroundTransparency=1; UpdateTitle.Text="  Update Log"; UpdateTitle.TextColor3=C.CYAN
-UpdateTitle.Font=Enum.Font.GothamBold; UpdateTitle.TextSize=10; UpdateTitle.TextXAlignment=Enum.TextXAlignment.Left
+UpdateTitle.Font=Enum.Font.GothamBold; UpdateTitle.TextSize=math.floor(8*SC); UpdateTitle.TextXAlignment=Enum.TextXAlignment.Left
 UpdateTitle.ZIndex=5; UpdateTitle.Parent=UpdateCard
-local UDiv=Instance.new("Frame"); UDiv.Size=UDim2.new(1,-12,0,1); UDiv.Position=UDim2.new(0,6,0,25)
+local UDiv=Instance.new("Frame"); UDiv.Size=UDim2.new(1,-10,0,1); UDiv.Position=UDim2.new(0,5,0,20)
 UDiv.BackgroundColor3=C.CYAN; UDiv.BackgroundTransparency=0.55; UDiv.BorderSizePixel=0; UDiv.ZIndex=4; UDiv.Parent=UpdateCard
-local UpdateScroll=Instance.new("ScrollingFrame"); UpdateScroll.Size=UDim2.new(1,-6,1,-28)
-UpdateScroll.Position=UDim2.new(0,3,0,27); UpdateScroll.BackgroundTransparency=1; UpdateScroll.BorderSizePixel=0
+local UpdateScroll=Instance.new("ScrollingFrame"); UpdateScroll.Size=UDim2.new(1,-4,1,-22)
+UpdateScroll.Position=UDim2.new(0,2,0,22); UpdateScroll.BackgroundTransparency=1; UpdateScroll.BorderSizePixel=0
 UpdateScroll.ScrollBarThickness=2; UpdateScroll.ScrollBarImageColor3=C.CYAN; UpdateScroll.CanvasSize=UDim2.new(0,0,0,0)
 UpdateScroll.AutomaticCanvasSize=Enum.AutomaticSize.Y; UpdateScroll.ZIndex=5; UpdateScroll.Parent=UpdateCard
-local UL=Instance.new("UIListLayout",UpdateScroll); UL.Padding=UDim.new(0,3)
-local UP2=Instance.new("UIPadding",UpdateScroll); UP2.PaddingTop=UDim.new(0,2)
+local UL=Instance.new("UIListLayout",UpdateScroll); UL.Padding=UDim.new(0,2)
+local UP2=Instance.new("UIPadding",UpdateScroll); UP2.PaddingTop=UDim.new(0,1)
 
 local updates={
-	{"v3.6","Tab MAP + 16 Teleport locations"},
-	{"v3.6","Skill Detector toggle trong Setting"},
-	{"v3.6","Fix save: auto load khi khởi động"},
-	{"v3.5","Tab Visual, Emote, Accessories mới"},
-	{"v3.5","Tab SERVER + SETTING, Key 24H"},
-	{"v3.5","Toast 30 phút, FPS/Ping live"},
-	{"v3.4","Key overlay che GUI, 1 lần"},
-	{"v3.0","Tăng kích thước right panel"},
-	{"v2.0","Redesign toàn bộ GUI"},
+	{"v3.6","True DownSlam toggle (Tech tab)"},
+	{"v3.6","Mobile DPI 350 resize"},
+	{"v3.6","CD: Dash=5s Side=2s"},
+	{"v3.6","Tab MAP + 16 Teleport"},
+	{"v3.6","Skill Detector toggle"},
+	{"v3.5","Tab Visual, Emote, Access"},
+	{"v3.5","Tab SERVER + SETTING"},
+	{"v3.4","Key overlay 24H"},
 }
 for _,u in ipairs(updates) do
-	local row=Instance.new("Frame"); row.Size=UDim2.new(1,-2,0,22); row.BackgroundColor3=C.PANEL2
-	row.BorderSizePixel=0; row.ZIndex=6; row.Parent=UpdateScroll; corner(row,5)
-	local ver=Instance.new("TextLabel"); ver.Size=UDim2.new(0,30,1,0); ver.Position=UDim2.new(0,3,0,0)
+	local row=Instance.new("Frame"); row.Size=UDim2.new(1,-2,0,18); row.BackgroundColor3=C.PANEL2
+	row.BorderSizePixel=0; row.ZIndex=6; row.Parent=UpdateScroll; corner(row,4)
+	local ver=Instance.new("TextLabel"); ver.Size=UDim2.new(0,26,1,0); ver.Position=UDim2.new(0,2,0,0)
 	ver.BackgroundTransparency=1; ver.Text=u[1]; ver.TextColor3=C.CYAN; ver.Font=Enum.Font.GothamBold
-	ver.TextSize=8; ver.ZIndex=7; ver.Parent=row
-	local desc=Instance.new("TextLabel"); desc.Size=UDim2.new(1,-34,1,0); desc.Position=UDim2.new(0,32,0,0)
+	ver.TextSize=math.floor(7*SC); ver.ZIndex=7; ver.Parent=row
+	local desc=Instance.new("TextLabel"); desc.Size=UDim2.new(1,-28,1,0); desc.Position=UDim2.new(0,26,0,0)
 	desc.BackgroundTransparency=1; desc.Text=u[2]; desc.TextColor3=C.SUB; desc.Font=Enum.Font.Gotham
-	desc.TextSize=8; desc.TextXAlignment=Enum.TextXAlignment.Left; desc.TextWrapped=true; desc.ZIndex=7; desc.Parent=row
+	desc.TextSize=math.floor(7*SC); desc.TextXAlignment=Enum.TextXAlignment.Left; desc.TextWrapped=true; desc.ZIndex=7; desc.Parent=row
 end
 
 -- ══════════════════════════════════════════
@@ -460,39 +568,39 @@ local TabRow=Instance.new("Frame"); TabRow.Size=UDim2.new(1,0,0,TAB_H); TabRow.B
 TabRow.BorderSizePixel=0; TabRow.ZIndex=4; TabRow.Parent=RightCol
 local TabBar=Instance.new("Frame"); TabBar.Size=UDim2.new(1,-(TAB_H+GAP),1,0)
 TabBar.BackgroundColor3=C.PANEL; TabBar.BorderSizePixel=0; TabBar.ZIndex=4; TabBar.Parent=TabRow
-corner(TabBar,9); stroke(TabBar,1.2,0.2)
-local TabScroll=Instance.new("ScrollingFrame"); TabScroll.Size=UDim2.new(1,-6,1,-2); TabScroll.Position=UDim2.new(0,3,0,1)
+corner(TabBar,7); stroke(TabBar,1,0.2)
+local TabScroll=Instance.new("ScrollingFrame"); TabScroll.Size=UDim2.new(1,-4,1,-2); TabScroll.Position=UDim2.new(0,2,0,1)
 TabScroll.BackgroundTransparency=1; TabScroll.BorderSizePixel=0; TabScroll.ScrollBarThickness=0
 TabScroll.CanvasSize=UDim2.new(0,0,0,0); TabScroll.AutomaticCanvasSize=Enum.AutomaticSize.X
 TabScroll.ScrollingDirection=Enum.ScrollingDirection.X; TabScroll.ZIndex=5; TabScroll.Parent=TabBar
 local TabLayout=Instance.new("UIListLayout"); TabLayout.FillDirection=Enum.FillDirection.Horizontal
-TabLayout.Padding=UDim.new(0,4); TabLayout.VerticalAlignment=Enum.VerticalAlignment.Center; TabLayout.Parent=TabScroll
+TabLayout.Padding=UDim.new(0,3); TabLayout.VerticalAlignment=Enum.VerticalAlignment.Center; TabLayout.Parent=TabScroll
 
 local CloseBtn=Instance.new("TextButton"); CloseBtn.Size=UDim2.new(0,TAB_H,0,TAB_H); CloseBtn.Position=UDim2.new(1,-TAB_H,0,0)
 CloseBtn.BackgroundColor3=C.RED; CloseBtn.Text="✕"; CloseBtn.TextColor3=C.TEXT; CloseBtn.Font=Enum.Font.GothamBold
-CloseBtn.TextSize=13; CloseBtn.ZIndex=6; CloseBtn.Parent=TabRow; corner(CloseBtn,9)
+CloseBtn.TextSize=math.floor(11*SC); CloseBtn.ZIndex=6; CloseBtn.Parent=TabRow; corner(CloseBtn,7)
 CloseBtn.MouseEnter:Connect(function() tw(CloseBtn,{BackgroundColor3=Color3.fromRGB(240,70,70)},0.12) end)
 CloseBtn.MouseLeave:Connect(function() tw(CloseBtn,{BackgroundColor3=C.RED},0.12) end)
 
 local ContentBg=Instance.new("Frame"); ContentBg.Size=UDim2.new(1,0,0,CONTENT_H)
 ContentBg.BackgroundColor3=C.PANEL; ContentBg.BorderSizePixel=0; ContentBg.ClipsDescendants=true
-ContentBg.ZIndex=3; ContentBg.Parent=RightCol; corner(ContentBg,10); stroke(ContentBg,1.2,0.2)
+ContentBg.ZIndex=3; ContentBg.Parent=RightCol; corner(ContentBg,8); stroke(ContentBg,1,0.2)
 local ContentBgImg=Instance.new("ImageLabel"); ContentBgImg.Size=UDim2.new(1,0,1,0); ContentBgImg.BackgroundTransparency=1
 ContentBgImg.Image=ID_ANH_NEN; ContentBgImg.ImageTransparency=0.42; ContentBgImg.ScaleType=Enum.ScaleType.Stretch
-ContentBgImg.ZIndex=3; ContentBgImg.Parent=ContentBg; corner(ContentBgImg,10)
+ContentBgImg.ZIndex=3; ContentBgImg.Parent=ContentBg; corner(ContentBgImg,8)
 local Overlay=Instance.new("Frame"); Overlay.Size=UDim2.new(1,0,1,0); Overlay.BackgroundColor3=C.BG
-Overlay.BackgroundTransparency=0.48; Overlay.BorderSizePixel=0; Overlay.ZIndex=4; Overlay.Parent=ContentBg; corner(Overlay,10)
+Overlay.BackgroundTransparency=0.48; Overlay.BorderSizePixel=0; Overlay.ZIndex=4; Overlay.Parent=ContentBg; corner(Overlay,8)
 
-local ContentFrame=Instance.new("ScrollingFrame"); ContentFrame.Size=UDim2.new(1,-8,1,-8)
-ContentFrame.Position=UDim2.new(0,4,0,4); ContentFrame.BackgroundTransparency=1; ContentFrame.ZIndex=6
+local ContentFrame=Instance.new("ScrollingFrame"); ContentFrame.Size=UDim2.new(1,-6,1,-6)
+ContentFrame.Position=UDim2.new(0,3,0,3); ContentFrame.BackgroundTransparency=1; ContentFrame.ZIndex=6
 ContentFrame.CanvasSize=UDim2.new(0,0,0,0); ContentFrame.AutomaticCanvasSize=Enum.AutomaticSize.Y
 ContentFrame.ScrollBarThickness=2; ContentFrame.ScrollBarImageColor3=C.CYAN; ContentFrame.Parent=ContentBg
-local CLayout=Instance.new("UIListLayout"); CLayout.Padding=UDim.new(0,5); CLayout.Parent=ContentFrame
-local CPad=Instance.new("UIPadding"); CPad.PaddingTop=UDim.new(0,3); CPad.PaddingBottom=UDim.new(0,3); CPad.Parent=ContentFrame
+local CLayout=Instance.new("UIListLayout"); CLayout.Padding=UDim.new(0,4); CLayout.Parent=ContentFrame
+local CPad=Instance.new("UIPadding"); CPad.PaddingTop=UDim.new(0,2); CPad.PaddingBottom=UDim.new(0,2); CPad.Parent=ContentFrame
 
-local OpenBtn=Instance.new("ImageButton"); OpenBtn.Size=UDim2.new(0,46,0,46); OpenBtn.Position=UDim2.new(0,12,0.5,-23)
+local OpenBtn=Instance.new("ImageButton"); OpenBtn.Size=UDim2.new(0,40,0,40); OpenBtn.Position=UDim2.new(0,10,0.5,-20)
 OpenBtn.Image=ID_LOGO_DONG; OpenBtn.BackgroundColor3=C.PANEL; OpenBtn.Visible=false; OpenBtn.Draggable=true
-OpenBtn.ZIndex=5; OpenBtn.Parent=ScreenGui; corner(OpenBtn,10); stroke(OpenBtn,1.5,0.15); glowOrb(OpenBtn,0.82)
+OpenBtn.ZIndex=5; OpenBtn.Parent=ScreenGui; corner(OpenBtn,8); stroke(OpenBtn,1.2,0.15); glowOrb(OpenBtn,0.82)
 
 -- ══════════════════════════════════════════
 --   ANIMATE
@@ -500,11 +608,11 @@ OpenBtn.ZIndex=5; OpenBtn.Parent=ScreenGui; corner(OpenBtn,10); stroke(OpenBtn,1
 local function animateOpen()
 	Root.Visible=true; Root.Size=UDim2.new(0,ROOT_W*0.9,0,ROOT_H*0.9)
 	Root.Position=UDim2.new(0.5,-(ROOT_W*0.9)/2,0.5,-(ROOT_H*0.9)/2); Root.BackgroundTransparency=1
-	tw(Root,{Size=UDim2.new(0,ROOT_W,0,ROOT_H),Position=UDim2.new(0.5,-ROOT_W/2,0.5,-ROOT_H/2),BackgroundTransparency=0},0.35,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
+	tw(Root,{Size=UDim2.new(0,ROOT_W,0,ROOT_H),Position=UDim2.new(0.5,-ROOT_W/2,0.5,-ROOT_H/2),BackgroundTransparency=0},0.3,Enum.EasingStyle.Quint,Enum.EasingDirection.Out)
 end
 local function animateClose(cb)
-	tw(Root,{Size=UDim2.new(0,ROOT_W*0.9,0,ROOT_H*0.9),Position=UDim2.new(0.5,-(ROOT_W*0.9)/2,0.5,-(ROOT_H*0.9)/2),BackgroundTransparency=1},0.25,Enum.EasingStyle.Quint,Enum.EasingDirection.In)
-	task.wait(0.26); Root.Visible=false; if cb then cb() end
+	tw(Root,{Size=UDim2.new(0,ROOT_W*0.9,0,ROOT_H*0.9),Position=UDim2.new(0.5,-(ROOT_W*0.9)/2,0.5,-(ROOT_H*0.9)/2),BackgroundTransparency=1},0.22,Enum.EasingStyle.Quint,Enum.EasingDirection.In)
+	task.wait(0.24); Root.Visible=false; if cb then cb() end
 end
 
 -- ══════════════════════════════════════════
@@ -516,15 +624,15 @@ local function slideContent(newIndex, loadFunc)
 	if isSliding then return end; isSliding=true
 	local W=ContentBg.AbsoluteSize.X; local goRight=newIndex>currentTabIndex; currentTabIndex=newIndex
 	local exitX=goRight and -W or W; local enterX=goRight and W or -W
-	tw(ContentFrame,{Position=UDim2.new(0,exitX,0,4)},0.18,Enum.EasingStyle.Cubic,Enum.EasingDirection.In)
-	task.wait(0.19)
+	tw(ContentFrame,{Position=UDim2.new(0,exitX,0,3)},0.15,Enum.EasingStyle.Cubic,Enum.EasingDirection.In)
+	task.wait(0.16)
 	for _,v in pairs(ContentFrame:GetChildren()) do
 		if v:IsA("TextButton") or v:IsA("Frame") or v:IsA("TextLabel") then v:Destroy() end
 	end
 	ContentFrame.CanvasPosition=Vector2.new(0,0); loadFunc()
-	ContentFrame.Position=UDim2.new(0,enterX,0,4)
-	tw(ContentFrame,{Position=UDim2.new(0,4,0,4)},0.22,Enum.EasingStyle.Cubic,Enum.EasingDirection.Out)
-	task.wait(0.23); isSliding=false
+	ContentFrame.Position=UDim2.new(0,enterX,0,3)
+	tw(ContentFrame,{Position=UDim2.new(0,3,0,3)},0.18,Enum.EasingStyle.Cubic,Enum.EasingDirection.Out)
+	task.wait(0.20); isSliding=false
 end
 
 local activeTab=nil
@@ -548,15 +656,19 @@ end
 -- ══════════════════════════════════════════
 --   UI BUILDERS
 -- ══════════════════════════════════════════
+local BTN_H = math.floor(30*SC)
+local FONT_S = math.floor(10*SC)
+local ICON_S = math.floor(12*SC)
+
 local function makeScriptBtn(name, code)
-	local btn=Instance.new("TextButton"); btn.Size=UDim2.new(1,-4,0,36); btn.Text=""
-	btn.BackgroundColor3=C.PANEL2; btn.ZIndex=7; btn.Parent=ContentFrame; corner(btn,8); stroke(btn,1.2,0.5)
-	local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(0,28,1,0); ic.Position=UDim2.new(0,5,0,0)
+	local btn=Instance.new("TextButton"); btn.Size=UDim2.new(1,-4,0,BTN_H); btn.Text=""
+	btn.BackgroundColor3=C.PANEL2; btn.ZIndex=7; btn.Parent=ContentFrame; corner(btn,6); stroke(btn,1,0.5)
+	local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(0,22,1,0); ic.Position=UDim2.new(0,4,0,0)
 	ic.BackgroundTransparency=1; ic.Text="▶"; ic.TextColor3=C.CYAN; ic.Font=Enum.Font.GothamBold
-	ic.TextSize=12; ic.ZIndex=8; ic.Parent=btn
-	local nl=Instance.new("TextLabel"); nl.Size=UDim2.new(1,-36,1,0); nl.Position=UDim2.new(0,30,0,0)
+	ic.TextSize=ICON_S; ic.ZIndex=8; ic.Parent=btn
+	local nl=Instance.new("TextLabel"); nl.Size=UDim2.new(1,-28,1,0); nl.Position=UDim2.new(0,24,0,0)
 	nl.BackgroundTransparency=1; nl.Text=name; nl.TextColor3=C.TEXT; nl.Font=Enum.Font.GothamBold
-	nl.TextSize=12; nl.TextXAlignment=Enum.TextXAlignment.Left; nl.ZIndex=8; nl.Parent=btn
+	nl.TextSize=FONT_S; nl.TextXAlignment=Enum.TextXAlignment.Left; nl.ZIndex=8; nl.Parent=btn
 	btn.MouseEnter:Connect(function() tw(btn,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.12); tw(nl,{TextColor3=C.CYAN},0.12) end)
 	btn.MouseLeave:Connect(function() tw(btn,{BackgroundColor3=C.PANEL2},0.12); tw(nl,{TextColor3=C.TEXT},0.12) end)
 	btn.MouseButton1Click:Connect(function()
@@ -566,14 +678,14 @@ local function makeScriptBtn(name, code)
 end
 
 local function makeActionBtn(name, icon, callback)
-	local btn=Instance.new("TextButton"); btn.Size=UDim2.new(1,-4,0,36); btn.Text=""
-	btn.BackgroundColor3=C.PANEL2; btn.ZIndex=7; btn.Parent=ContentFrame; corner(btn,8); stroke(btn,1.2,0.5)
-	local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(0,28,1,0); ic.Position=UDim2.new(0,5,0,0)
+	local btn=Instance.new("TextButton"); btn.Size=UDim2.new(1,-4,0,BTN_H); btn.Text=""
+	btn.BackgroundColor3=C.PANEL2; btn.ZIndex=7; btn.Parent=ContentFrame; corner(btn,6); stroke(btn,1,0.5)
+	local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(0,22,1,0); ic.Position=UDim2.new(0,4,0,0)
 	ic.BackgroundTransparency=1; ic.Text=icon; ic.TextColor3=C.CYAN; ic.Font=Enum.Font.GothamBold
-	ic.TextSize=14; ic.ZIndex=8; ic.Parent=btn
-	local nl=Instance.new("TextLabel"); nl.Size=UDim2.new(1,-36,1,0); nl.Position=UDim2.new(0,30,0,0)
+	ic.TextSize=ICON_S; ic.ZIndex=8; ic.Parent=btn
+	local nl=Instance.new("TextLabel"); nl.Size=UDim2.new(1,-28,1,0); nl.Position=UDim2.new(0,24,0,0)
 	nl.BackgroundTransparency=1; nl.Text=name; nl.TextColor3=C.TEXT; nl.Font=Enum.Font.GothamBold
-	nl.TextSize=12; nl.TextXAlignment=Enum.TextXAlignment.Left; nl.ZIndex=8; nl.Parent=btn
+	nl.TextSize=FONT_S; nl.TextXAlignment=Enum.TextXAlignment.Left; nl.ZIndex=8; nl.Parent=btn
 	btn.MouseEnter:Connect(function() tw(btn,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.12); tw(nl,{TextColor3=C.CYAN},0.12) end)
 	btn.MouseLeave:Connect(function() tw(btn,{BackgroundColor3=C.PANEL2},0.12); tw(nl,{TextColor3=C.TEXT},0.12) end)
 	btn.MouseButton1Click:Connect(function()
@@ -584,31 +696,34 @@ local function makeActionBtn(name, icon, callback)
 end
 
 local function makeSectionLabel(text)
-	local lbl=Instance.new("TextLabel"); lbl.Size=UDim2.new(1,-4,0,18); lbl.BackgroundTransparency=1
+	local lbl=Instance.new("TextLabel"); lbl.Size=UDim2.new(1,-4,0,14); lbl.BackgroundTransparency=1
 	lbl.Text="── "..text.." ──"; lbl.TextColor3=C.CYAN; lbl.Font=Enum.Font.GothamBold
-	lbl.TextSize=9; lbl.TextXAlignment=Enum.TextXAlignment.Center; lbl.ZIndex=7; lbl.Parent=ContentFrame
+	lbl.TextSize=math.floor(8*SC); lbl.TextXAlignment=Enum.TextXAlignment.Center; lbl.ZIndex=7; lbl.Parent=ContentFrame
 end
 
 local function makeTab(name)
-	local btn=Instance.new("TextButton"); btn.Size=UDim2.new(0,68,0,26); btn.Text=name
+	local W = math.floor(56*SC)
+	local btn=Instance.new("TextButton"); btn.Size=UDim2.new(0,W,0,math.floor(22*SC)); btn.Text=name
 	btn.BackgroundColor3=C.PANEL2; btn.TextColor3=C.SUB; btn.Font=Enum.Font.GothamBold
-	btn.TextSize=10; btn.ZIndex=6; btn.Parent=TabScroll; corner(btn,7); stroke(btn,1.2,0.6)
+	btn.TextSize=math.floor(8*SC); btn.ZIndex=6; btn.Parent=TabScroll; corner(btn,5); stroke(btn,1,0.6)
 	btn.MouseEnter:Connect(function() if activeTab~=btn then tw(btn,{BackgroundColor3=Color3.fromRGB(0,26,50)},0.12) end end)
 	btn.MouseLeave:Connect(function() if activeTab~=btn then tw(btn,{BackgroundColor3=C.PANEL2},0.12) end end)
 	return btn
 end
 
 local function makeToggle(labelText, state, onChange)
-	local frame=Instance.new("Frame"); frame.Size=UDim2.new(1,-4,0,34); frame.BackgroundColor3=C.PANEL2
-	frame.BorderSizePixel=0; frame.ZIndex=7; frame.Parent=ContentFrame; corner(frame,8); stroke(frame,1.2,0.5)
-	local lbl=Instance.new("TextLabel"); lbl.Size=UDim2.new(0.7,0,1,0); lbl.Position=UDim2.new(0,10,0,0)
+	local frame=Instance.new("Frame"); frame.Size=UDim2.new(1,-4,0,math.floor(28*SC)); frame.BackgroundColor3=C.PANEL2
+	frame.BorderSizePixel=0; frame.ZIndex=7; frame.Parent=ContentFrame; corner(frame,6); stroke(frame,1,0.5)
+	local lbl=Instance.new("TextLabel"); lbl.Size=UDim2.new(0.7,0,1,0); lbl.Position=UDim2.new(0,8,0,0)
 	lbl.BackgroundTransparency=1; lbl.Text=labelText; lbl.TextColor3=C.TEXT; lbl.Font=Enum.Font.GothamBold
-	lbl.TextSize=11; lbl.TextXAlignment=Enum.TextXAlignment.Left; lbl.ZIndex=8; lbl.Parent=frame
-	local pill=Instance.new("Frame"); pill.Size=UDim2.new(0,38,0,18); pill.Position=UDim2.new(1,-46,0.5,-9)
+	lbl.TextSize=FONT_S; lbl.TextXAlignment=Enum.TextXAlignment.Left; lbl.ZIndex=8; lbl.Parent=frame
+	local pillW=math.floor(32*SC); local pillH=math.floor(15*SC)
+	local pill=Instance.new("Frame"); pill.Size=UDim2.new(0,pillW,0,pillH); pill.Position=UDim2.new(1,-(pillW+6),0.5,-pillH/2)
 	pill.BackgroundColor3=state and C.CYAN or C.PANEL; pill.BorderSizePixel=0; pill.ZIndex=8; pill.Parent=frame
-	corner(pill,999); stroke(pill,1.2,state and 0.4 or 0.2)
-	local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,13,0,13)
-	dot.Position=state and UDim2.new(1,-16,0.5,-6.5) or UDim2.new(0,3,0.5,-6.5)
+	corner(pill,999); stroke(pill,1,state and 0.4 or 0.2)
+	local dotS=math.floor(11*SC)
+	local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,dotS,0,dotS)
+	dot.Position=state and UDim2.new(1,-(dotS+2),0.5,-dotS/2) or UDim2.new(0,2,0.5,-dotS/2)
 	dot.BackgroundColor3=state and C.BG or C.SUB; dot.BorderSizePixel=0; dot.ZIndex=9; dot.Parent=pill; corner(dot,999)
 	local isOn=state
 	local btn=Instance.new("TextButton"); btn.Size=UDim2.new(1,0,1,0); btn.BackgroundTransparency=1
@@ -616,22 +731,22 @@ local function makeToggle(labelText, state, onChange)
 	btn.MouseButton1Click:Connect(function()
 		isOn=not isOn
 		tw(pill,{BackgroundColor3=isOn and C.CYAN or C.PANEL},0.18)
-		tw(dot,{Position=isOn and UDim2.new(1,-16,0.5,-6.5) or UDim2.new(0,3,0.5,-6.5),BackgroundColor3=isOn and C.BG or C.SUB},0.18)
+		tw(dot,{Position=isOn and UDim2.new(1,-(dotS+2),0.5,-dotS/2) or UDim2.new(0,2,0.5,-dotS/2),BackgroundColor3=isOn and C.BG or C.SUB},0.18)
 		onChange(isOn)
 	end)
 end
 
 local function makeColorBtn(label, color, onClick)
-	local frame=Instance.new("Frame"); frame.Size=UDim2.new(1,-4,0,32); frame.BackgroundColor3=C.PANEL2
-	frame.BorderSizePixel=0; frame.ZIndex=7; frame.Parent=ContentFrame; corner(frame,8); stroke(frame,1.2,0.5)
-	local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,14,0,14); dot.Position=UDim2.new(0,8,0.5,-7)
+	local frame=Instance.new("Frame"); frame.Size=UDim2.new(1,-4,0,math.floor(26*SC)); frame.BackgroundColor3=C.PANEL2
+	frame.BorderSizePixel=0; frame.ZIndex=7; frame.Parent=ContentFrame; corner(frame,6); stroke(frame,1,0.5)
+	local dot=Instance.new("Frame"); dot.Size=UDim2.new(0,11,0,11); dot.Position=UDim2.new(0,6,0.5,-5.5)
 	dot.BackgroundColor3=color; dot.BorderSizePixel=0; dot.ZIndex=8; dot.Parent=frame; corner(dot,999)
-	local lbl=Instance.new("TextLabel"); lbl.Size=UDim2.new(0.7,0,1,0); lbl.Position=UDim2.new(0,28,0,0)
+	local lbl=Instance.new("TextLabel"); lbl.Size=UDim2.new(0.72,0,1,0); lbl.Position=UDim2.new(0,22,0,0)
 	lbl.BackgroundTransparency=1; lbl.Text=label; lbl.TextColor3=C.TEXT; lbl.Font=Enum.Font.GothamBold
-	lbl.TextSize=11; lbl.TextXAlignment=Enum.TextXAlignment.Left; lbl.ZIndex=8; lbl.Parent=frame
-	local al=Instance.new("TextLabel"); al.Size=UDim2.new(0.28,0,1,0); al.Position=UDim2.new(0.72,0,0,0)
+	lbl.TextSize=FONT_S; lbl.TextXAlignment=Enum.TextXAlignment.Left; lbl.ZIndex=8; lbl.Parent=frame
+	local al=Instance.new("TextLabel"); al.Size=UDim2.new(0.26,0,1,0); al.Position=UDim2.new(0.72,0,0,0)
 	al.BackgroundTransparency=1; al.Text="Chọn ▸"; al.TextColor3=C.CYAN; al.Font=Enum.Font.GothamBold
-	al.TextSize=9; al.ZIndex=8; al.Parent=frame
+	al.TextSize=math.floor(8*SC); al.ZIndex=8; al.Parent=frame
 	local btn=Instance.new("TextButton"); btn.Size=UDim2.new(1,0,1,0); btn.BackgroundTransparency=1
 	btn.Text=""; btn.ZIndex=9; btn.Parent=frame; btn.MouseButton1Click:Connect(onClick)
 	btn.MouseEnter:Connect(function() tw(frame,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.12) end)
@@ -650,13 +765,21 @@ local function LoadFPS()
 end
 
 local function LoadTech()
+	-- True DownSlam toggle (on/off, không load script ngoài)
+	makeSectionLabel("SPECIAL")
+	makeToggle("⬇️  True DownSlam", Settings.trueDownSlam, function(v)
+		Settings.trueDownSlam = v
+		updateStatWidget()
+		showToast(v and "⬇️  True DownSlam BẬT!" or "⬇️  True DownSlam TẮT!", v and C.GREEN or C.RED, 2)
+	end)
+	makeSectionLabel("SCRIPTS")
 	makeScriptBtn("Supa Tech",         [[loadstring(game:HttpGet("https://rawscripts.net/raw/The-Strongest-Battlegrounds-Supa-tech-v2-77454"))()]])
 	makeScriptBtn("Kiba Tech",         [[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_1593573630798166.lua.txt"))()]])
 	makeScriptBtn("Oreo Tech",         [[loadstring(game:HttpGet("https://raw.githubusercontent.com/Cyborg883/OreoTech/refs/heads/main/Protected_6856895483929371.lua"))()]])
 	makeScriptBtn("Lethal Dash",       [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/ac0dd3cd81188c95f00e81a7ca00d53b669c3fcb0f15eb0176c145df3d846d10/download"))()]])
 	makeScriptBtn("Back Dash Cancel",  [[loadstring(game:HttpGet("https://raw.githubusercontent.com/dinhthanhtuankiet1762009-sudo/Js/refs/heads/main/4418648b0e9b71ef.lua"))()]])
-	makeScriptBtn("kakyo tech",[[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/dd205f0487a772434c4bcde88a7d11d52b207c2afda89351d4a4f6f8ecfce48d/download"))()]])
-	makeScriptBtn("Loop Dash v2",         [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/034dca4d5771fdb254488bcccc3b669bf8ce7d32214ac9c2f6fc8db2866b4d81/download"))()]])
+	makeScriptBtn("kakyo tech",        [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/dd205f0487a772434c4bcde88a7d11d52b207c2afda89351d4a4f6f8ecfce48d/download"))()]])
+	makeScriptBtn("Loop Dash v2",      [[loadstring(game:HttpGet("https://api.jnkie.com/api/v1/luascripts/public/034dca4d5771fdb254488bcccc3b669bf8ce7d32214ac9c2f6fc8db2866b4d81/download"))()]])
 	makeScriptBtn("Silent aim reworked",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/yqantg-pixel/Find/refs/heads/main/Protected_6124417452209241.lua.txt"))()]])
 end
 
@@ -670,7 +793,7 @@ local function LoadVisual()
 	makeSectionLabel("AURA")
 	makeScriptBtn("Blue Flame Aura",     [[loadstring(game:HttpGet("Link_Script_Aura_Tai_Day"))()]])
 	makeScriptBtn("Ultra Instinct Aura", [[loadstring(game:HttpGet("Link_Script_Aura_2"))()]])
-	makeScriptBtn("curse energy effect",[[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Curse%20energy%20effect%5Bsaitama%5D"))()]])
+	makeScriptBtn("curse energy effect", [[loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/Curse%20energy%20effect%5Bsaitama%5D"))()]])
 end
 
 local function LoadScript()
@@ -681,7 +804,7 @@ local function LoadScript()
 	makeScriptBtn("tab glitch",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/nguyenduchunganh519-source/tab/refs/heads/main/2dbae4b67fc9eaf4.lua.txt"))()]])
 	makeScriptBtn("Shield",            [[Instance.new("ForceField",game.Players.LocalPlayer.Character)]])
 	makeScriptBtn("TouchFling",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/long191910/all-my-roblox-script/refs/heads/main/touchfling.lua"))()]])
-	makeScriptBtn("orbit farm",        [[loadstring(game:httpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/FARM-KILL/refs/heads/main/TSB"))()]])
+	makeScriptBtn("orbit farm",        [[loadstring(game:HttpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/FARM-KILL/refs/heads/main/TSB"))()]])
 	makeScriptBtn("farm kill",         [[loadstring(game:HttpGet("https://raw.githubusercontent.com/minhnhatdepzai8-cloud/Farm-Kill-V2/refs/heads/main/TSB"))()]])
 end
 
@@ -751,17 +874,17 @@ local function LoadMap()
 	for _,loc in ipairs(Locations) do
 		local icon=locationIcons[loc.name] or "📍"
 		local capturedCF=loc.cf; local capturedName=loc.name
-		local btn=Instance.new("TextButton"); btn.Size=UDim2.new(1,-4,0,36); btn.Text=""
-		btn.BackgroundColor3=C.PANEL2; btn.ZIndex=7; btn.Parent=ContentFrame; corner(btn,8); stroke(btn,1.2,0.5)
-		local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(0,28,1,0); ic.Position=UDim2.new(0,5,0,0)
+		local btn=Instance.new("TextButton"); btn.Size=UDim2.new(1,-4,0,BTN_H); btn.Text=""
+		btn.BackgroundColor3=C.PANEL2; btn.ZIndex=7; btn.Parent=ContentFrame; corner(btn,6); stroke(btn,1,0.5)
+		local ic=Instance.new("TextLabel"); ic.Size=UDim2.new(0,22,1,0); ic.Position=UDim2.new(0,4,0,0)
 		ic.BackgroundTransparency=1; ic.Text=icon; ic.TextColor3=C.CYAN; ic.Font=Enum.Font.GothamBold
-		ic.TextSize=14; ic.ZIndex=8; ic.Parent=btn
-		local nl=Instance.new("TextLabel"); nl.Size=UDim2.new(1,-80,1,0); nl.Position=UDim2.new(0,30,0,0)
+		ic.TextSize=ICON_S; ic.ZIndex=8; ic.Parent=btn
+		local nl=Instance.new("TextLabel"); nl.Size=UDim2.new(1,-72,1,0); nl.Position=UDim2.new(0,24,0,0)
 		nl.BackgroundTransparency=1; nl.Text=capturedName; nl.TextColor3=C.TEXT; nl.Font=Enum.Font.GothamBold
-		nl.TextSize=11; nl.TextXAlignment=Enum.TextXAlignment.Left; nl.ZIndex=8; nl.Parent=btn
-		local cl=Instance.new("TextLabel"); cl.Size=UDim2.new(0,72,1,0); cl.Position=UDim2.new(1,-74,0,0)
+		nl.TextSize=FONT_S; nl.TextXAlignment=Enum.TextXAlignment.Left; nl.ZIndex=8; nl.Parent=btn
+		local cl=Instance.new("TextLabel"); cl.Size=UDim2.new(0,64,1,0); cl.Position=UDim2.new(1,-66,0,0)
 		cl.BackgroundTransparency=1; cl.Text=math.floor(capturedCF.X)..", "..math.floor(capturedCF.Y)
-		cl.TextColor3=C.SUB; cl.Font=Enum.Font.Gotham; cl.TextSize=8
+		cl.TextColor3=C.SUB; cl.Font=Enum.Font.Gotham; cl.TextSize=math.floor(7*SC)
 		cl.TextXAlignment=Enum.TextXAlignment.Right; cl.ZIndex=8; cl.Parent=btn
 		btn.MouseEnter:Connect(function() tw(btn,{BackgroundColor3=Color3.fromRGB(0,38,68)},0.12); tw(nl,{TextColor3=C.CYAN},0.12) end)
 		btn.MouseLeave:Connect(function() tw(btn,{BackgroundColor3=C.PANEL2},0.12); tw(nl,{TextColor3=C.TEXT},0.12) end)
@@ -809,15 +932,15 @@ local function LoadServer()
 		else showToast("❌  Executor không hỗ trợ clipboard!",C.RED,3) end
 	end)
 	makeSectionLabel("JOIN SERVER CỤ THỂ")
-	local iF=Instance.new("Frame"); iF.Size=UDim2.new(1,-4,0,36); iF.BackgroundColor3=C.PANEL2
-	iF.BorderSizePixel=0; iF.ZIndex=7; iF.Parent=ContentFrame; corner(iF,8); stroke(iF,1.2,0.5)
-	local sBox=Instance.new("TextBox"); sBox.Size=UDim2.new(0.72,0,1,-8); sBox.Position=UDim2.new(0,6,0,4)
+	local iF=Instance.new("Frame"); iF.Size=UDim2.new(1,-4,0,BTN_H); iF.BackgroundColor3=C.PANEL2
+	iF.BorderSizePixel=0; iF.ZIndex=7; iF.Parent=ContentFrame; corner(iF,6); stroke(iF,1,0.5)
+	local sBox=Instance.new("TextBox"); sBox.Size=UDim2.new(0.70,0,1,-6); sBox.Position=UDim2.new(0,4,0,3)
 	sBox.BackgroundColor3=C.BG; sBox.PlaceholderText="Nhập Server ID..."; sBox.Text=""
-	sBox.Font=Enum.Font.Gotham; sBox.TextSize=10; sBox.TextColor3=C.TEXT; sBox.PlaceholderColor3=C.SUB
-	sBox.ZIndex=8; sBox.Parent=iF; corner(sBox,5)
-	local jBtn=Instance.new("TextButton"); jBtn.Size=UDim2.new(0.25,0,1,-8); jBtn.Position=UDim2.new(0.74,0,0,4)
-	jBtn.BackgroundColor3=C.CYAN; jBtn.Text="JOIN"; jBtn.Font=Enum.Font.GothamBold; jBtn.TextSize=10
-	jBtn.TextColor3=C.BG; jBtn.ZIndex=8; jBtn.Parent=iF; corner(jBtn,5)
+	sBox.Font=Enum.Font.Gotham; sBox.TextSize=math.floor(9*SC); sBox.TextColor3=C.TEXT; sBox.PlaceholderColor3=C.SUB
+	sBox.ZIndex=8; sBox.Parent=iF; corner(sBox,4)
+	local jBtn=Instance.new("TextButton"); jBtn.Size=UDim2.new(0.27,0,1,-6); jBtn.Position=UDim2.new(0.72,0,0,3)
+	jBtn.BackgroundColor3=C.CYAN; jBtn.Text="JOIN"; jBtn.Font=Enum.Font.GothamBold; jBtn.TextSize=math.floor(9*SC)
+	jBtn.TextColor3=C.BG; jBtn.ZIndex=8; jBtn.Parent=iF; corner(jBtn,4)
 	jBtn.MouseButton1Click:Connect(function()
 		local sid=sBox.Text
 		if sid and #sid>5 then showToast("🚀  Đang join server...",C.CYAN,2); task.wait(0.8)
@@ -825,14 +948,14 @@ local function LoadServer()
 		else showToast("❌  Nhập Server ID hợp lệ!",C.RED,2) end
 	end)
 	makeSectionLabel("THÔNG TIN SERVER")
-	local info=Instance.new("Frame"); info.Size=UDim2.new(1,-4,0,58); info.BackgroundColor3=C.PANEL2
-	info.BorderSizePixel=0; info.ZIndex=7; info.Parent=ContentFrame; corner(info,8); stroke(info,1.2,0.5)
+	local info=Instance.new("Frame"); info.Size=UDim2.new(1,-4,0,math.floor(52*SC)); info.BackgroundColor3=C.PANEL2
+	info.BorderSizePixel=0; info.ZIndex=7; info.Parent=ContentFrame; corner(info,6); stroke(info,1,0.5)
 	local lines={"🎮  Game: "..game:GetService("MarketplaceService"):GetProductInfo(game.PlaceId).Name,
-		"🆔  Server ID: "..string.sub(game.JobId,1,18).."...","👥  Players: "..#Players:GetPlayers().."  in server"}
+		"🆔  Server ID: "..string.sub(game.JobId,1,16).."...","👥  Players: "..#Players:GetPlayers().."  in server"}
 	for i,line in ipairs(lines) do
-		local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-8,0,17); l.Position=UDim2.new(0,5,0,(i-1)*18+2)
+		local l=Instance.new("TextLabel"); l.Size=UDim2.new(1,-6,0,math.floor(16*SC)); l.Position=UDim2.new(0,4,0,(i-1)*math.floor(16*SC)+2)
 		l.BackgroundTransparency=1; l.Text=line; l.TextColor3=C.SUB; l.Font=Enum.Font.Gotham
-		l.TextSize=9; l.TextXAlignment=Enum.TextXAlignment.Left; l.ZIndex=8; l.Parent=info
+		l.TextSize=math.floor(8*SC); l.TextXAlignment=Enum.TextXAlignment.Left; l.ZIndex=8; l.Parent=info
 	end
 end
 
@@ -900,13 +1023,13 @@ SettingTab.MouseButton1Click:Connect(function()     setActive(SettingTab,10,Load
 local function unlockGUI()
 	KeyStatus.Text="✓  Đúng! Key hợp lệ 24 giờ..."; KeyStatus.TextColor3=C.GREEN
 	tw(KeySubmit,{BackgroundColor3=C.GREEN},0.2); task.wait(0.5)
-	tw(KeyOverlay,{BackgroundTransparency=1},0.35)
+	tw(KeyOverlay,{BackgroundTransparency=1},0.3)
 	for _,v in pairs(KeyOverlay:GetChildren()) do
-		if v:IsA("TextLabel") or v:IsA("TextButton") or v:IsA("TextBox") then tw(v,{TextTransparency=1},0.3)
-		elseif v:IsA("ImageLabel") then tw(v,{ImageTransparency=1},0.3)
-		elseif v:IsA("Frame") then tw(v,{BackgroundTransparency=1},0.3) end
+		if v:IsA("TextLabel") or v:IsA("TextButton") or v:IsA("TextBox") then tw(v,{TextTransparency=1},0.25)
+		elseif v:IsA("ImageLabel") then tw(v,{ImageTransparency=1},0.25)
+		elseif v:IsA("Frame") then tw(v,{BackgroundTransparency=1},0.25) end
 	end
-	task.wait(0.38); KeyOverlay.Visible=false
+	task.wait(0.32); KeyOverlay.Visible=false
 	clearContent(); setActive(FPSTab,1,LoadFPS)
 	task.spawn(function() task.wait(1); showToast("✅  CryoXHUB mở khóa 24 giờ!",C.GREEN,3) end)
 end
@@ -916,7 +1039,7 @@ KeySubmit.MouseButton1Click:Connect(function()
 	else
 		KeyInput.Text=""; KeyStatus.Text="❌  Sai Key! Thử lại."; KeyStatus.TextColor3=C.RED
 		local orig=KeyInput.Position
-		for i=1,5 do tw(KeyInput,{Position=orig+UDim2.new(0,i%2==0 and 7 or -7,0,0)},0.04); task.wait(0.045) end
+		for i=1,5 do tw(KeyInput,{Position=orig+UDim2.new(0,i%2==0 and 6 or -6,0,0)},0.04); task.wait(0.045) end
 		tw(KeyInput,{Position=orig},0.07); task.wait(1.5); KeyStatus.Text=""
 	end
 end)
@@ -925,8 +1048,8 @@ if keyVerified then task.spawn(function() task.wait(0.5); unlockGUI() end) end
 
 CloseBtn.MouseButton1Click:Connect(function()
 	animateClose(function()
-		OpenBtn.Visible=true; OpenBtn.Size=UDim2.new(0,26,0,26)
-		tw(OpenBtn,{Size=UDim2.new(0,46,0,46)},0.3,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
+		OpenBtn.Visible=true; OpenBtn.Size=UDim2.new(0,22,0,22)
+		tw(OpenBtn,{Size=UDim2.new(0,40,0,40)},0.28,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
 	end)
 end)
 OpenBtn.MouseButton1Click:Connect(function() OpenBtn.Visible=false; animateOpen() end)
@@ -968,32 +1091,35 @@ end)
 task.spawn(function()
 	while true do
 		task.wait(1800)
-		local msgs={"💙  Cảm ơn bạn đã dùng CryoXHUB!\nChúc bạn chơi game vui vẻ~",
+		local msgs={
+			"💙  Cảm ơn bạn đã dùng CryoXHUB!\nChúc bạn chơi game vui vẻ~",
 			"✨  CryoXHUB v3.6  —  Cảm ơn vì sự tin tưởng!",
-			"🌊  Bạn đang dùng CryoXHUB được 30 phút~\nCảm ơn bạn rất nhiều! 💙"}
+			"🌊  Bạn đang dùng CryoXHUB được 30 phút~\nCảm ơn bạn rất nhiều! 💙",
+		}
 		local msg=msgs[math.random(1,#msgs)]
-		local BT=Instance.new("Frame"); BT.Size=UDim2.new(0,320,0,68); BT.Position=UDim2.new(0.5,-160,1,80)
-		BT.BackgroundColor3=Color3.fromRGB(2,12,24); BT.BorderSizePixel=0; BT.ZIndex=50; BT.Parent=ScreenGui; corner(BT,14)
-		local bts=Instance.new("UIStroke"); bts.Color=Color3.fromRGB(0,210,255); bts.Thickness=2
+		local BW=math.floor(280*SC); local BH=math.floor(58*SC)
+		local BT=Instance.new("Frame"); BT.Size=UDim2.new(0,BW,0,BH); BT.Position=UDim2.new(0.5,-BW/2,1,BH+10)
+		BT.BackgroundColor3=Color3.fromRGB(2,12,24); BT.BorderSizePixel=0; BT.ZIndex=50; BT.Parent=ScreenGui; corner(BT,12)
+		local bts=Instance.new("UIStroke"); bts.Color=Color3.fromRGB(0,210,255); bts.Thickness=1.8
 		bts.Transparency=0; bts.ApplyStrokeMode=Enum.ApplyStrokeMode.Border; bts.Parent=BT
-		local btg=Instance.new("ImageLabel"); btg.Size=UDim2.new(1,60,1,60); btg.Position=UDim2.new(0,-30,0,-30)
+		local btg=Instance.new("ImageLabel"); btg.Size=UDim2.new(1,50,1,50); btg.Position=UDim2.new(0,-25,0,-25)
 		btg.BackgroundTransparency=1; btg.Image="rbxassetid://5028857084"; btg.ImageColor3=Color3.fromRGB(0,210,255)
 		btg.ImageTransparency=0.65; btg.ZIndex=49; btg.Parent=BT
 		local bb=Instance.new("Frame"); bb.Size=UDim2.new(1,0,0,3); bb.BackgroundColor3=Color3.fromRGB(0,210,255)
 		bb.BorderSizePixel=0; bb.ZIndex=51; bb.Parent=BT; corner(bb,3)
-		local bi=Instance.new("TextLabel"); bi.Size=UDim2.new(0,40,1,0); bi.Position=UDim2.new(0,6,0,0)
-		bi.BackgroundTransparency=1; bi.Text="💙"; bi.TextSize=22; bi.ZIndex=51; bi.Parent=BT
-		local bt=Instance.new("TextLabel"); bt.Size=UDim2.new(1,-52,0,22); bt.Position=UDim2.new(0,46,0,6)
+		local bi=Instance.new("TextLabel"); bi.Size=UDim2.new(0,36,1,0); bi.Position=UDim2.new(0,5,0,0)
+		bi.BackgroundTransparency=1; bi.Text="💙"; bi.TextSize=math.floor(18*SC); bi.ZIndex=51; bi.Parent=BT
+		local bt=Instance.new("TextLabel"); bt.Size=UDim2.new(1,-44,0,18); bt.Position=UDim2.new(0,40,0,5)
 		bt.BackgroundTransparency=1; bt.Text="CryoXHUB"; bt.TextColor3=Color3.fromRGB(0,210,255)
-		bt.Font=Enum.Font.GothamBold; bt.TextSize=13; bt.TextXAlignment=Enum.TextXAlignment.Left; bt.ZIndex=51; bt.Parent=BT
-		local bm=Instance.new("TextLabel"); bm.Size=UDim2.new(1,-52,0,34); bm.Position=UDim2.new(0,46,0,28)
+		bt.Font=Enum.Font.GothamBold; bt.TextSize=math.floor(11*SC); bt.TextXAlignment=Enum.TextXAlignment.Left; bt.ZIndex=51; bt.Parent=BT
+		local bm=Instance.new("TextLabel"); bm.Size=UDim2.new(1,-44,0,30); bm.Position=UDim2.new(0,40,0,24)
 		bm.BackgroundTransparency=1; bm.Text=msg; bm.TextColor3=Color3.fromRGB(180,220,255)
-		bm.Font=Enum.Font.Gotham; bm.TextSize=10; bm.TextXAlignment=Enum.TextXAlignment.Left
+		bm.Font=Enum.Font.Gotham; bm.TextSize=math.floor(9*SC); bm.TextXAlignment=Enum.TextXAlignment.Left
 		bm.TextWrapped=true; bm.ZIndex=51; bm.Parent=BT
-		tw(BT,{Position=UDim2.new(0.5,-160,1,-88)},0.4,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
+		tw(BT,{Position=UDim2.new(0.5,-BW/2,1,-(BH+10))},0.36,Enum.EasingStyle.Back,Enum.EasingDirection.Out)
 		for _=1,3 do tw(bts,{Transparency=0.6},0.5); task.wait(0.55); tw(bts,{Transparency=0},0.5); task.wait(0.55) end
-		task.wait(2.5); tw(BT,{Position=UDim2.new(0.5,-160,1,80)},0.3,Enum.EasingStyle.Quint,Enum.EasingDirection.In)
-		task.wait(0.35); BT:Destroy()
+		task.wait(2.5); tw(BT,{Position=UDim2.new(0.5,-BW/2,1,BH+10)},0.28,Enum.EasingStyle.Quint,Enum.EasingDirection.In)
+		task.wait(0.32); BT:Destroy()
 	end
 end)
 
