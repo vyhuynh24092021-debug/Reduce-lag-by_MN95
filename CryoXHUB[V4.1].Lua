@@ -1,32 +1,35 @@
--- ===== CRYOXHUB LOADER v3.1 =====
+-- ===== CRYOXHUB LOADER v3.1 MINI =====
 local LOADING_TIME = 15
 
-local TweenService     = game:GetService("TweenService")
-local CoreGui          = game:GetService("CoreGui")
+local TweenService = game:GetService("TweenService")
+local CoreGui      = game:GetService("CoreGui")
 
 local sg = Instance.new("ScreenGui")
-sg.Name = "CryoX_Loading"
+sg.Name = "CryoX_Loading_Mini"
 sg.DisplayOrder = 2147483647
 sg.IgnoreGuiInset = true
 sg.ResetOnSpawn = false
 sg.Parent = CoreGui
 
 local function Tween(obj, props, t, style, dir)
-    local tw = TweenService:Create(obj,
-        TweenInfo.new(t, style or Enum.EasingStyle.Quart, dir or Enum.EasingDirection.Out),
-        props)
+    local tw = TweenService:Create(
+        obj,
+        TweenInfo.new(
+            t,
+            style or Enum.EasingStyle.Quart,
+            dir or Enum.EasingDirection.Out
+        ),
+        props
+    )
     tw:Play()
     return tw
 end
 
--- ══════════════════════════════════════════
---   BACKDROP
--- ══════════════════════════════════════════
+-- BACKGROUND
 local Backdrop = Instance.new("Frame")
 Backdrop.Size = UDim2.new(1,0,1,0)
 Backdrop.BackgroundColor3 = Color3.fromRGB(3,6,16)
 Backdrop.BorderSizePixel = 0
-Backdrop.ZIndex = 1
 Backdrop.Parent = sg
 
 local Grid = Instance.new("ImageLabel")
@@ -34,618 +37,309 @@ Grid.Size = UDim2.new(1,0,1,0)
 Grid.BackgroundTransparency = 1
 Grid.Image = "rbxassetid://3570695787"
 Grid.ImageColor3 = Color3.fromRGB(0,180,255)
-Grid.ImageTransparency = 0.96
+Grid.ImageTransparency = 0.97
 Grid.ScaleType = Enum.ScaleType.Tile
 Grid.TileSize = UDim2.new(0,64,0,64)
-Grid.ZIndex = 2
 Grid.Parent = Backdrop
 
--- ══════════════════════════════════════════
---   PARTICLES
--- ══════════════════════════════════════════
-local ParticleHolder = Instance.new("Frame")
-ParticleHolder.Size = UDim2.new(1,0,1,0)
-ParticleHolder.BackgroundTransparency = 1
-ParticleHolder.ZIndex = 2
-ParticleHolder.ClipsDescendants = true
-ParticleHolder.Parent = Backdrop
+-- PANEL
+local PW, PH = 340, 210
 
-local particles = {}
-for i = 1, 18 do
-    local p = Instance.new("Frame")
-    local sz = math.random(2,5)
-    p.Size = UDim2.new(0,sz,0,sz)
-    p.Position = UDim2.new(math.random(),0,math.random(),0)
-    p.BackgroundColor3 = Color3.fromRGB(0,math.random(160,255),255)
-    p.BackgroundTransparency = math.random(40,75)/100
-    p.BorderSizePixel = 0
-    p.ZIndex = 3
-    Instance.new("UICorner",p).CornerRadius = UDim.new(1,0)
-    p.Parent = ParticleHolder
-    particles[i] = { frame=p, speed=math.random(15,40)/1000, drift=(math.random()-0.5)*0.0003 }
-end
-
--- ══════════════════════════════════════════
---   AMBIENT ORBS
--- ══════════════════════════════════════════
-local function makeOrb(x,y,size,color,trans)
-    local o = Instance.new("ImageLabel")
-    o.Size = UDim2.new(0,size,0,size)
-    o.Position = UDim2.new(x,-size/2,y,-size/2)
-    o.BackgroundTransparency = 1
-    o.Image = "rbxassetid://5028857084"
-    o.ImageColor3 = color
-    o.ImageTransparency = trans
-    o.ZIndex = 2
-    o.Parent = Backdrop
-    return o
-end
-local Orb1 = makeOrb(0.3,0.4,600,Color3.fromRGB(0,180,255),0.82)
-local Orb2 = makeOrb(0.75,0.65,450,Color3.fromRGB(0,80,200),0.85)
-local Orb3 = makeOrb(0.5,0.5,900,Color3.fromRGB(0,120,220),0.91)
-
--- ══════════════════════════════════════════
---   MAIN PANEL
--- ══════════════════════════════════════════
 local Panel = Instance.new("Frame")
-Panel.Size = UDim2.new(0,500,0,320)
--- BẮT ĐẦU đúng vị trí center ngay, không animate từ đâu cả
-Panel.Position = UDim2.new(0.5,-250,0.5,-160)
+Panel.Size = UDim2.new(0,PW,0,PH)
+Panel.Position = UDim2.new(0.5,-PW/2,0.5,-PH/2)
 Panel.BackgroundColor3 = Color3.fromRGB(6,14,30)
 Panel.BackgroundTransparency = 1
 Panel.BorderSizePixel = 0
-Panel.ZIndex = 5
 Panel.Parent = sg
-Instance.new("UICorner",Panel).CornerRadius = UDim.new(0,16)
+Instance.new("UICorner",Panel).CornerRadius = UDim.new(0,12)
 
-local PanelStroke = Instance.new("UIStroke",Panel)
-PanelStroke.Color = Color3.fromRGB(0,190,230)
-PanelStroke.Thickness = 1.5
-PanelStroke.Transparency = 1
+local Stroke = Instance.new("UIStroke")
+Stroke.Parent = Panel
+Stroke.Color = Color3.fromRGB(0,190,230)
+Stroke.Thickness = 1.5
+Stroke.Transparency = 1
 
-local PanelGlow = Instance.new("ImageLabel",Panel)
-PanelGlow.Size = UDim2.new(1,60,1,60)
-PanelGlow.Position = UDim2.new(0,-30,0,-30)
-PanelGlow.BackgroundTransparency = 1
-PanelGlow.Image = "rbxassetid://5028857084"
-PanelGlow.ImageColor3 = Color3.fromRGB(0,160,220)
-PanelGlow.ImageTransparency = 0.88
-PanelGlow.ZIndex = 4
-
--- Top bar
-local TopBar = Instance.new("Frame",Panel)
-TopBar.Size = UDim2.new(1,0,0,3)
+-- TOP BAR
+local TopBar = Instance.new("Frame")
+TopBar.Parent = Panel
+TopBar.Size = UDim2.new(1,0,0,2)
 TopBar.BackgroundColor3 = Color3.fromRGB(0,210,255)
 TopBar.BorderSizePixel = 0
-TopBar.ZIndex = 6
-Instance.new("UICorner",TopBar).CornerRadius = UDim.new(0,16)
-local TBGrad = Instance.new("UIGradient",TopBar)
-TBGrad.Color = ColorSequence.new({
-    ColorSequenceKeypoint.new(0,Color3.fromRGB(0,100,200)),
-    ColorSequenceKeypoint.new(0.5,Color3.fromRGB(0,220,255)),
-    ColorSequenceKeypoint.new(1,Color3.fromRGB(0,100,200)),
-})
+Instance.new("UICorner",TopBar).CornerRadius = UDim.new(1,0)
 
--- Icon
-local Icon = Instance.new("TextLabel",Panel)
-Icon.Size = UDim2.new(0,64,0,64)
-Icon.Position = UDim2.new(0.5,-32,0,16)
+-- ICON
+local Icon = Instance.new("TextLabel")
+Icon.Parent = Panel
+Icon.Size = UDim2.new(0,44,0,44)
+Icon.Position = UDim2.new(0.5,-22,0,10)
 Icon.BackgroundTransparency = 1
 Icon.Text = "❄"
 Icon.TextColor3 = Color3.fromRGB(0,210,255)
-Icon.TextSize = 46
+Icon.TextSize = 30
 Icon.Font = Enum.Font.GothamBold
 Icon.TextTransparency = 1
-Icon.ZIndex = 7
 
-local IconShadow = Instance.new("TextLabel",Panel)
-IconShadow.Size = UDim2.new(0,64,0,64)
-IconShadow.Position = UDim2.new(0.5,-30,0,18)
-IconShadow.BackgroundTransparency = 1
-IconShadow.Text = "❄"
-IconShadow.TextColor3 = Color3.fromRGB(0,100,180)
-IconShadow.TextSize = 46
-IconShadow.Font = Enum.Font.GothamBold
-IconShadow.TextTransparency = 0.7
-IconShadow.ZIndex = 6
-
--- Title
-local Title = Instance.new("TextLabel",Panel)
-Title.Size = UDim2.new(1,-40,0,36)
-Title.Position = UDim2.new(0,20,0,84)
+-- TITLE
+local Title = Instance.new("TextLabel")
+Title.Parent = Panel
+Title.Size = UDim2.new(1,-20,0,24)
+Title.Position = UDim2.new(0,10,0,52)
 Title.BackgroundTransparency = 1
 Title.Text = "CryoXHUB"
 Title.TextColor3 = Color3.fromRGB(210,235,255)
-Title.TextSize = 30
+Title.TextSize = 20
 Title.Font = Enum.Font.GothamBold
-Title.TextXAlignment = Enum.TextXAlignment.Center
 Title.TextTransparency = 1
-Title.ZIndex = 7
 
--- Subtitle
-local Subtitle = Instance.new("TextLabel",Panel)
-Subtitle.Size = UDim2.new(1,-40,0,16)
-Subtitle.Position = UDim2.new(0,20,0,120)
+-- SUBTITLE
+local Subtitle = Instance.new("TextLabel")
+Subtitle.Parent = Panel
+Subtitle.Size = UDim2.new(1,-20,0,12)
+Subtitle.Position = UDim2.new(0,10,0,74)
 Subtitle.BackgroundTransparency = 1
 Subtitle.Text = "ADVANCED PERFORMANCE SUITE"
 Subtitle.TextColor3 = Color3.fromRGB(0,180,220)
-Subtitle.TextSize = 10
+Subtitle.TextSize = 7
 Subtitle.Font = Enum.Font.GothamBold
-Subtitle.TextXAlignment = Enum.TextXAlignment.Center
 Subtitle.TextTransparency = 1
-Subtitle.ZIndex = 7
 
--- Badge
-local Badge = Instance.new("Frame",Panel)
-Badge.Size = UDim2.new(0,58,0,22)
-Badge.Position = UDim2.new(0.5,-29,0,140)
-Badge.BackgroundColor3 = Color3.fromRGB(0,200,255)
-Badge.BackgroundTransparency = 1
-Badge.BorderSizePixel = 0
-Badge.ZIndex = 7
-Instance.new("UICorner",Badge).CornerRadius = UDim.new(0,5)
-local BadgeGrad = Instance.new("UIGradient",Badge)
-BadgeGrad.Color = ColorSequence.new(Color3.fromRGB(0,140,220),Color3.fromRGB(0,220,255))
-BadgeGrad.Rotation = 90
-
-local VerLabel = Instance.new("TextLabel",Badge)
-VerLabel.Size = UDim2.new(1,0,1,0)
-VerLabel.BackgroundTransparency = 1
-VerLabel.Text = "v 3.1"
-VerLabel.TextColor3 = Color3.fromRGB(3,6,16)
-VerLabel.TextSize = 11
-VerLabel.Font = Enum.Font.GothamBold
-VerLabel.TextTransparency = 1
-VerLabel.ZIndex = 8
-
--- Divider
-local Div = Instance.new("Frame",Panel)
-Div.Size = UDim2.new(0,440,0,1)
-Div.Position = UDim2.new(0.5,-220,0,174)
-Div.BackgroundColor3 = Color3.fromRGB(0,190,230)
-Div.BackgroundTransparency = 0.65
-Div.BorderSizePixel = 0
-Div.ZIndex = 6
-
--- Status
-local Status = Instance.new("TextLabel",Panel)
-Status.Size = UDim2.new(1,-100,0,20)
-Status.Position = UDim2.new(0,20,0,184)
+-- STATUS
+local Status = Instance.new("TextLabel")
+Status.Parent = Panel
+Status.Size = UDim2.new(1,-70,0,14)
+Status.Position = UDim2.new(0,15,0,102)
 Status.BackgroundTransparency = 1
 Status.Text = "Starting..."
-Status.TextColor3 = Color3.fromRGB(90,150,200)
-Status.TextSize = 12
+Status.TextColor3 = Color3.fromRGB(100,170,220)
+Status.TextSize = 9
 Status.Font = Enum.Font.Gotham
 Status.TextXAlignment = Enum.TextXAlignment.Left
 Status.TextTransparency = 1
-Status.ZIndex = 7
 
--- Pct
-local Pct = Instance.new("TextLabel",Panel)
-Pct.Size = UDim2.new(0,70,0,20)
-Pct.Position = UDim2.new(1,-86,0,184)
+-- %
+local Pct = Instance.new("TextLabel")
+Pct.Parent = Panel
+Pct.Size = UDim2.new(0,40,0,14)
+Pct.Position = UDim2.new(1,-52,0,102)
 Pct.BackgroundTransparency = 1
 Pct.Text = "0%"
 Pct.TextColor3 = Color3.fromRGB(0,220,255)
-Pct.TextSize = 13
+Pct.TextSize = 9
 Pct.Font = Enum.Font.GothamBold
-Pct.TextXAlignment = Enum.TextXAlignment.Right
 Pct.TextTransparency = 1
-Pct.ZIndex = 7
 
--- ══════════════════════════════════════════
---   PROGRESS BAR — FIX ô vuông
---   Dùng ClipsDescendants thay UICorner cho Fill
--- ══════════════════════════════════════════
-local TrackOuter = Instance.new("Frame",Panel)
-TrackOuter.Size = UDim2.new(0,440,0,8)
-TrackOuter.Position = UDim2.new(0.5,-220,0,212)
-TrackOuter.BackgroundColor3 = Color3.fromRGB(10,22,46)
-TrackOuter.BorderSizePixel = 0
-TrackOuter.ZIndex = 7
-TrackOuter.ClipsDescendants = true   -- ← clip fill bên trong, ko cần UICorner riêng
-Instance.new("UICorner",TrackOuter).CornerRadius = UDim.new(1,0)
+-- BAR
+local Track = Instance.new("Frame")
+Track.Parent = Panel
+Track.Size = UDim2.new(0,300,0,6)
+Track.Position = UDim2.new(0.5,-150,0,126)
+Track.BackgroundColor3 = Color3.fromRGB(10,22,46)
+Track.BorderSizePixel = 0
+Track.ClipsDescendants = true
+Instance.new("UICorner",Track).CornerRadius = UDim.new(1,0)
 
-local Fill = Instance.new("Frame",TrackOuter)
+local Fill = Instance.new("Frame")
+Fill.Parent = Track
 Fill.Size = UDim2.new(0,0,1,0)
 Fill.BackgroundColor3 = Color3.fromRGB(0,210,255)
 Fill.BorderSizePixel = 0
-Fill.ZIndex = 8
--- KHÔNG đặt UICorner cho Fill nữa → ko còn ô vuông lộ ra
-local FillGrad = Instance.new("UIGradient",Fill)
-FillGrad.Color = ColorSequence.new(Color3.fromRGB(0,120,220),Color3.fromRGB(120,240,255))
+Instance.new("UICorner",Fill).CornerRadius = UDim.new(1,0)
 
-local BarGlow = Instance.new("ImageLabel",Fill)
-BarGlow.Size = UDim2.new(1,30,6,0)
-BarGlow.Position = UDim2.new(0,-15,-2.5,0)
-BarGlow.BackgroundTransparency = 1
-BarGlow.Image = "rbxassetid://5028857084"
-BarGlow.ImageColor3 = Color3.fromRGB(0,210,255)
-BarGlow.ImageTransparency = 0.5
-BarGlow.ZIndex = 9
-
--- Tick marks
-for i = 1,8 do
-    local tk = Instance.new("Frame",TrackOuter)
-    tk.Size = UDim2.new(0,1,1,0)
-    tk.Position = UDim2.new(i/9,0,0,0)
-    tk.BackgroundColor3 = Color3.fromRGB(0,120,180)
-    tk.BackgroundTransparency = 0.6
-    tk.BorderSizePixel = 0
-    tk.ZIndex = 9
-end
-
--- Step dots
-local DotHolder = Instance.new("Frame",Panel)
-DotHolder.Size = UDim2.new(0,180,0,12)
-DotHolder.Position = UDim2.new(0.5,-90,0,228)
-DotHolder.BackgroundTransparency = 1
-DotHolder.ZIndex = 7
-
-local stepDots = {}
-for i = 1,9 do
-    local d = Instance.new("Frame",DotHolder)
-    d.Size = UDim2.new(0,8,0,8)
-    d.Position = UDim2.new((i-1)/9+0.03,0,0.5,-4)
-    d.BackgroundColor3 = Color3.fromRGB(20,45,80)
-    d.BorderSizePixel = 0
-    d.ZIndex = 8
-    Instance.new("UICorner",d).CornerRadius = UDim.new(1,0)
-    stepDots[i] = d
-end
-
--- Info row
-local InfoLeft = Instance.new("TextLabel",Panel)
-InfoLeft.Size = UDim2.new(0.5,-10,0,18)
-InfoLeft.Position = UDim2.new(0,20,0,250)
-InfoLeft.BackgroundTransparency = 1
-InfoLeft.Text = "🎮  "..game.Name
-InfoLeft.TextColor3 = Color3.fromRGB(55,90,130)
-InfoLeft.TextSize = 11
-InfoLeft.Font = Enum.Font.Gotham
-InfoLeft.TextXAlignment = Enum.TextXAlignment.Left
-InfoLeft.TextTransparency = 1
-InfoLeft.ZIndex = 7
-
-local InfoRight = Instance.new("TextLabel",Panel)
-InfoRight.Size = UDim2.new(0.5,-10,0,18)
-InfoRight.Position = UDim2.new(0.5,0,0,250)
-InfoRight.BackgroundTransparency = 1
-InfoRight.Text = "⏱  "..LOADING_TIME.."s est."
-InfoRight.TextColor3 = Color3.fromRGB(55,90,130)
-InfoRight.TextSize = 11
-InfoRight.Font = Enum.Font.Gotham
-InfoRight.TextXAlignment = Enum.TextXAlignment.Right
-InfoRight.TextTransparency = 1
-InfoRight.ZIndex = 7
-
--- Footer
-local Footer = Instance.new("TextLabel",Panel)
-Footer.Size = UDim2.new(1,-40,0,18)
-Footer.Position = UDim2.new(0,20,1,-26)
+-- FOOTER
+local Footer = Instance.new("TextLabel")
+Footer.Parent = Panel
+Footer.Size = UDim2.new(1,-20,0,12)
+Footer.Position = UDim2.new(0,10,1,-22)
 Footer.BackgroundTransparency = 1
-Footer.Text = "CryoXHUB  •  Please wait..."
-Footer.TextColor3 = Color3.fromRGB(35,65,100)
-Footer.TextSize = 11
+Footer.Text = "CryoXHUB • Please wait..."
+Footer.TextColor3 = Color3.fromRGB(45,80,120)
+Footer.TextSize = 7
 Footer.Font = Enum.Font.Gotham
-Footer.TextXAlignment = Enum.TextXAlignment.Center
 Footer.TextTransparency = 1
-Footer.ZIndex = 7
 
--- ══════════════════════════════════════════
---   SKIP BUTTON — FIX vị trí, không animate
--- ══════════════════════════════════════════
+-- SKIP BUTTON
 local SkipBtn = Instance.new("TextButton")
-SkipBtn.Size = UDim2.new(0,110,0,32)
--- Đặt thẳng vị trí đúng ngay từ đầu, KHÔNG dùng position tween
-SkipBtn.Position = UDim2.new(0.5,-55,0.5,178)
-SkipBtn.BackgroundColor3 = Color3.fromRGB(6,18,40)
-SkipBtn.BackgroundTransparency = 1   -- ẩn bằng transparency, ko phải position
+SkipBtn.Parent = Panel
+SkipBtn.Size = UDim2.new(0,70,0,20)
+SkipBtn.Position = UDim2.new(0.5,-35,1,-48)
+SkipBtn.BackgroundColor3 = Color3.fromRGB(8,22,42)
 SkipBtn.BorderSizePixel = 0
-SkipBtn.Text = "⏭  Skip"
+SkipBtn.Text = "Skip"
 SkipBtn.TextColor3 = Color3.fromRGB(0,200,245)
-SkipBtn.TextTransparency = 1
-SkipBtn.TextSize = 13
+SkipBtn.TextSize = 9
 SkipBtn.Font = Enum.Font.GothamBold
-SkipBtn.ZIndex = 10
-SkipBtn.AutoButtonColor = false
-SkipBtn.Parent = sg
-Instance.new("UICorner",SkipBtn).CornerRadius = UDim.new(0,8)
+SkipBtn.TextTransparency = 1
+SkipBtn.BackgroundTransparency = 1
+Instance.new("UICorner",SkipBtn).CornerRadius = UDim.new(0,6)
 
-local SkipStroke = Instance.new("UIStroke",SkipBtn)
+local SkipStroke = Instance.new("UIStroke")
+SkipStroke.Parent = SkipBtn
 SkipStroke.Color = Color3.fromRGB(0,180,220)
-SkipStroke.Thickness = 1.2
+SkipStroke.Thickness = 1
 SkipStroke.Transparency = 1
 
--- ══════════════════════════════════════════
---   DIALOG
--- ══════════════════════════════════════════
-local Dialog = Instance.new("Frame")
-Dialog.Size = UDim2.new(0,320,0,130)
-Dialog.Position = UDim2.new(0.5,-160,0.5,-65)
-Dialog.BackgroundColor3 = Color3.fromRGB(6,14,30)
-Dialog.BorderSizePixel = 0
-Dialog.ZIndex = 20
-Dialog.Visible = false
-Dialog.Parent = sg
-Instance.new("UICorner",Dialog).CornerRadius = UDim.new(0,14)
-local DStroke = Instance.new("UIStroke",Dialog)
-DStroke.Color = Color3.fromRGB(0,200,240)
-DStroke.Thickness = 1.5
-
-local DTitle = Instance.new("TextLabel",Dialog)
-DTitle.Size = UDim2.new(1,-30,0,30)
-DTitle.Position = UDim2.new(0,15,0,14)
-DTitle.BackgroundTransparency = 1
-DTitle.Text = "Skip loading?"
-DTitle.TextColor3 = Color3.fromRGB(200,230,255)
-DTitle.TextSize = 16
-DTitle.Font = Enum.Font.GothamBold
-DTitle.ZIndex = 21
-
-local DSub = Instance.new("TextLabel",Dialog)
-DSub.Size = UDim2.new(1,-30,0,24)
-DSub.Position = UDim2.new(0,15,0,42)
-DSub.BackgroundTransparency = 1
-DSub.Text = "Some features may not work correctly."
-DSub.TextColor3 = Color3.fromRGB(80,120,165)
-DSub.TextSize = 12
-DSub.Font = Enum.Font.Gotham
-DSub.ZIndex = 21
-
-local function makeDialogBtn(text,x,bgColor,txtColor)
-    local b = Instance.new("TextButton",Dialog)
-    b.Size = UDim2.new(0,130,0,34)
-    b.Position = UDim2.new(0,x,1,-50)
-    b.BackgroundColor3 = bgColor
-    b.BorderSizePixel = 0
-    b.Text = text
-    b.TextColor3 = txtColor
-    b.TextSize = 13
-    b.Font = Enum.Font.GothamBold
-    b.ZIndex = 22
-    b.AutoButtonColor = false
-    Instance.new("UICorner",b).CornerRadius = UDim.new(0,8)
-    return b
-end
-local DConfirm = makeDialogBtn("Yes, skip",20,Color3.fromRGB(0,180,220),Color3.fromRGB(3,6,16))
-local DCancel  = makeDialogBtn("Keep loading",170,Color3.fromRGB(12,28,55),Color3.fromRGB(0,180,220))
-local DCStroke = Instance.new("UIStroke",DCancel)
-DCStroke.Color = Color3.fromRGB(0,150,200)
-DCStroke.Thickness = 1
-
--- ══════════════════════════════════════════
---   TOAST
--- ══════════════════════════════════════════
-local function showToast(msg,color)
-    local toast = Instance.new("Frame")
-    toast.Size = UDim2.new(0,300,0,40)
-    toast.Position = UDim2.new(0.5,-150,0,-50)
-    toast.BackgroundColor3 = Color3.fromRGB(6,16,34)
-    toast.BorderSizePixel = 0
-    toast.ZIndex = 30
-    toast.Parent = sg
-    Instance.new("UICorner",toast).CornerRadius = UDim.new(0,10)
-    local ts = Instance.new("UIStroke",toast)
-    ts.Color = color or Color3.fromRGB(0,200,240)
-    ts.Thickness = 1.2
-    local tl = Instance.new("TextLabel",toast)
-    tl.Size = UDim2.new(1,-20,1,0)
-    tl.Position = UDim2.new(0,10,0,0)
-    tl.BackgroundTransparency = 1
-    tl.Text = msg
-    tl.TextColor3 = color or Color3.fromRGB(0,210,255)
-    tl.TextSize = 12
-    tl.Font = Enum.Font.GothamBold
-    tl.ZIndex = 31
-    Tween(toast,{Position=UDim2.new(0.5,-150,0,16)},0.4,Enum.EasingStyle.Back)
-    task.delay(2.5,function()
-        Tween(toast,{Position=UDim2.new(0.5,-150,0,-50)},0.4)
-        task.wait(0.45)
-        toast:Destroy()
-    end)
-end
-
--- ══════════════════════════════════════════
---   LOAD MAIN SCRIPT
--- ══════════════════════════════════════════
-local scriptDone = false
+-- LOAD SCRIPT
 task.spawn(function()
-    local ok,err = pcall(function()
-        loadstring(game:HttpGet("https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/CryoXHUB.lua"))()
+    pcall(function()
+        loadstring(game:HttpGet(
+            "https://raw.githubusercontent.com/vyhuynh24092021-debug/Reduce-lag-by_MN95/refs/heads/main/CryoXHUB.lua"
+        ))()
     end)
-    scriptDone = true
-    if not ok then warn("[CryoXHUB] Error: "..tostring(err)) end
 end)
 
--- ══════════════════════════════════════════
---   FADE OUT — dùng coroutine riêng, luôn destroy
--- ══════════════════════════════════════════
-local fadeActive = false
-local function doFadeOut()
-    if fadeActive then return end
-    fadeActive = true
-
-    local textObjs = {Title,Status,Pct,Footer,Icon,IconShadow,VerLabel,Subtitle,InfoLeft,InfoRight}
-    for _,o in ipairs(textObjs) do
-        Tween(o,{TextTransparency=1},0.4)
-    end
-    for _,o in ipairs({Badge,PanelGlow}) do
-        Tween(o,{BackgroundTransparency=1},0.4)
-    end
-    Tween(Orb1,{ImageTransparency=1},0.4)
-    Tween(Orb2,{ImageTransparency=1},0.4)
-    Tween(Orb3,{ImageTransparency=1},0.4)
-    Tween(BarGlow,{ImageTransparency=1},0.4)
-    Tween(PanelStroke,{Transparency=1},0.4)
-    Tween(Panel,{BackgroundTransparency=1},0.4)
-    Tween(TrackOuter,{BackgroundTransparency=1},0.4)
-    Tween(Fill,{BackgroundTransparency=1},0.4)
-    Tween(SkipBtn,{BackgroundTransparency=1,TextTransparency=1},0.3)
-    Tween(Grid,{ImageTransparency=1},0.4)
-    -- Backdrop fade cuối
-    task.wait(0.4)
-    Tween(Backdrop,{BackgroundTransparency=1},0.5)
-    task.wait(0.55)
-    -- Destroy chắc chắn
-    if sg and sg.Parent then
-        sg:Destroy()
-    end
-end
-
--- ══════════════════════════════════════════
---   ENTRY ANIMATION
--- ══════════════════════════════════════════
+-- FADE IN
+Tween(Panel,{BackgroundTransparency=0},0.45)
 task.wait(0.1)
 
--- Orb breathe
-task.spawn(function()
-    while sg and sg.Parent do
-        Tween(Orb1,{ImageTransparency=0.87},3,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut)
-        Tween(Orb2,{ImageTransparency=0.80},3.5,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut)
-        task.wait(3)
-        if not (sg and sg.Parent) then break end
-        Tween(Orb1,{ImageTransparency=0.78},3,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut)
-        Tween(Orb2,{ImageTransparency=0.88},3.5,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut)
-        task.wait(3)
-    end
-end)
+Tween(Stroke,{Transparency=0.35},0.3)
+Tween(Icon,{TextTransparency=0},0.3)
 
--- Panel fade in (không slide từ lạ)
-Tween(Panel,{BackgroundTransparency=0},0.5)
-task.wait(0.2)
-Tween(PanelStroke,{Transparency=0.3},0.4)
-Tween(Icon,{TextTransparency=0},0.4)
-Tween(IconShadow,{TextTransparency=0.7},0.4)
-task.wait(0.12)
-Tween(Title,{TextTransparency=0},0.35)
-task.wait(0.1)
+task.wait(0.08)
+
+Tween(Title,{TextTransparency=0},0.3)
 Tween(Subtitle,{TextTransparency=0},0.3)
-Tween(Badge,{BackgroundTransparency=0},0.3)
-Tween(VerLabel,{TextTransparency=0},0.3)
-task.wait(0.12)
+
+task.wait(0.08)
+
 Tween(Status,{TextTransparency=0},0.3)
 Tween(Pct,{TextTransparency=0},0.3)
 Tween(Footer,{TextTransparency=0},0.3)
-Tween(InfoLeft,{TextTransparency=0},0.3)
-Tween(InfoRight,{TextTransparency=0},0.3)
-task.wait(0.15)
--- Skip button fade in tại chỗ (không dịch chuyển)
-Tween(SkipBtn,{BackgroundTransparency=0,TextTransparency=0},0.4)
-Tween(SkipStroke,{Transparency=0.4},0.4)
 
--- Icon pulse
+task.wait(0.08)
+
+Tween(SkipBtn,{
+    BackgroundTransparency=0,
+    TextTransparency=0
+},0.3)
+
+Tween(SkipStroke,{
+    Transparency=0.4
+},0.3)
+
+-- ICON PULSE
 task.spawn(function()
-    while sg and sg.Parent do
-        Tween(Icon,{TextTransparency=0.4,TextSize=50},0.85,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut)
-        task.wait(0.85)
-        if not (sg and sg.Parent) then break end
-        Tween(Icon,{TextTransparency=0,TextSize=46},0.85,Enum.EasingStyle.Sine,Enum.EasingDirection.InOut)
-        task.wait(0.85)
+    while sg.Parent do
+        Tween(Icon,{TextSize=34},0.8,Enum.EasingStyle.Sine)
+        task.wait(0.8)
+        Tween(Icon,{TextSize=30},0.8,Enum.EasingStyle.Sine)
+        task.wait(0.8)
     end
 end)
 
--- Particles
-task.spawn(function()
-    while sg and sg.Parent do
-        for _,p in ipairs(particles) do
-            local pos = p.frame.Position
-            local newY = pos.Y.Scale - p.speed
-            local newX = pos.X.Scale + p.drift
-            if newY < -0.05 then newY = 1.05 end
-            if newX < 0 then newX = 1 elseif newX > 1 then newX = 0 end
-            p.frame.Position = UDim2.new(newX,0,newY,0)
-        end
-        task.wait()
-    end
-end)
-
--- ══════════════════════════════════════════
---   SKIP HOVER
--- ══════════════════════════════════════════
+-- HOVER
 SkipBtn.MouseEnter:Connect(function()
-    Tween(SkipBtn,{BackgroundColor3=Color3.fromRGB(0,180,220),TextColor3=Color3.fromRGB(3,6,16)},0.2)
-    Tween(SkipStroke,{Transparency=1},0.2)
+    Tween(SkipBtn,{
+        BackgroundColor3 = Color3.fromRGB(0,180,220),
+        TextColor3 = Color3.fromRGB(3,6,16)
+    },0.15)
+
+    Tween(SkipStroke,{
+        Transparency = 1
+    },0.15)
 end)
+
 SkipBtn.MouseLeave:Connect(function()
-    Tween(SkipBtn,{BackgroundColor3=Color3.fromRGB(6,18,40),TextColor3=Color3.fromRGB(0,200,245)},0.2)
-    Tween(SkipStroke,{Transparency=0.4},0.2)
+    Tween(SkipBtn,{
+        BackgroundColor3 = Color3.fromRGB(8,22,42),
+        TextColor3 = Color3.fromRGB(0,200,245)
+    },0.15)
+
+    Tween(SkipStroke,{
+        Transparency = 0.4
+    },0.15)
 end)
 
--- ══════════════════════════════════════════
---   SKIP CLICK
--- ══════════════════════════════════════════
-local skipRequested = false
-
-SkipBtn.MouseButton1Click:Connect(function()
-    if fadeActive then return end
-    Dialog.Visible = true
-end)
-DCancel.MouseButton1Click:Connect(function()
-    Dialog.Visible = false
-end)
-DConfirm.MouseButton1Click:Connect(function()
-    if fadeActive then return end
-    skipRequested = true
-    Dialog.Visible = false
-    showToast("⚡  Skipped — loading in background",Color3.fromRGB(0,210,255))
-    task.wait(0.4)
-    doFadeOut()
-end)
-
--- ══════════════════════════════════════════
---   PROGRESS SEQUENCE
--- ══════════════════════════════════════════
+-- STEPS
 local Steps = {
-    {text="Initializing core modules...",   icon="🔧"},
-    {text="Loading UI components...",        icon="🖥"},
-    {text="Connecting to services...",       icon="🌐"},
-    {text="Fetching configuration...",       icon="📦"},
-    {text="Applying patches...",             icon="🩹"},
-    {text="Optimizing performance...",       icon="⚡"},
-    {text="Running diagnostics...",          icon="🔍"},
-    {text="Finalizing environment...",       icon="🛠"},
-    {text="Ready.",                          icon="✓"},
+    "Initializing modules...",
+    "Loading UI...",
+    "Connecting services...",
+    "Applying configs...",
+    "Optimizing...",
+    "Running diagnostics...",
+    "Finalizing...",
+    "Ready."
 }
 
-task.spawn(function()
-    local stepCount = #Steps
-    local interval  = LOADING_TIME / stepCount
+local fadeActive = false
 
-    for i,step in ipairs(Steps) do
-        if skipRequested then return end
+local function FadeOut()
+    if fadeActive then return end
+    fadeActive = true
 
-        if stepDots[i] then
-            Tween(stepDots[i],{BackgroundColor3=Color3.fromRGB(0,210,255)},0.3)
-        end
+    Tween(Panel,{BackgroundTransparency=1},0.35)
+    Tween(Stroke,{Transparency=1},0.35)
 
-        Status.Text = step.icon.."  "..step.text
-        local pct     = i/stepCount
-        local prevPct = (i-1)/stepCount
-        Tween(Fill,{Size=UDim2.new(pct,0,1,0)},interval*0.85,Enum.EasingStyle.Quart)
-
-        local startN = math.floor(prevPct*100)
-        local endN   = math.floor(pct*100)
-        local t0     = tick()
-        local dur    = interval*0.85
-        task.spawn(function()
-            while not skipRequested do
-                local frac = math.min((tick()-t0)/dur,1)
-                Pct.Text = math.floor(startN+(endN-startN)*frac).."%"
-                if frac >= 1 then break end
-                task.wait()
-            end
-        end)
-
-        task.wait(interval)
-        if skipRequested then return end
+    for _,v in ipairs({
+        Title,Subtitle,Status,Pct,Footer,Icon
+    }) do
+        Tween(v,{TextTransparency=1},0.3)
     end
 
-    -- Xong → tự động fade out
-    Status.Text       = "✓   Loaded successfully"
-    Status.TextColor3 = Color3.fromRGB(0,220,255)
-    Pct.Text          = "100%"
-    showToast("✅  CryoXHUB loaded!",Color3.fromRGB(0,220,120))
-    task.wait(1.0)
-    doFadeOut()   -- ← luôn gọi được, ko bao giờ bỏ sót
+    Tween(SkipBtn,{
+        BackgroundTransparency=1,
+        TextTransparency=1
+    },0.3)
+
+    Tween(Grid,{
+        ImageTransparency=1
+    },0.35)
+
+    task.wait(0.4)
+
+    Tween(Backdrop,{
+        BackgroundTransparency=1
+    },0.4)
+
+    task.wait(0.45)
+
+    sg:Destroy()
+end
+
+-- SKIP
+SkipBtn.MouseButton1Click:Connect(function()
+    FadeOut()
+end)
+
+-- LOADING
+task.spawn(function()
+    local total = #Steps
+    local interval = LOADING_TIME / total
+
+    for i,v in ipairs(Steps) do
+        if fadeActive then return end
+
+        Status.Text = v
+
+        local pct = i / total
+
+        Tween(
+            Fill,
+            {Size = UDim2.new(pct,0,1,0)},
+            interval * 0.85
+        )
+
+        local start = math.floor(((i-1)/total)*100)
+        local goal  = math.floor(pct*100)
+
+        local t0 = tick()
+
+        while tick()-t0 < interval*0.85 do
+            local frac = (tick()-t0)/(interval*0.85)
+            Pct.Text = math.floor(start + (goal-start)*frac).."%"
+            task.wait()
+        end
+
+        Pct.Text = goal.."%"
+
+        task.wait(interval)
+    end
+
+    Status.Text = "Loaded successfully"
+    Pct.Text = "100%"
+
+    task.wait(1)
+
+    FadeOut()
 end)
